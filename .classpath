@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.jar"/>
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.servlet.jar"/>
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jackson.jar"/>
+	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jaxb.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

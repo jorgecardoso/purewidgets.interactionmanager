@@ -13,7 +13,7 @@ public class InteractionManagerApplication extends Application {
 	private static final Logger log; 
 	static {
 		log = Logger.getLogger("InteractionManagerApplication");
-		//log.setLevel(Level.ALL);
+		log.setLevel(Level.INFO);
 	}
 	
 	@Override
@@ -22,11 +22,12 @@ public class InteractionManagerApplication extends Application {
 		// new instance of HelloWorldResource.
         Router router = new Router(getContext());
         
-        this.getTunnelService().setExtensionsTunnel(true);
-        this.getTunnelService().setMediaTypeParameter("output");
-        this.getMetadataService().addExtension("jsonp", MediaType.APPLICATION_JAVASCRIPT);
-        
+        //this.getTunnelService().setExtensionsTunnel(true);
+        //this.getTunnelService().setMediaTypeParameter("output");
 
+        //this.getMetadataService().addExtension("jsonp", MediaType.APPLICATION_JAVASCRIPT, true);
+        
+        //this.getMetadataService().addCommonExtensions()
         //router.attachDefault(HelloWorldResource.class);
         router.attach("/rest/", HelloWorldResource.class);
         //router.attach("/places/{placeid}/applications/{appid}/widgets/{widgetid}", WidgetResource.class);  

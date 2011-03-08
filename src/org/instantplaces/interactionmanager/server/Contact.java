@@ -3,8 +3,10 @@ package org.instantplaces.interactionmanager.server;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+
 @XmlRootElement
-public class Contact {
+public class Contact  {
 	@XmlAttribute
 	public String name;
 	
