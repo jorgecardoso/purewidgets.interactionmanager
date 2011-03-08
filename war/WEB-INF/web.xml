@@ -5,20 +5,18 @@
 
 <web-app>
   
-  <!-- Servlets -->
-  <servlet>
-    <servlet-name>greetServlet</servlet-name>
-    <servlet-class>org.instantplaces.interactionmanager.server.GreetingServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/interactionmanager/greet</url-pattern>
-  </servlet-mapping>
-  
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>InteractionManager.html</welcome-file>
-  </welcome-file-list>
+<servlet>
+           <servlet-name>RestletServlet</servlet-name>
+                 <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+                 <init-param>
+                         <param-name>org.restlet.application</param-name>
+                         <param-value>org.instantplaces.interactionmanager.server.FirstStepsApplication</param-value>
+                 </init-param>
+         </servlet>
+ <!-- Catch all requests -->
+ <servlet-mapping>
+  <servlet-name>RestletServlet</servlet-name>
+  <url-pattern>/*</url-pattern>
+ </servlet-mapping>
 
 </web-app>
