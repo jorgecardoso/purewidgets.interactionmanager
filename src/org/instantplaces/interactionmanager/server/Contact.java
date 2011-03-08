@@ -1,26 +1,32 @@
 package org.instantplaces.interactionmanager.server;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class Contact {
+	@XmlAttribute
+	public String name;
+	
+	@XmlAttribute
+	public int age;
+	
+	@XmlAttribute
+	public int height;
 
-	 public String name;
-	 public int age;
-	 public int height;
-		
+	/**
+	 * Needed because of the JAXB annotations...
+	 */
+	public Contact() {
+
+	}
+
 	public Contact(String name, int age) {
 		this.name = name;
 		this.age = age;
-		height = 10;
+		this.height = 10;
 	}
+
 	
-	public String getName() {
-		return name;
-	}
-	public int getAge() {
-		return age;
-	}
-	public int getHeight() {
-		return height;
-	}
-	
+
 }

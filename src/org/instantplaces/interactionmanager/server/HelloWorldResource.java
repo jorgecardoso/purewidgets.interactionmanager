@@ -5,37 +5,20 @@ import org.restlet.resource.ServerResource;
 
 import org.restlet.ext.jackson.*;
 
-public class HelloWorldResource extends ServerResource {
+public class HelloWorldResource extends InstantPlacesGenericResource {
 	
-	Contact c;
-	String callback = "call";
+	//Contact c;
+	//String callback = "call";
 	
 	@Override
 	public void doInit() {
+		super.doInit();
+		this.setResource(new Contact("jorge cardoso", 30)); 
 		//System.out.println(this.getReference());
-		c = new Contact("jorge cardoso", 30);
-		callback = this.getQuery().getFirstValue("callback", "defaultCallback");
+		//resource = new Contact("jorge cardoso", 30);
+		//callback = this.getQuery().getFirstValue("callback", "defaultCallback");
 	}
 
 	
-	@Get("jsonp")
-    public String representJsonp() {
-		System.out.println(this.getReference());
-		JacksonRepresentation jr = new JacksonRepresentation( c );
-		String s = "";
-		try {
-			s = callback + "(" + jr.getText() + ")";
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-        return s;
-	}
-	
-	@Get("json")
-	 public Contact representJson() {
-			//System.out.println(this.getReference());
-			return c;
-			
-		}
 
 }
