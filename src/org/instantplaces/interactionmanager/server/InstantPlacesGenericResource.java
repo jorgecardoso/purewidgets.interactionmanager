@@ -1,19 +1,30 @@
 package org.instantplaces.interactionmanager.server;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.restlet.ext.jackson.JacksonConverter;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.DeserializationProblemHandler;
+import org.eclipse.jdt.internal.compiler.ast.ThisReference;
+import org.restlet.Response;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.jaxb.JaxbRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Status;
 
 /**
  * This class provides generic functions for resources. It provides subclasses with
@@ -22,18 +33,24 @@ import org.restlet.data.Method;
  * 
  * @author Jorge C. S. Cardoso
  *
- * @param <T> The type of object that is going to be serialized and sent back to 
+ * @param <?> The type of object that is going to be serialized and sent back to 
  * the client.
  */
-public abstract class InstantPlacesGenericResource<T> extends ServerResource {
+public abstract class InstantPlacesGenericResource extends ServerResource {
 	static Logger log = Logger.getLogger("InteractionManagerApplication"); 
+	
+	/**
+	 * The accepted types.
+	 */
+	protected static enum ContentType {JSONP, JSON, XML, HTML};
+	
 	
 	
 	/**
 	 * This is what will be serialized (in JSON, JSONP, XML, etc) 
 	 * back to the client
 	 **/
-	protected T resource;
+	protected Object resource;
 
 	/**
 	 * If the request is for JSONP, this is the name of the callback function
@@ -49,6 +66,10 @@ public abstract class InstantPlacesGenericResource<T> extends ServerResource {
 	 */	
 	protected String failureCallback;
 	
+	/**
+	 * The name of the data format to be sent back.
+	 * We're bypassing Restlet's automatic content-negotiation and conversion.
+	 */
 	protected String contentType;
 	
 	public InstantPlacesGenericResource() {
@@ -65,22 +86,43 @@ public abstract class InstantPlacesGenericResource<T> extends ServerResource {
 	 */
 	@Override
 	public void doInit() {
-		contentType = this.getQuery().getFirstValue("output", "JSONP");
-		log.info("Using content-type: " + contentType);
+		/*
+		 * Read the user specified content-type. 
+		 */
+		contentType = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("output", "");
+		
+		/*
+		 * Read the user specified callback function name (used for JSONP only)
+		 */
 		callback = this.getQuery().getFirstValue("callback", "defaultCallback");
 		failureCallback = this.getQuery().getFirstValue("failurecallback",
 				"defaultFailureCallback");
 				
-		Logger.getLogger("InteractionManagerApplication").info("Using callback: " + callback + " and failureCallback: " +failureCallback);
+		log.info("Client specified content-type: " + contentType);
+		if (contentType.equalsIgnoreCase(ContentType.JSONP.name())) {
+			log.info("Using callback: " + callback + " and failureCallback: " +failureCallback);
+		}
+		
+		/*
+		 * Check if the user specified content-type (if any) matches any of the 
+		 * accepted ones.
+		 */
+		for (ContentType t: ContentType.values()) {
+			if (t.name().equalsIgnoreCase(contentType)) {
+				return;
+			}
+		}
+		
+		/*
+		 * If not, return the error message
+		 */
+		String errorMessage =  "Sorry, you have to specify a valid content-type.";
+		errorMessage += "Valid types are: " + Arrays.toString(ContentType.values());
+		//this.setStatus(status)
+		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+		
 	}
 	
-	@Override
-	protected List<Variant> getVariants(Method method) {
-		ArrayList<Variant> l = new ArrayList<Variant>();
-		
-		
-		return l;
-	}
 
 	
 	/**
@@ -88,78 +130,102 @@ public abstract class InstantPlacesGenericResource<T> extends ServerResource {
 	 * 
 	 * @param resource
 	 */
-	public void setResource(T resource) {
+	public void setResource(Object resource) {
 		this.resource = resource;
 	}
 	
-	@Override
-	protected Representation get() {
-		log.warning("Received request for full representation");
-		return get(null);
+	@Put("json")
+	public Representation acceptItemToPut(Representation entity) { 
+
+		JacksonRepresentation jr = new JacksonRepresentation(entity, this.resource.getClass());
+		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
+			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
+				log.warning("Ignoring : " + propertyName);
+				try {
+					ctxt.getParser().skipChildren();
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return true;
+			}
+		});
+		
+		
+		Object object = jr.getObject();
+		Object toClient = doPut(object);
+		if (toClient instanceof Error) {
+			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+		}
+		return representAsJSON(toClient);
 	}
 	
-	@Override
-	protected Representation get(Variant variant) {
+	@Post("json")
+	public Representation acceptItem(Representation entity) { 
 		
-		//return this.getConverterService().toRepresentation(this.resource, variant, this);
-
-		//variant.getMediaType().
-		/*if (variant.getMediaType().equals(MediaType.APPLICATION_JAVASCRIPT)) {
-			return representAsJSONP();
-		} else if (variant.getMediaType().equals(MediaType.APPLICATION_JSON)) {
-				return representAsJSON();
-		} else if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
-			return representAsXML();
-		} else if (variant.isCompatible(VARIANT_HTML)) {
-			return representAsHTML();
-		}*/
-		if (this.contentType.equalsIgnoreCase("JSONP")) {
-			return representAsJSONP();
-		} else if (this.contentType.equalsIgnoreCase("JSON")) {
-			return representAsJSON();
-		} else if (this.contentType.equalsIgnoreCase("XML")) {
-			return representAsXML();
-		} else if (this.contentType.equalsIgnoreCase("HTML")) {
-			return representAsHTML();
-		} 
-		return null;
+		JacksonRepresentation jr = new JacksonRepresentation(entity, this.resource.getClass());
+		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
+			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
+				log.warning("Ignoring : " + propertyName);
+				try {
+					ctxt.getParser().skipChildren();
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return true;
+			}
+		});
 		
-	}
-
-	public Representation representAsHTML() {
-		return new StringRepresentation(this.resource.toString()); 
+		
+		Object object = jr.getObject();
+		
+		return representAsJSON(doPost(object));
 	}
 	
-
-	public Representation representAsJSONP() {
-		// System.out.println(this.getReference());
-		Logger.getLogger("InteractionManagerApplication").info("Representing as JSONP");
-		
-		JacksonRepresentation<T> jr = new JacksonRepresentation<T>(this.resource);
+	protected abstract Object doPost(Object incoming);
+	protected abstract Object doPut(Object incoming);
+	
+	@Get("html")
+	public Representation representAsHTML(Object object) {
+		log.info("Representing as HTML");
+		StringRepresentation sr = new StringRepresentation(object.toString());
+		sr.setMediaType(MediaType.TEXT_HTML);
+		return sr;
+	}
+	
+	@Get("jsonp")
+	public Representation representAsJSONP(Object object) {
+		log.info("Representing as JSONP");
 		
 		String s = "";
 		try {
+			JacksonRepresentation jr = new JacksonRepresentation(object);
+			
+			
 			s = callback + "(" + jr.getText() + ")";
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.severe("Oops: " + e.getMessage());			
+			 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry an internal error has occurred.");
 		}
 		return new StringRepresentation(s);
 	}
 		
-	public Representation representAsXML() {
-		Logger.getLogger("InteractionManagerApplication").info("Representing as XML" );
-		JaxbRepresentation<T> jr = new JaxbRepresentation<T>(this.resource);
-		
+	@Get("xml")
+	public Representation representAsXML(Object object) {
+		log.info("Representing as XML" );
+		JaxbRepresentation jr = null;
+		jr = new JaxbRepresentation(object);
 		return jr;
-
 	}
 	
-	public Representation representAsJSON() {
-		Logger.getLogger("InteractionManagerApplication").info("Representing as JSON" );
-		JacksonRepresentation<T> jr = new JacksonRepresentation<T>(this.resource);
-		
+	@Get("json")
+	public Representation representAsJSON(Object object) {
+		log.info("Representing as JSON" );
+		JacksonRepresentation jr = new JacksonRepresentation(object);
 		return jr;
-
 	}
 	
 

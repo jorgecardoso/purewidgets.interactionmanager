@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.servlet.jar"/>
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jackson.jar"/>
 	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jaxb.jar"/>
+	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/gwt-log-3.1.0.jar"/>
+	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.codehaus.jackson.mapper.jar"/>
+	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.codehaus.jackson.core.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

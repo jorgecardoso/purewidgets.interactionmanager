@@ -23,14 +23,18 @@ public class InteractionManagerApplication extends Application {
         Router router = new Router(getContext());
         
         //this.getTunnelService().setExtensionsTunnel(true);
-        //this.getTunnelService().setMediaTypeParameter("output");
-
-        //this.getMetadataService().addExtension("jsonp", MediaType.APPLICATION_JAVASCRIPT, true);
+        this.getTunnelService().setMediaTypeParameter("output");
+        
+        //this.getMetadataService().clearExtensions();
+        
+        this.getMetadataService().addExtension("jsonp", MediaType.APPLICATION_JAVASCRIPT, true);
+        
+        //this.getMetadataService().
         
         //this.getMetadataService().addCommonExtensions()
         //router.attachDefault(HelloWorldResource.class);
         router.attach("/rest/", HelloWorldResource.class);
-        //router.attach("/places/{placeid}/applications/{appid}/widgets/{widgetid}", WidgetResource.class);  
+        router.attach("/domain/{domainid}/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);  
         
      // Attach the handlers to the root router  
        // router.attach("/users/{user}", account);  
