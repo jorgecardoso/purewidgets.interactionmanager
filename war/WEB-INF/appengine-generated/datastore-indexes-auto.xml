@@ -1,4 +1,15 @@
-<!-- Indices written at Wed, 9 Mar 2011 22:23:09 GMT -->
+<!-- Indices written at Thu, 10 Mar 2011 19:38:57 WET -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 14 times in query history -->
+    <datastore-index kind="ApplicationDO" ancestor="true" source="auto">
+        <property name="applications_INTEGER_IDX" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 9 times in query history -->
+    <datastore-index kind="WidgetDO" ancestor="true" source="auto">
+        <property name="widgets_INTEGER_IDX" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

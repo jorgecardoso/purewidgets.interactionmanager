@@ -4,12 +4,12 @@
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.servlet.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jackson.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.restlet.ext.jaxb.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/gwt-log-3.1.0.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.codehaus.jackson.mapper.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/org.codehaus.jackson.core.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.restlet.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.restlet.ext.servlet.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.restlet.ext.jackson.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.restlet.ext.jaxb.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/gwt-log-3.1.0.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.codehaus.jackson.mapper.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/org.codehaus.jackson.core.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

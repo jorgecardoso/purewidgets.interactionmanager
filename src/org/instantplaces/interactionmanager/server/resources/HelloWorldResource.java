@@ -1,10 +1,13 @@
-package org.instantplaces.interactionmanager.server;
+package org.instantplaces.interactionmanager.server.resources;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
 
+import org.instantplaces.interactionmanager.server.PMF;
+import org.instantplaces.interactionmanager.server.dataobjects.ContactDO;
 import org.instantplaces.interactionmanager.shared.Contact;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -15,40 +18,22 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 public class HelloWorldResource extends InstantPlacesGenericResource {
-	static Logger log = Logger.getLogger("InteractionManagerApplication"); 
+	
 	
 	//Contact c;
 	//String callback = "call";
 	
-	@Override
-	public void doInit() {
-		super.doInit();
-		this.setResource(new ContactImpl("jorge cardoso", 30)); 
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		/*ContactImpl e = new ContactImpl("Alfred", 31);
-
-        try {
-            pm.makePersistent(e);
-        } finally {
-            pm.close();
-        }*/
-		//System.out.println(this.getReference());
-		//resource = new Contact("jorge cardoso", 30);
-		//callback = this.getQuery().getFirstValue("callback", "defaultCallback");
-	}
-
+	
 	
 	@Override
 	protected Object doPost(Object in) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		ContactImpl incoming = (ContactImpl)in;
+		ContactDO incoming = (ContactDO)in;
 		
-		Key k = KeyFactory.createKey(ContactImpl.class.getSimpleName(), incoming.getEmail());
-		ContactImpl fromDS = null;
+		Key k = KeyFactory.createKey(ContactDO.class.getSimpleName(), incoming.getEmail());
+		ContactDO fromDS = null;
 		try {
-			fromDS = pm.getObjectById(ContactImpl.class, k);
+			fromDS = pm.getObjectById(ContactDO.class, k);
 		} catch (Exception e) {
 			log.warning("Could not retrieve object");
 		}
@@ -73,12 +58,12 @@ public class HelloWorldResource extends InstantPlacesGenericResource {
 	protected Object doPut(Object in) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		ContactImpl incoming = (ContactImpl)in;
+		ContactDO incoming = (ContactDO)in;
 		
-		Key k = KeyFactory.createKey(ContactImpl.class.getSimpleName(), incoming.getEmail());
-		ContactImpl fromDS = null;
+		Key k = KeyFactory.createKey(ContactDO.class.getSimpleName(), incoming.getEmail());
+		ContactDO fromDS = null;
 		try {
-			fromDS = pm.getObjectById(ContactImpl.class, k);
+			fromDS = pm.getObjectById(ContactDO.class, k);
 		} catch (Exception e) {
 			log.warning("Could not retrieve object");
 		}
@@ -101,6 +86,19 @@ public class HelloWorldResource extends InstantPlacesGenericResource {
 		
 		}
 		return incoming;
+	}
+
+
+	@Override
+	protected Object doGet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	protected Class getResourceClass() {
+		return ContactDO.class;
 	}
 
 }

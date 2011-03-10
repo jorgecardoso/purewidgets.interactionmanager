@@ -1,16 +1,24 @@
-package org.instantplaces.interactionmanager.server;
+package org.instantplaces.interactionmanager.server.resources;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 import org.eclipse.jdt.internal.compiler.ast.ThisReference;
+import org.instantplaces.interactionmanager.server.PMF;
+import org.instantplaces.interactionmanager.server.dataobjects.ApplicationDO;
+import org.instantplaces.interactionmanager.server.dataobjects.PlaceDO;
+import org.instantplaces.interactionmanager.server.dataobjects.WidgetDO;
 import org.restlet.Response;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.jaxb.JaxbRepresentation;
@@ -37,20 +45,13 @@ import org.restlet.data.Status;
  * the client.
  */
 public abstract class InstantPlacesGenericResource extends ServerResource {
-	static Logger log = Logger.getLogger("InteractionManagerApplication"); 
+	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
 	/**
 	 * The accepted types.
 	 */
 	protected static enum ContentType {JSONP, JSON, XML, HTML};
 	
-	
-	
-	/**
-	 * This is what will be serialized (in JSON, JSONP, XML, etc) 
-	 * back to the client
-	 **/
-	protected Object resource;
 
 	/**
 	 * If the request is for JSONP, this is the name of the callback function
@@ -72,8 +73,10 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	 */
 	protected String contentType;
 	
+	protected PersistenceManager pm; 
+	
 	public InstantPlacesGenericResource() {
-		resource = null;
+		
 	}
 	
 	/**
@@ -81,11 +84,11 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	 * names. 
 	 * 
 	 * Subclasses should override this method and call super.doInit() 
-	 * to make sure that the callbacks are properly parsed, and setResource() to
-	 * set the resource that is going to be serialized.
+	 * to make sure that the callbacks are properly parsed.
 	 */
 	@Override
 	public void doInit() {
+		pm = PMF.get().getPersistenceManager();
 		/*
 		 * Read the user specified content-type. 
 		 */
@@ -123,21 +126,46 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		
 	}
 	
+	protected abstract Object doPost(Object incoming);
+	protected abstract Object doPut(Object incoming);
+	protected abstract Object doGet();
+	protected abstract Class getResourceClass();
+
 
 	
-	/**
-	 * Sets the resource that is going to be serialized.
-	 * 
-	 * @param resource
-	 */
-	public void setResource(Object resource) {
-		this.resource = resource;
+	@Get("html")
+	public Representation returnAsHTML() {
+		Object object = doGet();
+		pm.close();
+		return this.representAsHTML(object);
+		
+	}
+	
+	@Get("xml")
+	public Representation returnAsXML() {
+		Object object = doGet();
+		pm.close();
+		return this.representAsXML(object);
+	}
+	
+	@Get("json")
+	public Representation returnAsJSON() {
+		Object object = doGet();
+		pm.close();
+		return this.representAsJSON(object);
+	}
+	
+	@Get("jsonp")
+	public Representation returnAsJSONP() {
+		Object object = doGet();
+		pm.close();
+		return this.representAsJSONP(object);
 	}
 	
 	@Put("json")
 	public Representation acceptItemToPut(Representation entity) { 
 
-		JacksonRepresentation jr = new JacksonRepresentation(entity, this.resource.getClass());
+		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
 		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
 				log.warning("Ignoring : " + propertyName);
@@ -158,13 +186,14 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		if (toClient instanceof Error) {
 			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
 		}
+		pm.close();
 		return representAsJSON(toClient);
 	}
 	
 	@Post("json")
 	public Representation acceptItem(Representation entity) { 
 		
-		JacksonRepresentation jr = new JacksonRepresentation(entity, this.resource.getClass());
+		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
 		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
 				log.warning("Ignoring : " + propertyName);
@@ -181,14 +210,15 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		
 		
 		Object object = jr.getObject();
-		
+		//finally {
+		pm.close();
+		//}
 		return representAsJSON(doPost(object));
 	}
 	
-	protected abstract Object doPost(Object incoming);
-	protected abstract Object doPut(Object incoming);
 	
-	@Get("html")
+	
+	
 	public Representation representAsHTML(Object object) {
 		log.info("Representing as HTML");
 		StringRepresentation sr = new StringRepresentation(object.toString());
@@ -196,7 +226,7 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return sr;
 	}
 	
-	@Get("jsonp")
+
 	public Representation representAsJSONP(Object object) {
 		log.info("Representing as JSONP");
 		
@@ -213,7 +243,7 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return new StringRepresentation(s);
 	}
 		
-	@Get("xml")
+
 	public Representation representAsXML(Object object) {
 		log.info("Representing as XML" );
 		JaxbRepresentation jr = null;
@@ -221,13 +251,99 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return jr;
 	}
 	
-	@Get("json")
+
 	public Representation representAsJSON(Object object) {
 		log.info("Representing as JSON" );
 		JacksonRepresentation jr = new JacksonRepresentation(object);
 		return jr;
 	}
 	
+	
+	public PlaceDO getPlaceDO( String placeId ) {
+		
+		
+		Query query = pm.newQuery(PlaceDO.class);
+	    query.setFilter("id == idParam");
+	    query.declareParameters("String idParam");
 
+	    
+	    try {
+	        List<Object> results = (List<Object>) query.execute(placeId);
+	        if (!results.isEmpty()) {
+	        	PlaceDO place = (PlaceDO)results.get(0);
+	        	//ApplicationDO [] apps = place.getApplications();
+	        	//for ()
+	        	return place;
+	        } 
+	    } finally {
+	        query.closeAll();
+	        //pm.close();
+	    }
+	    //log.info("Place not found");
+	    return null;
+	}
+	
+	public ApplicationDO[] getApplicationsDO( String placeId ) {
+		PlaceDO place = getPlaceDO(placeId);
+		if ( place == null ) {
+			return null;
+		}
+		//log.info("Place: " + place.toString());
+		return place.getApplications();
+	}	
+	
+	public ApplicationDO getApplicationDO( String placeId, String applicationId ) {
+		ApplicationDO[] applications = getApplicationsDO(placeId);
+		if ( applications == null ) {
+			return null;
+		}
+		for ( ApplicationDO app : applications ) {
+			log.info("APP: "  + app.toString());
+			if (app.getId().equals(applicationId)) {
+				return app;
+			}
+		}
+		return null;
+	}	
+	
+	public WidgetDO[] getWidgetsDO(String placeId, String applicationId) {
+		ApplicationDO application = getApplicationDO(placeId, applicationId);
+		if (application == null) {
+			return null;
+		}
+		return application.getWidgets();
+	}
+	
+	public WidgetDO getWidgetDO(String placeId, String applicationId, String widgetId) {
+		WidgetDO widgets[] = getWidgetsDO(placeId, applicationId);
+		
+		if ( widgets == null ) {
+			return null;
+		}
+		for ( WidgetDO widget : widgets ) {
+			if (widget.getId().equals(widgetId)) {
+				return widget;
+			}
+		}
+		return null;
+	}
+/*
+	public Object getDO(Class c, String id ) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		Query query = pm.newQuery(c);
+	    query.setFilter("id == idParam");
+	    query.declareParameters("String idParam");
 
+	    try {
+	        List<Object> results = (List<Object>) query.execute(id);
+	        if (!results.isEmpty()) {
+	            return results.get(0);
+	        } else {
+	            return null;
+	        }
+	    } finally {
+	        query.closeAll();
+	    }
+	}*/
 }

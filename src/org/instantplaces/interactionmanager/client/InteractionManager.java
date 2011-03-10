@@ -21,7 +21,7 @@ public class InteractionManager implements EntryPoint {
 	
 	
 	RequestBuilder rb;
-	String url = "/rest/?output=json";
+	String url = "/place/1/application/1/widget/?output=json";
 	
 	Label l; 
 	
@@ -33,14 +33,17 @@ public class InteractionManager implements EntryPoint {
 		l = new Label("sdfsd");
 		RootPanel.get().add(l);
 		
-		ContactJSON c = ContactJSON.getNew();//ContactJSON.fromJSON("{\"name\":\"jorge\", \"age\":3, \"height\":4}");
-		c.setName("jorge");
-		c.setEmail("jorge@ieee.com");
+		//ContactJSON c = ContactJSON.getNew();//ContactJSON.fromJSON("{\"name\":\"jorge\", \"age\":3, \"height\":4}");
+		//c.setName("jorge");
+		//c.setEmail("jorge@ieee.com");
+		WidgetJSON w = WidgetJSON.getNew();
+		w.setApplicationId("myapp");
+		w.setId("1");
 		
-		rb = new RequestBuilder(RequestBuilder.PUT, url);
+		rb = new RequestBuilder(RequestBuilder.GET, url);
 		rb.setHeader("Content-type", "application/json");
 		try {
-		      Request request = rb.sendRequest(c.toJSON(), new RequestCallback() {
+		      Request request = rb.sendRequest(w.toJSON(), new RequestCallback() {
 		        public void onError(Request request, Throwable exception) {
 		        	Log.error("Couldn't retrieve JSON");
 		        	l.setText("Couldn't retrieve JSON");

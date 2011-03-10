@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server;
+package org.instantplaces.interactionmanager.server.resources;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
