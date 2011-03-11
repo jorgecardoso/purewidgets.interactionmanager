@@ -16,9 +16,10 @@ import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 import org.instantplaces.interactionmanager.server.PMF;
-import org.instantplaces.interactionmanager.server.dataobjects.ApplicationDO;
-import org.instantplaces.interactionmanager.server.dataobjects.PlaceDO;
-import org.instantplaces.interactionmanager.server.dataobjects.WidgetDO;
+import org.instantplaces.interactionmanager.server.dso.ApplicationDSO;
+import org.instantplaces.interactionmanager.server.dso.PlaceDSO;
+import org.instantplaces.interactionmanager.server.dso.WidgetDSO;
+import org.instantplaces.interactionmanager.server.rest.ErrorREST;
 import org.restlet.Response;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.jaxb.JaxbRepresentation;
@@ -183,7 +184,7 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		
 		Object object = jr.getObject();
 		Object toClient = doPut(object);
-		if (toClient instanceof Error) {
+		if (toClient instanceof ErrorREST) {
 			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
 		}
 		pm.close();
@@ -259,10 +260,10 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	}
 	
 	
-	public PlaceDO getPlaceDO( String placeId ) {
+	public PlaceDSO getPlaceDO( String placeId ) {
 		
 		
-		Query query = pm.newQuery(PlaceDO.class);
+		Query query = pm.newQuery(PlaceDSO.class);
 	    query.setFilter("id == idParam");
 	    query.declareParameters("String idParam");
 
@@ -270,7 +271,7 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	    try {
 	        List<Object> results = (List<Object>) query.execute(placeId);
 	        if (!results.isEmpty()) {
-	        	PlaceDO place = (PlaceDO)results.get(0);
+	        	PlaceDSO place = (PlaceDSO)results.get(0);
 	        	//ApplicationDO [] apps = place.getApplications();
 	        	//for ()
 	        	return place;
@@ -283,8 +284,8 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	    return null;
 	}
 	
-	public ApplicationDO[] getApplicationsDO( String placeId ) {
-		PlaceDO place = getPlaceDO(placeId);
+	public ApplicationDSO[] getApplicationsDO( String placeId ) {
+		PlaceDSO place = getPlaceDO(placeId);
 		if ( place == null ) {
 			return null;
 		}
@@ -292,12 +293,12 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return place.getApplications();
 	}	
 	
-	public ApplicationDO getApplicationDO( String placeId, String applicationId ) {
-		ApplicationDO[] applications = getApplicationsDO(placeId);
+	public ApplicationDSO getApplicationDO( String placeId, String applicationId ) {
+		ApplicationDSO[] applications = getApplicationsDO(placeId);
 		if ( applications == null ) {
 			return null;
 		}
-		for ( ApplicationDO app : applications ) {
+		for ( ApplicationDSO app : applications ) {
 			log.info("APP: "  + app.toString());
 			if (app.getId().equals(applicationId)) {
 				return app;
@@ -306,21 +307,21 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return null;
 	}	
 	
-	public WidgetDO[] getWidgetsDO(String placeId, String applicationId) {
-		ApplicationDO application = getApplicationDO(placeId, applicationId);
+	public WidgetDSO[] getWidgetsDO(String placeId, String applicationId) {
+		ApplicationDSO application = getApplicationDO(placeId, applicationId);
 		if (application == null) {
 			return null;
 		}
 		return application.getWidgets();
 	}
 	
-	public WidgetDO getWidgetDO(String placeId, String applicationId, String widgetId) {
-		WidgetDO widgets[] = getWidgetsDO(placeId, applicationId);
+	public WidgetDSO getWidgetDO(String placeId, String applicationId, String widgetId) {
+		WidgetDSO widgets[] = getWidgetsDO(placeId, applicationId);
 		
 		if ( widgets == null ) {
 			return null;
 		}
-		for ( WidgetDO widget : widgets ) {
+		for ( WidgetDSO widget : widgets ) {
 			if (widget.getId().equals(widgetId)) {
 				return widget;
 			}

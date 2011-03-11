@@ -7,7 +7,8 @@ import javax.jdo.PersistenceManager;
 
 
 import org.instantplaces.interactionmanager.server.PMF;
-import org.instantplaces.interactionmanager.server.dataobjects.ContactDO;
+import org.instantplaces.interactionmanager.server.dso.ContactDSO;
+import org.instantplaces.interactionmanager.server.rest.ErrorREST;
 import org.instantplaces.interactionmanager.shared.Contact;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -28,12 +29,12 @@ public class HelloWorldResource extends InstantPlacesGenericResource {
 	@Override
 	protected Object doPost(Object in) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		ContactDO incoming = (ContactDO)in;
+		ContactDSO incoming = (ContactDSO)in;
 		
-		Key k = KeyFactory.createKey(ContactDO.class.getSimpleName(), incoming.getEmail());
-		ContactDO fromDS = null;
+		Key k = KeyFactory.createKey(ContactDSO.class.getSimpleName(), incoming.getEmail());
+		ContactDSO fromDS = null;
 		try {
-			fromDS = pm.getObjectById(ContactDO.class, k);
+			fromDS = pm.getObjectById(ContactDSO.class, k);
 		} catch (Exception e) {
 			log.warning("Could not retrieve object");
 		}
@@ -58,18 +59,18 @@ public class HelloWorldResource extends InstantPlacesGenericResource {
 	protected Object doPut(Object in) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		ContactDO incoming = (ContactDO)in;
+		ContactDSO incoming = (ContactDSO)in;
 		
-		Key k = KeyFactory.createKey(ContactDO.class.getSimpleName(), incoming.getEmail());
-		ContactDO fromDS = null;
+		Key k = KeyFactory.createKey(ContactDSO.class.getSimpleName(), incoming.getEmail());
+		ContactDSO fromDS = null;
 		try {
-			fromDS = pm.getObjectById(ContactDO.class, k);
+			fromDS = pm.getObjectById(ContactDSO.class, k);
 		} catch (Exception e) {
 			log.warning("Could not retrieve object");
 		}
 		if (fromDS != null) {
 			String errorMessage = "Object already exists!";
-			Error error = new Error(in, errorMessage);
+			ErrorREST error = new ErrorREST(in, errorMessage);
 			log.severe(errorMessage);
 			
 			pm.close();
@@ -98,7 +99,7 @@ public class HelloWorldResource extends InstantPlacesGenericResource {
 
 	@Override
 	protected Class getResourceClass() {
-		return ContactDO.class;
+		return ContactDSO.class;
 	}
 
 }

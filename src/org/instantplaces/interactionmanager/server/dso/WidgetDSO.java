@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.dataobjects;
+package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import org.instantplaces.interactionmanager.shared.WidgetOption;
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
-public class WidgetDO {
+public class WidgetDSO {
 
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -30,39 +30,39 @@ public class WidgetDO {
 	
 	
 	@Persistent(defaultFetchGroup = "true")
-	ApplicationDO application;
+	ApplicationDSO application;
 	
 	@Persistent
 	String id;
 	
 	@Persistent(mappedBy = "widget")
-	ArrayList <WidgetOptionDO> options; 
+	ArrayList <WidgetOptionDSO> options; 
 
 	
-	public WidgetDO() {
+	public WidgetDSO() {
 		this(null, null, null);
 	}
 	
-	public WidgetDO(String id, 	ApplicationDO app, ArrayList<WidgetOptionDO>options) {
+	public WidgetDSO(String id, 	ApplicationDSO app, ArrayList<WidgetOptionDSO>options) {
 		this.id = id;
 		this.application = app;
 		
 		if (options != null) {
 			this.options = options;
 		} else {
-			this.options = new ArrayList<WidgetOptionDO>();
+			this.options = new ArrayList<WidgetOptionDSO>();
 		}
 			
 	}
 	
 
-	public void setApplication(	ApplicationDO app) {
+	public void setApplication(	ApplicationDSO app) {
 		this.application = app;
 		
 	}
 
 
-	public 	ApplicationDO getApplication() {
+	public 	ApplicationDSO getApplication() {
 		return this.application;
 	}
 
@@ -81,14 +81,14 @@ public class WidgetDO {
 
 
 
-	public void addOption(WidgetOptionDO option) {
+	public void addOption(WidgetOptionDSO option) {
 		this.options.add(option);
 		
 	}
 
 
-	public WidgetOptionDO[] getOptions() {
-		return this.options.toArray(new WidgetOptionDO[0]);
+	public WidgetOptionDSO[] getOptions() {
+		return this.options.toArray(new WidgetOptionDSO[0]);
 	}
 
 	public void setKey(Key key) {
@@ -111,9 +111,9 @@ public class WidgetDO {
 	
 	@Override
 	public boolean equals(Object app) {
-		if ( !(app instanceof WidgetDO) ) {
+		if ( !(app instanceof WidgetDSO) ) {
 			return false;
 		}
-		return ((WidgetDO) app).getKey().equals(this.key);
+		return ((WidgetDSO) app).getKey().equals(this.key);
 	} 	
 }

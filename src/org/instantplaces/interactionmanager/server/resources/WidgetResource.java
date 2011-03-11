@@ -7,9 +7,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.instantplaces.interactionmanager.server.PMF;
-import org.instantplaces.interactionmanager.server.dataobjects.ApplicationDO;
-import org.instantplaces.interactionmanager.server.dataobjects.PlaceDO;
-import org.instantplaces.interactionmanager.server.dataobjects.WidgetDO;
+import org.instantplaces.interactionmanager.server.dso.ApplicationDSO;
+import org.instantplaces.interactionmanager.server.dso.PlaceDSO;
+import org.instantplaces.interactionmanager.server.dso.WidgetDSO;
+import org.instantplaces.interactionmanager.server.rest.ErrorREST;
 import org.instantplaces.interactionmanager.server.rest.WidgetREST;
 import org.restlet.data.Status;
 
@@ -47,18 +48,18 @@ public class WidgetResource extends InstantPlacesGenericResource {
 		WidgetREST widgetREST = (WidgetREST)in;
 		
 		 
-		PlaceDO place = null;
-		ApplicationDO application = null;
-		WidgetDO widget = this.getWidgetDO(this.placeId, this.appId, widgetREST.getId());
+		PlaceDSO place = null;
+		ApplicationDSO application = null;
+		WidgetDSO widget = this.getWidgetDO(this.placeId, this.appId, widgetREST.getId());
 		//TODO: Check if url parameters match widgetREST parameters
 		
 		/*
 		 * Check if widget already exists in the data store
 		 */
 		if (widget != null) {
-			return new Error(widgetREST, "Widget already exists. Use POST to update.");
+			return new ErrorREST(widgetREST, "Widget already exists. Use POST to update.");
 		} else {
-			widget = new WidgetDO(widgetREST.getId(), null, null);
+			widget = new WidgetDSO(widgetREST.getId(), null, null);
 		}
 		
 		/*
@@ -67,7 +68,7 @@ public class WidgetResource extends InstantPlacesGenericResource {
 	    place = getPlaceDO(this.placeId);
 	    if (null == place) {
 	    	log.info("The place was not found. Creating new...");
-	        place = new PlaceDO(this.placeId, null);
+	        place = new PlaceDSO(this.placeId, null);
 	    } 
 	    place.debug();
 	    
@@ -77,7 +78,7 @@ public class WidgetResource extends InstantPlacesGenericResource {
 	    application = getApplicationDO(this.placeId, this.appId);
 	    if (null == application) {
 	    	log.info("The application was not found. Creating new...");
-	        application = new ApplicationDO(this.appId, place, null);
+	        application = new ApplicationDSO(this.appId, place, null);
 	    }
 	    
 	    /*
@@ -115,16 +116,16 @@ public class WidgetResource extends InstantPlacesGenericResource {
 	@Override
 	protected Object doGet() {
 		if (this.widgetId != null) { //return the widget
-			WidgetDO widget = getWidgetDO(this.placeId, this.appId, this.widgetId);
+			WidgetDSO widget = getWidgetDO(this.placeId, this.appId, this.widgetId);
 			if (widget == null) {
 				this.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-				return new Error(null, "Resource not found.");
+				return new ErrorREST(null, "Resource not found.");
 			} else {
 				return widget.toREST();
 			}
 			
 		} else {
-			WidgetDO[] widgets = this.getWidgetsDO(this.placeId, this.appId);
+			WidgetDSO[] widgets = this.getWidgetsDO(this.placeId, this.appId);
 			
 			if ( widgets != null ) {
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();

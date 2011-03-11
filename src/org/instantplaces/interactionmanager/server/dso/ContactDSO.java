@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.dataobjects;
+package org.instantplaces.interactionmanager.server.dso;
 
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -17,7 +17,7 @@ import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
 @XmlRootElement
-public class ContactDO implements Contact  {
+public class ContactDSO implements Contact  {
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
@@ -44,18 +44,18 @@ public class ContactDO implements Contact  {
 	 * Needed because of the JAXB annotations
 	 */
 	
-	public ContactDO() {
+	public ContactDSO() {
 		
 	}
 
-	public ContactDO(String name, int age) {
+	public ContactDSO(String name, int age) {
 		this.name = name;
 		this.age = age;
 		this.height = 10;
 
 	}
 	
-	public void copyFrom(ContactDO other) {
+	public void copyFrom(ContactDSO other) {
 		this.setEmail(other.getEmail());
 		this.setName(other.getName());
 		this.setAge(other.getAge());

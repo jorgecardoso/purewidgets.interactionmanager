@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.dataobjects;
+package org.instantplaces.interactionmanager.server.dso;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -14,7 +14,7 @@ import org.instantplaces.interactionmanager.shared.WidgetOption;
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
-public class WidgetOptionDO {
+public class WidgetOptionDSO {
 	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -25,24 +25,24 @@ public class WidgetOptionDO {
 	
 	
 	@Persistent(defaultFetchGroup = "true")
-	private WidgetDO widget;
+	private WidgetDSO widget;
 	
-	public WidgetOptionDO() {
+	public WidgetOptionDSO() {
 		this(null, null);
 	}
 	
-	public WidgetOptionDO(String id, WidgetDO widget) {
+	public WidgetOptionDSO(String id, WidgetDSO widget) {
 		this.id = id;
 		this.widget = widget;
 	}
 	
 
-	public void setWidget(WidgetDO w) {
+	public void setWidget(WidgetDSO w) {
 		this.widget = w;	
 	}
 
 
-	public WidgetDO getWidget() {
+	public WidgetDSO getWidget() {
 		return this.widget;
 	}
 
@@ -67,9 +67,9 @@ public class WidgetOptionDO {
 
 	@Override
 	public boolean equals(Object app) {
-		if ( !(app instanceof WidgetOptionDO) ) {
+		if ( !(app instanceof WidgetOptionDSO) ) {
 			return false;
 		}
-		return ((WidgetOptionDO) app).getKey().equals(this.key);
+		return ((WidgetOptionDSO) app).getKey().equals(this.key);
 	} 	
 }

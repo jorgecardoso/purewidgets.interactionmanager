@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.dataobjects;
+package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
 
@@ -17,7 +17,7 @@ import org.instantplaces.interactionmanager.shared.Widget;
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
-public class ApplicationDO  {
+public class ApplicationDSO  {
 	
 
 	@PrimaryKey
@@ -28,23 +28,23 @@ public class ApplicationDO  {
 	private String id;
 	
 	@Persistent(defaultFetchGroup = "true")
-	private PlaceDO place;
+	private PlaceDSO place;
 	
 	@Persistent(mappedBy = "application")
-	private ArrayList<WidgetDO> widgets;
+	private ArrayList<WidgetDSO> widgets;
 	
-	public ApplicationDO() {
+	public ApplicationDSO() {
 		this(null, null, null);
 	}
 	
-	public ApplicationDO(String id, PlaceDO place, ArrayList<WidgetDO> widgets) {
+	public ApplicationDSO(String id, PlaceDSO place, ArrayList<WidgetDSO> widgets) {
 		this.id = id;
 		this.place = place;
 		
 		if (widgets != null) {
 			this.widgets = widgets;
 		} else {
-			this.widgets = new ArrayList<WidgetDO>();
+			this.widgets = new ArrayList<WidgetDSO>();
 		}
 	}
 	
@@ -57,22 +57,22 @@ public class ApplicationDO  {
 		return this.id;
 	}
 
-	public void setPlace(PlaceDO place) {
+	public void setPlace(PlaceDSO place) {
 		this.place = place;
 		
 	}
 
-	public PlaceDO getPlace() {
+	public PlaceDSO getPlace() {
 		return this.place;
 	}
 
-	public void addWidget(WidgetDO widget) {
+	public void addWidget(WidgetDSO widget) {
 		this.widgets.add(widget);
 		
 	}
 
-	public WidgetDO[] getWidgets() {
-		return this.widgets.toArray(new WidgetDO[0]);
+	public WidgetDSO[] getWidgets() {
+		return this.widgets.toArray(new WidgetDSO[0]);
 	}
 
 	public void setKey(Key key) {
@@ -85,10 +85,10 @@ public class ApplicationDO  {
 	
 	@Override
 	public boolean equals(Object app) {
-		if ( !(app instanceof ApplicationDO) ) {
+		if ( !(app instanceof ApplicationDSO) ) {
 			return false;
 		}
-		return ((ApplicationDO) app).getKey().equals(this.key);
+		return ((ApplicationDSO) app).getKey().equals(this.key);
 	} 
 
 }

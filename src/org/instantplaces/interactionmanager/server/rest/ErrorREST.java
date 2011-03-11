@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.resources;
+package org.instantplaces.interactionmanager.server.rest;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.instantplaces.interactionmanager.client.ContactJSON;
 
 @XmlRootElement
-public class Error {
+public class ErrorREST {
 	
 	@XmlAttribute
 	public String errorMessage;
@@ -15,11 +15,11 @@ public class Error {
 	@XmlElement
 	public Object object; 
 	
-	public Error() {
+	public ErrorREST() {
 		
 	}
 	
-	public Error(Object object, String message) {
+	public ErrorREST(Object object, String message) {
 		this.object = object;
 		this.errorMessage = message;
 	}

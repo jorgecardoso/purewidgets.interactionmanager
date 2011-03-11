@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.dataobjects;
+package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
 @XmlRootElement
-public class PlaceDO {
+public class PlaceDSO {
 	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
 	@PrimaryKey
@@ -30,18 +30,18 @@ public class PlaceDO {
 	private String id;
 	
 	@Persistent(mappedBy = "place")
-	private ArrayList<ApplicationDO> applications;
+	private ArrayList<ApplicationDSO> applications;
 	
-	public PlaceDO() {
+	public PlaceDSO() {
 		this(null, null);
 	}
 	
-	public PlaceDO(String id, ArrayList<ApplicationDO> applications) {
+	public PlaceDSO(String id, ArrayList<ApplicationDSO> applications) {
 		this.id = id;
 		if (applications != null) {
 			this.applications = applications;
 		} else {
-			this.applications = new ArrayList<ApplicationDO>();
+			this.applications = new ArrayList<ApplicationDSO>();
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class PlaceDO {
 	}
 
 
-	public void addApplication(ApplicationDO app) {
+	public void addApplication(ApplicationDSO app) {
 		if (!this.applications.contains(app)) {
 			this.applications.add(app);
 		}
@@ -64,9 +64,9 @@ public class PlaceDO {
 	}
 
 
-	public ApplicationDO[] getApplications() {
+	public ApplicationDSO[] getApplications() {
 		log.info("Appications: " + this.applications.toString());
-		return this.applications.toArray(new ApplicationDO[0]);
+		return this.applications.toArray(new ApplicationDSO[0]);
 	}
 
 	public void setKey(Key key) {
@@ -79,16 +79,16 @@ public class PlaceDO {
 	
 	@Override
 	public boolean equals(Object app) {
-		if ( !(app instanceof PlaceDO) ) {
+		if ( !(app instanceof PlaceDSO) ) {
 			return false;
 		}
-		return ((PlaceDO) app).getKey().equals(this.key);
+		return ((PlaceDSO) app).getKey().equals(this.key);
 	} 	
 	
 	public void debug() {
 		log.info("Place " + this.id);
 		log.info("Applications: ");
-		for (ApplicationDO app : this.applications) {
+		for (ApplicationDSO app : this.applications) {
 			log.info("   " + app.getId());
 		}
 	}
