@@ -15,6 +15,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 import org.eclipse.jdt.internal.compiler.ast.ThisReference;
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.PMF;
 import org.instantplaces.interactionmanager.server.dso.ApplicationDSO;
 import org.instantplaces.interactionmanager.server.dso.PlaceDSO;
@@ -204,7 +205,12 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
 		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
-				log.warning("Ignoring : " + propertyName);
+				if (propertyName.equalsIgnoreCase("__gwt_ObjectId")) {
+					Log.get().debug("Ignoring __gwt_ObjectId property.");
+				} else {
+					Log.get().warn("Ignoring : " + propertyName);
+				}
+				
 				try {
 					ctxt.getParser().skipChildren();
 				} catch (JsonParseException e) {

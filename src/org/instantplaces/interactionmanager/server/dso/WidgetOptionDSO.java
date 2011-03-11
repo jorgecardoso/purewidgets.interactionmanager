@@ -4,13 +4,10 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.rest.WidgetOptionREST;
-import org.instantplaces.interactionmanager.shared.Widget;
-import org.instantplaces.interactionmanager.shared.WidgetOption;
+
 
 import com.google.appengine.api.datastore.Key;
 
@@ -30,9 +27,8 @@ public class WidgetOptionDSO {
 	@Persistent
 	private String referenceCode;
 	
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private WidgetDSO widget;
-	
 	
 	
 	public WidgetOptionDSO() {
@@ -78,21 +74,7 @@ public class WidgetOptionDSO {
 		return key;
 	}
 
-	@Override
-	public boolean equals(Object that) {
-		if ( !(that instanceof WidgetOptionDSO) ) {
-			return false;
-		}
-		Key thatKey = ((WidgetOptionDSO)that).getKey();
-		String thatId = ((WidgetOptionDSO)that).getId();
-		
-		
-		if (this.id == null || thatId == null) {
-			return false;
-		}
-		return this.id.equals(thatId);
-		
-	}
+
 
 	public void setSuggestedReferenceCode(String suggestedReferenceCode) {
 		this.suggestedReferenceCode = suggestedReferenceCode;
@@ -120,24 +102,29 @@ public class WidgetOptionDSO {
 	}
 	
 	public WidgetOptionREST toREST() {
+		Log.get().debug("Converting to REST " + this.toString());
 		WidgetOptionREST woREST = new WidgetOptionREST();
 		woREST.setId(this.id);
 		woREST.setSuggestedReferenceCode(this.referenceCode);
 		woREST.setSuggestedReferenceCode(this.suggestedReferenceCode);
 		
-		
+		Log.get().debug("Converted: " + woREST.toString());
 		return woREST;
 	}
-	/*
-	 	public WidgetOptionDSO toDSO() {
-		log.info("Converting WidgetOptionREST to DSO");
-		WidgetOptionDSO woDSO = new WidgetOptionDSO();
+	
+	@Override
+	public boolean equals(Object that) {
+		if ( !(that instanceof WidgetOptionDSO) ) {
+			return false;
+		}
+		//Key thatKey = ((WidgetOptionDSO)that).getKey();
+		String thatId = ((WidgetOptionDSO)that).getId();
 		
-		woDSO.setId(this.id);
-		woDSO.setSuggestedReferenceCode(this.suggestedReferenceCode);
-		woDSO.setReferenceCode(this.referenceCode);
 		
-		return woDSO;
+		if (this.id == null || thatId == null) {
+			return false;
+		}
+		return this.id.equals(thatId);
+		
 	}
-	 * */
 }

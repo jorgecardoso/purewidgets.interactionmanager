@@ -1,33 +1,22 @@
 package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.instantplaces.interactionmanager.server.PMF;
-import org.instantplaces.interactionmanager.server.rest.WidgetOptionREST;
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.rest.WidgetREST;
-import org.instantplaces.interactionmanager.shared.Application;
-import org.instantplaces.interactionmanager.shared.Widget;
-import org.instantplaces.interactionmanager.shared.WidgetOption;
-import org.mortbay.log.Log;
+
 
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
 public class WidgetDSO {
-	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
 	
 	@PrimaryKey
@@ -35,7 +24,7 @@ public class WidgetDSO {
     private Key key;
 	
 	
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private ApplicationDSO application;
 	
 	
@@ -115,6 +104,7 @@ public class WidgetDSO {
 
 	
 	public WidgetREST toREST() {
+		Log.get().debug("Converting to REST " + this.toString());
 		WidgetREST  w = new WidgetREST();
 	
 		if (this.application != null) {
@@ -130,23 +120,10 @@ public class WidgetDSO {
 		
 		w.setId(this.id);
 		
+		Log.get().debug("Converted: " + w.toString());
 		return w; 
 	}
-	/*
-	 * 	public WidgetDSO toDSO() {
-		WidgetDSO wDSO = new WidgetDSO();
-		log.info("Converting WidgetREST to DSO");
-		wDSO.setId(this.id);
-		log.info(this.widgetOptions.toString());
-		for (WidgetOption wo : this.widgetOptions) {
-			
-			WidgetOptionREST woREST = (WidgetOptionREST)wo;
-			
-			wDSO.addWidgetOption(woREST.toDSO());
-		}
-		
-		return wDSO;
-	}*/
+
 	
 	@Override
 	public boolean equals(Object app) {
@@ -162,7 +139,7 @@ public class WidgetDSO {
 		sb.append("Widget(id: ").append(this.id).append("; options: ");
 		if ( this.options != null ) {
 			for (WidgetOptionDSO wo : this.options) {
-				sb.append(wo.toString());
+				sb.append(wo.toString()).append(" ");
 			}
 		}
 		sb.append(")");
@@ -171,31 +148,36 @@ public class WidgetDSO {
 
 	
 	public static WidgetDSO[] getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
-	
+		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		ApplicationDSO application = ApplicationDSO.getApplicationDSO(pm, placeId, applicationId);
 		if (application == null) {
+			Log.get().debug("Application not found.");
 			return null;
 		}
 		if (application.getWidgets() == null) {
-			log.info("Retrieved 0 widgets from " + application.toString());
+			Log.get().debug("Found 0 widgets.");
 		} else {
-			log.info("Retrieved " + application.getWidgets().length + " widgets for " + application.toString());
-			
+			Log.get().debug("Found " + application.getWidgets().length + " widgets.");
 		}
 		return application.getWidgets();
 	}
 	
 	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
+		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "), Widget(" + widgetId + ") from Data Store.");
 		WidgetDSO widgets[] = getWidgetsFromDSO(pm, placeId, applicationId);
 		
 		if ( widgets == null ) {
+			Log.get().debug("No widget found.");
 			return null;
 		}
+		
 		for ( WidgetDSO widget : widgets ) {
 			if (widget.getId().equals(widgetId)) {
+				Log.get().debug("Returning widget.");
 				return widget;
 			}
 		}
+		Log.get().debug("Widget not found.");
 		return null;
 	}	
 	
@@ -205,7 +187,7 @@ public class WidgetDSO {
 	 * @param that
 	 */
 	public void mergeWith(WidgetDSO that) {
-		log.info("Merging ");
+		Log.get().debug("Merging " + this.toString() + " with " + that.toString());
 		//right now only merging options. the widget itself has no other
 		// information that can be merged
 		
@@ -216,7 +198,7 @@ public class WidgetDSO {
 		while (it.hasNext()) {
 			WidgetOptionDSO next = it.next();
 			if (!that.getWidgetOptionsAsArrayList().contains(next)) {
-				log.info("Deleting from " + this.toString() + " unused option " + it.toString());
+				Log.get().debug("Deleting unused option " + it.toString());
 				it.remove();	
 			} 
 		}
@@ -228,7 +210,7 @@ public class WidgetDSO {
 		while (it.hasNext()) {
 			WidgetOptionDSO next = it.next();
 			if (!this.options.contains(next)) {
-				log.info("Adding to " + this.toString() + " new option " + next.toString());
+				Log.get().debug("Adding to new option " + next.toString());
 				this.addWidgetOption(next);	
 			} 
 		}

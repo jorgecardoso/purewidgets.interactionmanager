@@ -1,27 +1,20 @@
 package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.instantplaces.interactionmanager.shared.Application;
-import org.instantplaces.interactionmanager.shared.Place;
-import org.instantplaces.interactionmanager.shared.Widget;
+import org.instantplaces.interactionmanager.server.Log;
 
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
 public class ApplicationDSO  {
-	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
-
+	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
@@ -29,7 +22,7 @@ public class ApplicationDSO  {
 	@Persistent
 	private String id;
 	
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private PlaceDSO place;
 	
 	@Persistent(mappedBy = "application")
@@ -98,29 +91,37 @@ public class ApplicationDSO  {
 	} 
 	
 	public static ApplicationDSO[] getApplicationsDSO( PersistenceManager pm, String placeId ) {
+		Log.get().debug("Fetching applications for Place(" + placeId + ") from Data Store.");
+		
 		PlaceDSO place = PlaceDSO.getPlaceDSO(pm, placeId);
 		if ( place == null ) {
+			Log.get().debug("Place not found.");
 			return null;
 		}
 		if (place.getApplications() == null) {
-			log.info("Retrieved 0 applications from " + place.toString());
+			Log.get().debug("Found 0 applications.");
 		} else {
-			log.info("Retrieved " + place.getApplications().length + " applications for " + place.toString());
+			Log.get().debug("Found " + place.getApplications().length + " applications.");
 		}
 		return place.getApplications();
 	}	
 	
 	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
+		Log.get().debug("Fetching application Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
+		
 		ApplicationDSO[] applications = getApplicationsDSO(pm, placeId);
 		if ( applications == null ) {
+			Log.get().debug("No applications found.");
 			return null;
 		}
+		
 		for ( ApplicationDSO app : applications ) {
 			if (app.getId().equals(applicationId)) {
-				log.info("Retrieved " + app.toString());
+				Log.get().debug("Returning application.");
 				return app;
 			}
 		}
+		Log.get().debug("Application not found.");
 		return null;
 	}	
 

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.PMF;
 import org.instantplaces.interactionmanager.server.dso.ApplicationDSO;
 import org.instantplaces.interactionmanager.server.dso.PlaceDSO;
@@ -40,7 +41,8 @@ public class WidgetResource extends InstantPlacesGenericResource {
 	@Override
 	protected Object doPost(Object in) {
 		WidgetREST widgetREST = (WidgetREST)in;
-		log.info("Received data: " + widgetREST.toString());
+	
+		Log.get().debug("Received from client: " + widgetREST.toString());
 		
 		WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetREST.getId());
 		
@@ -110,7 +112,7 @@ public class WidgetResource extends InstantPlacesGenericResource {
 	    	log.info("The place was not found. Creating new...");
 	        place = new PlaceDSO(this.placeId, null);
 	    } 
-	    place.debug();
+	    
 	    
 	    /*
 	     * Get the Application from the store. Create one if it does not exist yet.
@@ -146,7 +148,7 @@ public class WidgetResource extends InstantPlacesGenericResource {
 			//pm.close();
 		}
 		
-		place.debug();
+		
 		/*
 		 * Return the complete widget back.
 		 */
