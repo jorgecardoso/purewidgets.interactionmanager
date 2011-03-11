@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.resources;
+package org.instantplaces.interactionmanager.server.resource;
 
 import java.util.Map;
 import java.util.logging.Logger;

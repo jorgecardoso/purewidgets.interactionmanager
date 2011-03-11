@@ -3,8 +3,8 @@ package org.instantplaces.interactionmanager.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.instantplaces.interactionmanager.server.resources.HelloWorldResource;
-import org.instantplaces.interactionmanager.server.resources.WidgetResource;
+import org.instantplaces.interactionmanager.server.resource.HelloWorldResource;
+import org.instantplaces.interactionmanager.server.resource.WidgetResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;

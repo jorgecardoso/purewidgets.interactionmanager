@@ -1,4 +1,4 @@
-package org.instantplaces.interactionmanager.server.resources;
+package org.instantplaces.interactionmanager.server.resource;
 
 import java.util.ArrayList;
 import java.util.List;
