@@ -1,7 +1,9 @@
 package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -18,7 +20,7 @@ import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable
 public class ApplicationDSO  {
-	
+	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
 
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -83,6 +85,10 @@ public class ApplicationDSO  {
 		return key;
 	}
 	
+	public String toString() {
+		return "application(id: " + this.id + ")";
+	}
+	
 	@Override
 	public boolean equals(Object app) {
 		if ( !(app instanceof ApplicationDSO) ) {
@@ -90,5 +96,32 @@ public class ApplicationDSO  {
 		}
 		return ((ApplicationDSO) app).getKey().equals(this.key);
 	} 
+	
+	public static ApplicationDSO[] getApplicationsDSO( PersistenceManager pm, String placeId ) {
+		PlaceDSO place = PlaceDSO.getPlaceDSO(pm, placeId);
+		if ( place == null ) {
+			return null;
+		}
+		if (place.getApplications() == null) {
+			log.info("Retrieved 0 applications from " + place.toString());
+		} else {
+			log.info("Retrieved " + place.getApplications().length + " applications for " + place.toString());
+		}
+		return place.getApplications();
+	}	
+	
+	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
+		ApplicationDSO[] applications = getApplicationsDSO(pm, placeId);
+		if ( applications == null ) {
+			return null;
+		}
+		for ( ApplicationDSO app : applications ) {
+			if (app.getId().equals(applicationId)) {
+				log.info("Retrieved " + app.toString());
+				return app;
+			}
+		}
+		return null;
+	}	
 
 }

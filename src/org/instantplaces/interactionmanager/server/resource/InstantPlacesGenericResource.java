@@ -48,11 +48,11 @@ import org.restlet.data.Status;
 public abstract class InstantPlacesGenericResource extends ServerResource {
 	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
+	
 	/**
 	 * The accepted types.
 	 */
 	protected static enum ContentType {JSONP, JSON, XML, HTML};
-	
 
 	/**
 	 * If the request is for JSONP, this is the name of the callback function
@@ -89,6 +89,11 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	 */
 	@Override
 	public void doInit() {
+		/*
+		 * JDO Queries only retrieve child objects when they are accessed so
+		 * we keep an instance of PersistanceManager throughout the whole request and
+		 * release it at the end (see doRelease())
+		 */
 		pm = PMF.get().getPersistenceManager();
 		/*
 		 * Read the user specified content-type. 
@@ -124,7 +129,11 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		errorMessage += "Valid types are: " + Arrays.toString(ContentType.values());
 		//this.setStatus(status)
 		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
-		
+	}
+	
+	@Override
+	public void doRelease() {
+		pm.close();
 	}
 	
 	protected abstract Object doPost(Object incoming);
@@ -132,68 +141,66 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	protected abstract Object doGet();
 	protected abstract Class getResourceClass();
 
-
-	
+	// GET Methods
 	@Get("html")
 	public Representation returnAsHTML() {
 		Object object = doGet();
-		pm.close();
 		return this.representAsHTML(object);
-		
 	}
 	
 	@Get("xml")
 	public Representation returnAsXML() {
 		Object object = doGet();
-		pm.close();
 		return this.representAsXML(object);
 	}
 	
 	@Get("json")
 	public Representation returnAsJSON() {
 		Object object = doGet();
-		pm.close();
 		return this.representAsJSON(object);
 	}
 	
 	@Get("jsonp")
 	public Representation returnAsJSONP() {
 		Object object = doGet();
-		pm.close();
 		return this.representAsJSONP(object);
 	}
 	
+	// PUT Methods
 	@Put("json")
 	public Representation acceptItemToPut(Representation entity) { 
-
-		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
-		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
-			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
-				log.warning("Ignoring : " + propertyName);
-				try {
-					ctxt.getParser().skipChildren();
-				} catch (JsonParseException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return true;
-			}
-		});
+		Object object = deserializeJSON(entity);
 		
-		
-		Object object = jr.getObject();
 		Object toClient = doPut(object);
+		
 		if (toClient instanceof ErrorREST) {
 			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
 		}
-		pm.close();
 		return representAsJSON(toClient);
 	}
 	
+	// POST Methods
 	@Post("json")
 	public Representation acceptItem(Representation entity) { 
+		Object object = deserializeJSON(entity);
 		
+		Object toClient = doPost(object);
+		
+		if (toClient instanceof ErrorREST) {
+			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+		}
+		return representAsJSON(toClient);
+	}
+
+	/**
+	 * Deserializes JSON objects using JacksonRepresentation. 
+	 * This ignores any unknown object properties. It determines
+	 * the target object class by calling getResourceClass().
+	 * 
+	 * @param entity The object to be deserialized.
+	 * @return A Java Object with the deserialized JSON object.
+	 */
+	private Object deserializeJSON(Representation entity) {
 		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
 		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
@@ -209,12 +216,8 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 			}
 		});
 		
-		
 		Object object = jr.getObject();
-		//finally {
-		pm.close();
-		//}
-		return representAsJSON(doPost(object));
+		return object;
 	}
 	
 	
@@ -259,92 +262,5 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 		return jr;
 	}
 	
-	
-	public PlaceDSO getPlaceDO( String placeId ) {
-		
-		
-		Query query = pm.newQuery(PlaceDSO.class);
-	    query.setFilter("id == idParam");
-	    query.declareParameters("String idParam");
 
-	    
-	    try {
-	        List<Object> results = (List<Object>) query.execute(placeId);
-	        if (!results.isEmpty()) {
-	        	PlaceDSO place = (PlaceDSO)results.get(0);
-	        	//ApplicationDO [] apps = place.getApplications();
-	        	//for ()
-	        	return place;
-	        } 
-	    } finally {
-	        query.closeAll();
-	        //pm.close();
-	    }
-	    //log.info("Place not found");
-	    return null;
-	}
-	
-	public ApplicationDSO[] getApplicationsDO( String placeId ) {
-		PlaceDSO place = getPlaceDO(placeId);
-		if ( place == null ) {
-			return null;
-		}
-		//log.info("Place: " + place.toString());
-		return place.getApplications();
-	}	
-	
-	public ApplicationDSO getApplicationDO( String placeId, String applicationId ) {
-		ApplicationDSO[] applications = getApplicationsDO(placeId);
-		if ( applications == null ) {
-			return null;
-		}
-		for ( ApplicationDSO app : applications ) {
-			log.info("APP: "  + app.toString());
-			if (app.getId().equals(applicationId)) {
-				return app;
-			}
-		}
-		return null;
-	}	
-	
-	public WidgetDSO[] getWidgetsDO(String placeId, String applicationId) {
-		ApplicationDSO application = getApplicationDO(placeId, applicationId);
-		if (application == null) {
-			return null;
-		}
-		return application.getWidgets();
-	}
-	
-	public WidgetDSO getWidgetDO(String placeId, String applicationId, String widgetId) {
-		WidgetDSO widgets[] = getWidgetsDO(placeId, applicationId);
-		
-		if ( widgets == null ) {
-			return null;
-		}
-		for ( WidgetDSO widget : widgets ) {
-			if (widget.getId().equals(widgetId)) {
-				return widget;
-			}
-		}
-		return null;
-	}
-/*
-	public Object getDO(Class c, String id ) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		Query query = pm.newQuery(c);
-	    query.setFilter("id == idParam");
-	    query.declareParameters("String idParam");
-
-	    try {
-	        List<Object> results = (List<Object>) query.execute(id);
-	        if (!results.isEmpty()) {
-	            return results.get(0);
-	        } else {
-	            return null;
-	        }
-	    } finally {
-	        query.closeAll();
-	    }
-	}*/
 }

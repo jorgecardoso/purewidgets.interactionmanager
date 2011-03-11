@@ -1,8 +1,11 @@
 package org.instantplaces.interactionmanager.server.dso;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -20,7 +23,7 @@ import com.google.appengine.api.datastore.Key;
 @PersistenceCapable
 @XmlRootElement
 public class PlaceDSO {
-	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
+	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -84,6 +87,29 @@ public class PlaceDSO {
 		}
 		return ((PlaceDSO) app).getKey().equals(this.key);
 	} 	
+	
+	public static PlaceDSO getPlaceDSO(PersistenceManager pm, String placeId ) {
+		Query query = pm.newQuery(PlaceDSO.class);
+	    query.setFilter("id == idParam");
+	    query.declareParameters("String idParam");
+	    
+	    try {
+	        List<Object> results = (List<Object>) query.execute(placeId);
+	        if (!results.isEmpty()) {
+	        	PlaceDSO place = (PlaceDSO)results.get(0);
+	        	log.info("Retrieved " + place.toString());
+	        	return place;
+	        } 
+	    } finally {
+	        query.closeAll();
+	    }
+	    log.info("Could not retrieve place with id: " + placeId);
+	    return null;
+	}
+	
+	public String toString() {
+		return "place(id: " + this.id + ")";
+	}
 	
 	public void debug() {
 		log.info("Place " + this.id);

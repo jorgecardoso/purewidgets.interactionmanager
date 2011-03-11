@@ -2,6 +2,10 @@ package org.instantplaces.interactionmanager.client;
 
 
 
+import org.instantplaces.interactionmanager.client.json.ContactJSON;
+import org.instantplaces.interactionmanager.client.json.ErrorJSON;
+import org.instantplaces.interactionmanager.client.json.WidgetJSON;
+import org.instantplaces.interactionmanager.client.json.WidgetOptionJSON;
 import org.instantplaces.interactionmanager.shared.Contact;
 
 import com.allen_sauer.gwt.log.client.Log;
@@ -21,7 +25,7 @@ public class InteractionManager implements EntryPoint {
 	
 	
 	RequestBuilder rb;
-	String url = "/place/1/application/1/widget/?output=json";
+	
 	
 	Label l; 
 	
@@ -36,11 +40,25 @@ public class InteractionManager implements EntryPoint {
 		//ContactJSON c = ContactJSON.getNew();//ContactJSON.fromJSON("{\"name\":\"jorge\", \"age\":3, \"height\":4}");
 		//c.setName("jorge");
 		//c.setEmail("jorge@ieee.com");
-		WidgetJSON w = WidgetJSON.getNew();
-		w.setApplicationId("myapp");
-		w.setId("1");
+		WidgetOptionJSON option = WidgetOptionJSON.getNew();
+		option.setId("option1");
+		option.setWidgetId("1");
+		option.setSuggestedReferenceCode("suggestion1");
 		
-		rb = new RequestBuilder(RequestBuilder.GET, url);
+		WidgetOptionJSON option2 = WidgetOptionJSON.getNew();
+		option2.setId("option2");
+		option2.setWidgetId("1");
+		option2.setSuggestedReferenceCode("suggestion2");
+		
+		WidgetJSON w = WidgetJSON.getNew();
+		w.setPlaceId("place:jorge");
+		w.setApplicationId("app:jorge");
+		w.setId("1");
+		w.addWidgetOption(option);
+		w.addWidgetOption(option2);
+		
+		Log.info(w.toJSON());
+		rb = new RequestBuilder(RequestBuilder.POST, w.getURL());
 		rb.setHeader("Content-type", "application/json");
 		try {
 		      Request request = rb.sendRequest(w.toJSON(), new RequestCallback() {

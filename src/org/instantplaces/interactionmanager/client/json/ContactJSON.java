@@ -1,10 +1,10 @@
-package org.instantplaces.interactionmanager.client;
+package org.instantplaces.interactionmanager.client.json;
 
 import org.instantplaces.interactionmanager.shared.Contact;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class ContactJSON extends JavaScriptObject implements Contact {
+public class ContactJSON extends GenericJSON implements Contact {
 	
 	// Overlay types always have protected, zero-arg ctors
 	  protected ContactJSON() { }
@@ -16,13 +16,7 @@ public class ContactJSON extends JavaScriptObject implements Contact {
 	  public final native int getAge()  /*-{ return this.age;  }-*/;
 	  public final native int getHeight()  /*-{ return this.height;  }-*/;
 	
-	  public static native ContactJSON getNew() /*-{
-	  	return new Object();
-	  }-*/;
-	  
-	  public static native ContactJSON fromJSON(String json) /*-{
-	  	return eval('('+json+')');
-	  }-*/;
+
 
 
 		@Override
@@ -45,7 +39,5 @@ public class ContactJSON extends JavaScriptObject implements Contact {
 		this.height = height;
 	}-*/;
 	
-	public final native String toJSON() /*-{
-	  return JSON.stringify(this);
-	}-*/;
+	
 }

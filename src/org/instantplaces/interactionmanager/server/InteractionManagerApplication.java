@@ -15,7 +15,7 @@ public class InteractionManagerApplication extends Application {
 	private static final Logger log; 
 	static {
 		log = Logger.getLogger("InteractionManagerApplication");
-		log.setLevel(Level.INFO);
+		log.setLevel(Level.FINE);
 	}
 	
 	@Override
