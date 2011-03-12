@@ -1,18 +1,18 @@
-<!-- Indices written at Sat, 12 Mar 2011 11:00:36 UTC -->
+<!-- Indices written at Sat, 12 Mar 2011 23:13:27 GMT -->
 
 <datastore-indexes>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 11 times in query history -->
     <datastore-index kind="ApplicationDSO" ancestor="true" source="auto">
         <property name="applications_INTEGER_IDX" direction="asc"/>
     </datastore-index>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 11 times in query history -->
     <datastore-index kind="WidgetDSO" ancestor="true" source="auto">
         <property name="widgets_INTEGER_IDX" direction="asc"/>
     </datastore-index>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 11 times in query history -->
     <datastore-index kind="WidgetOptionDSO" ancestor="true" source="auto">
         <property name="options_INTEGER_IDX" direction="asc"/>
     </datastore-index>

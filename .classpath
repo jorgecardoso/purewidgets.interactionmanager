@@ -11,6 +11,7 @@
 	<classpathentry kind="lib" path="externalLibraries/gwt-log-3.1.0.jar"/>
 	<classpathentry kind="lib" path="externalLibraries/org.codehaus.jackson.mapper.jar"/>
 	<classpathentry kind="lib" path="externalLibraries/org.codehaus.jackson.core.jar"/>
-	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="externalLibraries/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="D:/Jorge/PhD/Work/0-Code-EclipseWorkspace/InteractionManager/externalLibraries/jdom.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
