@@ -3,7 +3,6 @@ package org.instantplaces.interactionmanager.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.instantplaces.interactionmanager.server.resource.HelloWorldResource;
 import org.instantplaces.interactionmanager.server.resource.WidgetResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -35,14 +34,11 @@ public class InteractionManagerApplication extends Application {
         
         //this.getMetadataService().addCommonExtensions()
         //router.attachDefault(HelloWorldResource.class);
-        router.attach("/rest/", HelloWorldResource.class);
+
         router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);
-        router.attach("/place/{placeid}/application/{appid}/widget/", WidgetResource.class);
+        router.attach("/place/{placeid}/application/{appid}/widget", WidgetResource.class);
         
-     // Attach the handlers to the root router  
-       // router.attach("/users/{user}", account);  
-        //router.attach("/users/{user}/orders", orders);  
-        //router.attach("/users/{user}/orders/{order}", order);  
+     
         return router;
 	}    
 }

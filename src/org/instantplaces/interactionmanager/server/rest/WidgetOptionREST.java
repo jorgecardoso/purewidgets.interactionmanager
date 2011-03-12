@@ -2,21 +2,24 @@ package org.instantplaces.interactionmanager.server.rest;
 
 import java.util.logging.Logger;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.dso.WidgetDSO;
 import org.instantplaces.interactionmanager.server.dso.WidgetOptionDSO;
 import org.instantplaces.interactionmanager.shared.Widget;
 import org.instantplaces.interactionmanager.shared.WidgetOption;
-import org.mortbay.log.Log;
 
+
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class WidgetOptionREST implements WidgetOption {
-	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
-	@XmlAttribute
-	private	String widgetId;
+	//@XmlAttribute
+	//private	String widgetId;
 	
 	
 	@XmlAttribute
@@ -33,7 +36,7 @@ public class WidgetOptionREST implements WidgetOption {
 		
 	}
 	
-	
+	/*
 	@Override
 	public void setWidgetId(String widgetId) {
 		this.widgetId = widgetId;
@@ -42,7 +45,7 @@ public class WidgetOptionREST implements WidgetOption {
 	@Override
 	public String getWidgetId() {
 		return this.widgetId;
-	}
+	}*/
 	
 
 	@Override
@@ -76,7 +79,8 @@ public class WidgetOptionREST implements WidgetOption {
 	}
 	
 	public WidgetOptionDSO toDSO() {
-		log.info("Converting WidgetOptionREST to DSO");
+		Log.get().debug("Converting WidgetOptionREST to DSO");
+		
 		WidgetOptionDSO woDSO = new WidgetOptionDSO();
 		
 		woDSO.setId(this.id);

@@ -9,15 +9,16 @@ public class WidgetOptionJSON extends GenericJSON implements WidgetOption {
 	protected WidgetOptionJSON() { 
 	}
 	
-	@Override
-	public final native void setWidgetId(String widgetId) /*-{
-		this.widgetId = widgetId;
-	}-*/;
-
-	@Override
-	public final native String getWidgetId() /*-{
-		return this.widgetId;
-	}-*/;
+	
+//	@Override
+//	public final native void setWidgetId(String widgetId) /*-{
+//		this.widgetId = widgetId;
+//	}-*/;
+//
+//	@Override
+//	public final native String getWidgetId() /*-{
+//		return this.widgetId;
+//	}-*/;
 
 	@Override
 	public final native void setId(String id) /*-{

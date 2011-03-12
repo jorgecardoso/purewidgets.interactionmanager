@@ -2,11 +2,11 @@ package org.instantplaces.interactionmanager.client;
 
 
 
-import org.instantplaces.interactionmanager.client.json.ContactJSON;
 import org.instantplaces.interactionmanager.client.json.ErrorJSON;
 import org.instantplaces.interactionmanager.client.json.WidgetJSON;
 import org.instantplaces.interactionmanager.client.json.WidgetOptionJSON;
 import org.instantplaces.interactionmanager.shared.Contact;
+import org.instantplaces.interactionmanager.shared.Widget;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
@@ -40,12 +40,12 @@ public class InteractionManager implements EntryPoint {
 		//c.setEmail("jorge@ieee.com");
 		WidgetOptionJSON option = WidgetOptionJSON.getNew();
 		option.setId("option1");
-		option.setWidgetId("1");
+		//option.setWidgetId("1");
 		option.setSuggestedReferenceCode("suggestion1");
 		
 		WidgetOptionJSON option2 = WidgetOptionJSON.getNew();
 		option2.setId("option2");
-		option2.setWidgetId("1");
+		//option2.setWidgetId("1");
 		option2.setSuggestedReferenceCode("suggestion2");
 		
 		WidgetJSON w = WidgetJSON.getNew();
@@ -69,9 +69,9 @@ public class InteractionManager implements EntryPoint {
 		          if (200 == response.getStatusCode()) {
 		        	  Log.info(response.getText());
 		        	  if (response.getText() != null && response.getText().length()>0) {
-		        	 Contact c = ContactJSON.fromJSON(response.getText());
+		        		  Widget c = WidgetJSON.fromJSON(response.getText());
 		        	 
-		        	 l.setText(c.getName());
+		        	 l.setText(c.getId());
 		        	  } else {
 		        		  Log.warn("Received empty object");
 		        	  }

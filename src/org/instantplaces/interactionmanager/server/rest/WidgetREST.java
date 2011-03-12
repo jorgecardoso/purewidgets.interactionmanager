@@ -4,20 +4,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonSetter;
+import org.instantplaces.interactionmanager.server.Log;
 import org.instantplaces.interactionmanager.server.dso.WidgetDSO;
 import org.instantplaces.interactionmanager.server.dso.WidgetOptionDSO;
 import org.instantplaces.interactionmanager.shared.Widget;
 import org.instantplaces.interactionmanager.shared.WidgetOption;
-import org.mortbay.log.Log;
 
-@XmlRootElement
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name="widget")
 public class WidgetREST implements Widget {
-	protected static Logger log = Logger.getLogger("InteractionManagerApplication"); 
+
 	@XmlAttribute
 	private	String placeId;
 	
@@ -29,10 +34,10 @@ public class WidgetREST implements Widget {
 	private String id;
 
 	@XmlElement
-	private ArrayList<WidgetOption>widgetOptions;
+	private ArrayList<WidgetOptionREST>widgetOptions;
 	
 	public WidgetREST() {
-		this.widgetOptions = new ArrayList<WidgetOption>();
+		this.widgetOptions = new ArrayList<WidgetOptionREST>();
 	}	
 	
 	@Override
@@ -51,6 +56,7 @@ public class WidgetREST implements Widget {
 		
 	}
 
+
 	@Override
 	public String getApplicationId() {
 		return this.applicationId;
@@ -67,6 +73,7 @@ public class WidgetREST implements Widget {
 		return this.id;
 	}
 
+
 	@Override
 	public WidgetOptionREST[] getWidgetOptions() {
 		if ( this.widgetOptions != null ) { 
@@ -81,7 +88,7 @@ public class WidgetREST implements Widget {
 	public void addWidgetOption(WidgetOption widgetOption) {
 		
 		if ( !this.widgetOptions.contains(widgetOption) ) {
-			this.widgetOptions.add(widgetOption);
+			this.widgetOptions.add((WidgetOptionREST)widgetOption);
 		}
 		
 	}
@@ -90,7 +97,7 @@ public class WidgetREST implements Widget {
 	 * Needed so that Jackson can deserialize JSON correctly
 	 */
 	public void setWidgetOptions(ArrayList<WidgetOptionREST> options) {
-		this.widgetOptions = new ArrayList<WidgetOption>();
+		this.widgetOptions = new ArrayList<WidgetOptionREST>();
 		this.widgetOptions.addAll(options);
 		//this.widgetOptions = (ArrayList<WidgetOption>)options;
 	}
@@ -98,9 +105,8 @@ public class WidgetREST implements Widget {
 	
 	public WidgetDSO toDSO() {
 		WidgetDSO wDSO = new WidgetDSO();
-		log.info("Converting WidgetREST to DSO");
+		Log.get().debug("Converting WidgetREST to DSO");
 		wDSO.setId(this.id);
-		log.info(this.widgetOptions.toString());
 		for (WidgetOption wo : this.widgetOptions) {
 			
 			WidgetOptionREST woREST = (WidgetOptionREST)wo;

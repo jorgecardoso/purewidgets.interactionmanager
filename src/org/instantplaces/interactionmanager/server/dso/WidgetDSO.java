@@ -191,6 +191,9 @@ public class WidgetDSO {
 		//right now only merging options. the widget itself has no other
 		// information that can be merged
 		
+		// TODO: if client changed the suggested ref code for an option should we 
+		// update it and try to generate a new ref code?
+		
 		/*
 		 * Check options that have been deleted in that and... delete them in this 
 		 */

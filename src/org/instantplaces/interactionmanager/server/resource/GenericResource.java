@@ -46,7 +46,7 @@ import org.restlet.data.Status;
  * @param <?> The type of object that is going to be serialized and sent back to 
  * the client.
  */
-public abstract class InstantPlacesGenericResource extends ServerResource {
+public abstract class GenericResource extends ServerResource {
 	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
 	
 	
@@ -77,7 +77,7 @@ public abstract class InstantPlacesGenericResource extends ServerResource {
 	
 	protected PersistenceManager pm; 
 	
-	public InstantPlacesGenericResource() {
+	public GenericResource() {
 		
 	}
 	
