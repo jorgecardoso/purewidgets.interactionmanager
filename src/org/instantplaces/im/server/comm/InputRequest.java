@@ -2,16 +2,24 @@ package org.instantplaces.im.server.comm;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.PMF;
+import org.instantplaces.im.server.dso.WidgetDSO;
+import org.instantplaces.im.server.dso.WidgetInputDSO;
+import org.instantplaces.im.server.dso.WidgetOptionDSO;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+
+import javax.jdo.PersistenceManager;
 
 /**
  * Requests input for a place from the Instant Places main service 
@@ -22,8 +30,9 @@ import org.jdom.input.SAXBuilder;
  */
 public class InputRequest {
 	private static final String WIDGET_COMMAND_NAME = "TAG";
-	
 	private static final String COMMAND_NAME_SEPARATOR = ".";
+	private static final String PARAM_SEPARATOR = ":";
+	
 	private static final String url ="http://193.137.8.107/instantplacesservice/instantplacesservice.svc/domain/dsi/place/jorge/presences/commands";
 	
 	public  static void getPresences() {
@@ -51,40 +60,30 @@ public class InputRequest {
 					for (Element usedCommandInfo : (List<Element>)usedCommandsInfo.getChildren("usedCommandInfo")) {
 						Log.get().debug(usedCommandInfo.toString());
 						
-						String parameter = usedCommandInfo.getChild("command").getChildText("firstArgument");
 						String identity = usedCommandInfo.getChildText("identityId");
 						
-						Log.get().debug("Identity: " + identity + "  parameter:" +parameter);
+						String parameters[] = usedCommandInfo.getChild("command").getChildText("firstArgument").split(PARAM_SEPARATOR);
+						
+						String refCode = "";
+						
+						if (parameters != null && parameters.length > 0) {
+							refCode = parameters[0];
+							String tmp[] = new String[parameters.length-1];
+							for (int i = 0; i < tmp.length; i++) {
+								tmp[i] = parameters[i+1];
+							}
+							parameters = tmp;
+												
+						}
+						Log.get().debug("Identity: " + identity + " refCode:"+ refCode +"  parameter:" +Arrays.toString(parameters));
+						
+						saveInput(identity, refCode, parameters);
 						
 					}
 				}
 				
 			}
-			/*
-			List <Element>namedChildren = presenceItems.getChildren("presence");
-			log.info(namedChildren.toString());
-			
-			for (Element e : namedChildren) {
-				String url = e.getChild("deviceNameUrl").getText();
-				log.info(url);
-				presenceURLs.add(url);
-			}
-			is.close();
-			
-			for (String url : presenceURLs) {
-				is = getNoCache(url);
-				doc = builder.build(is);
-				String deviceName = doc.getRootElement().getChild("name").getText();
-				String initTime = doc.getRootElement().getChild("initTime").getText();
-				
-				Identity iden = new Identity(deviceName);
-				iden.setFirstSeen(initTime);
-				if (iden.getRawIdentity() != "") {
-					identities.add(iden);
-				}
-				is.close();
-			}
-			*/
+		
 		} catch (JDOMException e) {
 			e.printStackTrace();
 			Log.get().error(e.getMessage());
@@ -98,6 +97,41 @@ public class InputRequest {
 	}	
 	
 	
+	private static void saveInput(String identity, String refCode,
+			String[] parameters) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		WidgetOptionDSO widgetOption = WidgetOptionDSO.getWidgetOptionDSOByReferenceCode(pm, refCode);
+		
+		if ( widgetOption == null ) {
+			Log.get().debug("No widgets are using this reference code.");
+			return;
+		} else {
+			Log.get().debug("Saving input for " + widgetOption.toString());
+			
+			WidgetInputDSO input = new WidgetInputDSO();
+			input.setPersona(identity);
+		
+			input.setParameters(parameters);
+			input.setWidgetOptionDSO(widgetOption);
+			input.setTimeStamp("");
+			widgetOption.addWidgetInput(input);
+			try {
+				pm.close();
+			} catch(Exception e) {
+				Log.get().error("Could not save input to datastore");
+				Log.get().equals(e.getMessage());
+				e.printStackTrace();
+			} finally {
+				
+			}
+		}
+		
+		
+		
+	}
+
+
 	/**
 	 * Makes a connection to the specified URL and returns the associated 
 	 * InputStream. This method makes sure that the connection does not use 

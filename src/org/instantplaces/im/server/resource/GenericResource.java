@@ -1,39 +1,30 @@
 package org.instantplaces.im.server.resource;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
-import org.eclipse.jdt.internal.compiler.ast.ThisReference;
+
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.PlaceDSO;
-import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.rest.ErrorREST;
-import org.restlet.Response;
+
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.jaxb.JaxbRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
-import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.data.Status;
 
 /**

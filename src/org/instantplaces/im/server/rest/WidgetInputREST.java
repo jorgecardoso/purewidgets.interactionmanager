@@ -19,7 +19,6 @@ public class WidgetInputREST implements WidgetInput{
 	@XmlAttribute
 	private String widgetId;
 	
-	
 	@XmlAttribute
 	private String referenceCode;
 	

@@ -15,11 +15,8 @@ public class WidgetInputDSO {
     private Key key;
 	
 	@Persistent
-	private String widgetId;
-	
-	@Persistent
-	private String referenceCode;
-	
+	private WidgetOptionDSO widgetOption;
+		
 	@Persistent
 	private String timeStamp;
 	
@@ -41,13 +38,7 @@ public class WidgetInputDSO {
 		return key;
 	}
 
-	public void setReferenceCode(String referenceCode) {
-		this.referenceCode = referenceCode;
-	}
-
-	public String getReferenceCode() {
-		return referenceCode;
-	}
+	
 
 	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
@@ -73,13 +64,44 @@ public class WidgetInputDSO {
 		return persona;
 	}
 
-	public void setWidgetId(String widgetId) {
-		this.widgetId = widgetId;
+	public void setWidgetOptionDSO(WidgetOptionDSO widgetOption) {
+		this.widgetOption = widgetOption;
 	}
 
-	public String getWidgetId() {
-		return widgetId;
+	public WidgetOptionDSO getWidgetOptionDSO() {
+		return this.widgetOption;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (super.equals(o)) {
+			return true;
+		}
+		
+		if ( !(o instanceof WidgetInputDSO) ) {
+			return false;
+		}
+		
+		WidgetInputDSO other  = (WidgetInputDSO)o;
+		
+		if ( !this.timeStamp.equals(other.getTimeStamp()) ) {
+			return false;
+		}
+		
+		if ( !this.persona.equals(other.getPersona()) ) {
+			return false;
+		}
+		
+		if ( this.parameters.length != other.getParameters().length ) {
+			return false;
+		}
+		
+		for (int i = 0; i < this.parameters.length; i++) {
+			if ( !this.parameters[i].equals(other.getParameters()[i]) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 }

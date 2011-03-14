@@ -1,5 +1,10 @@
 package org.instantplaces.im.server.dso;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -29,6 +34,9 @@ public class WidgetOptionDSO {
 	
 	@Persistent
 	private WidgetDSO widget;
+	
+	@Persistent(mappedBy = "widgetOption")
+	private ArrayList <WidgetInputDSO> inputs; 
 	
 	
 	public WidgetOptionDSO() {
@@ -92,6 +100,26 @@ public class WidgetOptionDSO {
 		return referenceCode;
 	} 	
 	
+	
+	public void addWidgetInput(WidgetInputDSO input) {
+		if (!this.inputs.contains(input)) {
+			this.inputs.add(input);
+		}
+	}
+	public void removeWidgetInput(WidgetInputDSO input) {
+		this.inputs.remove(input);
+	}
+
+
+	public WidgetInputDSO[] getWidgetInputs() {
+		return this.inputs.toArray(new WidgetInputDSO[0]);
+	}
+
+	public ArrayList<WidgetInputDSO> getWidgetInputsAsArrayList() {
+		return this.inputs;
+	}
+	
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -127,4 +155,30 @@ public class WidgetOptionDSO {
 		return this.id.equals(thatId);
 		
 	}
+	
+	public static WidgetOptionDSO getWidgetOptionDSOByReferenceCode(PersistenceManager pm, String referenceCode ) {
+		Log.get().debug("Fetching WidgetOptionDSO with referenceCode(" + referenceCode + ") from Data Store.");
+		
+		Query query = pm.newQuery(WidgetOptionDSO.class);
+	    query.setFilter("referenceCode == idParam");
+	    query.declareParameters("String idParam");
+	    
+	    try {
+	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(referenceCode);
+	        if (!results.isEmpty()) {
+	        	Log.get().debug("Found " + results.size() + " widget options. Returning first.");
+	        	WidgetOptionDSO widgetOption = results.get(0);
+	        	return widgetOption;
+	        } else {
+	        	Log.get().debug("Widget option not found.");
+	        }
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store.");
+	    	Log.get().error(e.getMessage());
+	    	e.printStackTrace();
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}	
 }
