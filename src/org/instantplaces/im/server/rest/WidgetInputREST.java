@@ -1,5 +1,7 @@
 package org.instantplaces.im.server.rest;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,6 +15,8 @@ import org.instantplaces.im.shared.WidgetInput;
  * @author Jorge C. S. Cardoso
  *
  */
+
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class WidgetInputREST implements WidgetInput{
 	
@@ -23,7 +27,7 @@ public class WidgetInputREST implements WidgetInput{
 	private String referenceCode;
 	
 	@XmlAttribute
-	private String timeStamp;	
+	private long timeStamp;	
 	
 	@XmlElement
 	private String[] parameters;
@@ -56,12 +60,12 @@ public class WidgetInputREST implements WidgetInput{
 	}
 
 	@Override
-	public void setTimeStamp(String timeStamp) {
+	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
 	@Override
-	public String getTimeStamp() {
+	public Long getTimeStamp() {
 		return this.timeStamp;
 	}
 

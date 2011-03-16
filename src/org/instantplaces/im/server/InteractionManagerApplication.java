@@ -33,8 +33,6 @@ public class InteractionManagerApplication extends Application {
         
         router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}/input", WidgetInputResource.class);
         router.attach("/place/{placeid}/application/{appid}/input", WidgetInputResource.class);
-        
-        
      
         return router;
 	}    

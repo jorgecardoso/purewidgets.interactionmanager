@@ -161,8 +161,7 @@ public class WidgetResource extends GenericResource {
 
 	@Override
 	protected Object doGet() {
-		InputRequest.getPresences();
-		
+				
 		Log.get().debug("Responding to GET request.");
 		
 		if (this.widgetId != null) { 

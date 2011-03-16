@@ -13,6 +13,7 @@ import org.codehaus.jackson.map.DeserializationProblemHandler;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
+import org.instantplaces.im.server.comm.InputRequest;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -103,6 +104,8 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	@Override
 	public void doInit() {
+		InputRequest.getPresences();
+		
 		/*
 		 * JDO Queries only retrieve child objects when they are accessed so
 		 * we keep an instance of PersistanceManager throughout the whole request and

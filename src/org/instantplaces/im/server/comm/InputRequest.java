@@ -5,7 +5,9 @@ import java.io.InputStream;
 
 import java.net.HttpURLConnection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
@@ -35,8 +37,20 @@ public class InputRequest {
 	
 	private static final String url ="http://193.137.8.107/instantplacesservice/instantplacesservice.svc/domain/dsi/place/jorge/presences/commands";
 	
+	private static ArrayList<String> lastCommands = new ArrayList<String>();
+	private static ArrayList<String> currentCommands;
+	
+	private static long lastRun = 0;
+	private static long minInterval = 15*1000; //15 seconds
+	
 	public  static void getPresences() {
-		
+		long currentTime = System.currentTimeMillis();
+		if ( (currentTime - lastRun) < minInterval ) {
+			//Log.get().debug();
+			return;
+		}
+		Log.get().debug("Updating input from main Instant Places server.");
+		lastRun = currentTime;
 		
  		SAXBuilder builder = new SAXBuilder();
 		builder.setValidation(false);
@@ -50,6 +64,8 @@ public class InputRequest {
 			
 			Element usedCommands = root.getChild("usedCommands");
 			Log.get().debug(usedCommands.toString());
+			
+			currentCommands = new ArrayList<String>();
 			
 			for (Element usedCommand : (List<Element>)usedCommands.getChildren()) {
 				if (usedCommand.getChildText("name").equalsIgnoreCase(WIDGET_COMMAND_NAME)) {
@@ -77,11 +93,43 @@ public class InputRequest {
 						}
 						Log.get().debug("Identity: " + identity + " refCode:"+ refCode +"  parameter:" +Arrays.toString(parameters));
 						
-						saveInput(identity, refCode, parameters);
+						String cmd = identity+refCode+Arrays.toString(parameters);
+						currentCommands.add(cmd);
+						
+						if ( !(lastCommands.contains(cmd)) ) {
+							/*
+							 * new command, so save it.
+							 */
+							saveInput(identity, refCode, parameters);
+						} else {
+							Log.get().debug("Command already exists... skiping.");
+						}
+						
+						
+						
 						
 					}
 				}
 				
+			}
+			
+			/*
+			 * remove from last commands the commands that disappeared in the current list
+			 */
+			
+			Iterator<String> it = lastCommands.iterator();
+			while (it.hasNext()) {
+				String next = it.next();
+				if ( !(currentCommands.contains(next)) ) {
+					it.remove();
+				}
+			}
+			
+			/*
+			 * add current commands to the lastcommands list
+			 */
+			for (String s : currentCommands) {
+				lastCommands.add(s);
 			}
 		
 		} catch (JDOMException e) {
@@ -92,8 +140,6 @@ public class InputRequest {
 			Log.get().error(e.getMessage());
 		}
 		
-		
-		//return identities;
 	}	
 	
 	
@@ -114,7 +160,7 @@ public class InputRequest {
 		
 			input.setParameters(parameters);
 			input.setWidgetOptionDSO(widgetOption);
-			input.setTimeStamp("");
+			input.setTimeStamp(System.currentTimeMillis());
 			widgetOption.addWidgetInput(input);
 			try {
 				pm.close();

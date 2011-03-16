@@ -1,9 +1,15 @@
 package org.instantplaces.im.server.dso;
 
+import java.util.Arrays;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+
+import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.rest.WidgetInputREST;
+import org.instantplaces.im.server.rest.WidgetREST;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -18,7 +24,7 @@ public class WidgetInputDSO {
 	private WidgetOptionDSO widgetOption;
 		
 	@Persistent
-	private String timeStamp;
+	private long timeStamp;
 	
 	@Persistent
 	private String []parameters;
@@ -40,11 +46,11 @@ public class WidgetInputDSO {
 
 	
 
-	public void setTimeStamp(String timeStamp) {
+	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	public String getTimeStamp() {
+	public long getTimeStamp() {
 		return timeStamp;
 	}
 
@@ -72,6 +78,26 @@ public class WidgetInputDSO {
 		return this.widgetOption;
 	}
 	
+
+	public WidgetInputREST toREST() {
+		Log.get().debug("Converting to REST " + this.toString());
+		
+		WidgetInputREST  w = new WidgetInputREST();
+	
+		if (this.widgetOption != null) {
+			w.setReferenceCode(this.widgetOption.getReferenceCode());
+			w.setWidgetId(this.widgetOption.getWidget().getId());
+		}
+		w.setParameters(this.parameters);
+		w.setPersona(this.persona);
+		w.setTimeStamp(this.timeStamp);
+		
+		Log.get().debug("Converted: " + w.toString());
+		return w; 
+	}
+
+	
+	
 	@Override
 	public boolean equals(Object o) {
 		if (super.equals(o)) {
@@ -84,7 +110,7 @@ public class WidgetInputDSO {
 		
 		WidgetInputDSO other  = (WidgetInputDSO)o;
 		
-		if ( !this.timeStamp.equals(other.getTimeStamp()) ) {
+		if ( !(this.timeStamp == other.getTimeStamp()) ) {
 			return false;
 		}
 		
@@ -102,6 +128,12 @@ public class WidgetInputDSO {
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		
+		return "WidgetInput(" + "persona: " + this.persona + "; parameters " + Arrays.toString(this.parameters) + ")";
 	}
 	
 }

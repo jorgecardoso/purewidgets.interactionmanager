@@ -9,8 +9,8 @@ public interface WidgetInput {
 	public void setReferenceCode(String referenceCode);
 	public String getReferenceCode();
 	
-	public void setTimeStamp(String timeStamp);
-	public String getTimeStamp();
+	public void setTimeStamp(Long timeStamp);
+	public Long getTimeStamp();
 	
 	public void setParameters(String []parameters);
 	public String[] getParameters();

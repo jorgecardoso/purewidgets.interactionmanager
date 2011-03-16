@@ -8,7 +8,6 @@ public class WidgetInputJSON extends GenericJSON implements WidgetInput {
    protected WidgetInputJSON() { 
 		   
    }
-
 	   
 	@Override
 	public final native void setWidgetId(String widgetId) /*-{ 
@@ -31,12 +30,12 @@ public class WidgetInputJSON extends GenericJSON implements WidgetInput {
 	}-*/;
 
 	@Override
-	public final native void setTimeStamp(String timeStamp) /*-{ 
+	public final native void setTimeStamp(Long timeStamp) /*-{ 
 		this.timeStamp = timeStamp;
 	}-*/;
 	
 	@Override
-	public final native String getTimeStamp() /*-{ 
+	public final native Long getTimeStamp() /*-{ 
 		return this.timeStamp;
 	}-*/;
 
