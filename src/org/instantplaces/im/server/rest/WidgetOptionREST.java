@@ -36,17 +36,6 @@ public class WidgetOptionREST implements WidgetOption {
 		
 	}
 	
-	/*
-	@Override
-	public void setWidgetId(String widgetId) {
-		this.widgetId = widgetId;
-	}
-
-	@Override
-	public String getWidgetId() {
-		return this.widgetId;
-	}*/
-	
 
 	@Override
 	public void setId(String id) {

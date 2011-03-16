@@ -1,16 +1,13 @@
 package org.instantplaces.im.client;
 
 
-
 import org.instantplaces.im.client.json.ErrorJSON;
 import org.instantplaces.im.client.json.WidgetJSON;
 import org.instantplaces.im.client.json.WidgetOptionJSON;
-import org.instantplaces.im.shared.Contact;
 import org.instantplaces.im.shared.Widget;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.JavaScriptObject;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestException;
@@ -28,7 +25,6 @@ public class InteractionManager implements EntryPoint {
 	Label l; 
 	
 
-	  
 	@Override
 	public void onModuleLoad() {
 		//Log.setCurrentLogLevel(Log.LOG_LEVEL_DEBUG);

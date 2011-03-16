@@ -18,7 +18,10 @@ public class WidgetArrayListREST {
 	
 	@Override
 	public String toString() {
-		return null;
+		StringBuilder sb = new StringBuilder();
+		for (WidgetREST w : widgets) {
+			sb.append(w.toString());
+		}
+		return sb.toString();
 	}
-	//TODO: make a toString representation
 }

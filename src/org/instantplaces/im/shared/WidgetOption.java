@@ -2,10 +2,6 @@ package org.instantplaces.im.shared;
 
 public interface WidgetOption {
 	
-/*	public void setWidgetId(String widgetId);
-	public String getWidgetId();*/
-	
-	
 	public void setId(String id);
 	public String getId();
 	
