@@ -181,6 +181,14 @@ public class WidgetDSO {
 		return null;
 	}	
 	
+	public void copySuggestedReferenceCodesToReferenceCodes() {
+		//Log.get().debug(this.toString());
+		for (WidgetOptionDSO option : this.options) {
+			option.setReferenceCode(option.getSuggestedReferenceCode());
+		}
+	//	Log.get().debug(this.toString());
+	}
+	
 	/**
 	 * Merges this WidgetDSO with the information from that WidgetDSO.
 	 * 

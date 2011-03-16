@@ -25,60 +25,17 @@ public class WidgetResource extends GenericResource {
 
 		
 	@Override
-	protected Object doPost(Object in) {
-		Log.get().debug("Responding to POST request.");
-		
-		WidgetREST receivedWidgetREST = (WidgetREST)in;
-	
-		Log.get().debug("Data received from client: " + receivedWidgetREST.toString());
-		
-		//TODO: Check consistency of query params and received widget data
-		
-		/*
-		 * Fetch the widget from the data store.
-		 */
-		WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetREST.getId());
-		
-		/*
-		 * If the widget does not exist yet throw an error back to the client 
-		 */
-		if (storedWidgetDSO == null) {
-			Log.get().debug("Client specified an non-existing widget to update.");
-			return new ErrorREST(receivedWidgetREST, "Widget does not exist. Use PUT to... put.");
-		}
-		
-		/*
-		 * Convert the received REST data to DSO
-		 */
-		WidgetDSO receivedWidgetDSO = receivedWidgetREST.toDSO();
-	
-		
-		/*
-		 * And merge it with the existing widget in the data store.
-		 */
-		storedWidgetDSO.mergeWith(receivedWidgetDSO);
-		
-		
-		
-		/*
-		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
-			wo.setReferenceCode(wo.getSuggestedReferenceCode());
-		}*/
-		
-		/*
-		 * Convert the updated widget back to REST to send it to the client 
-		 */
-		WidgetREST toClient = storedWidgetDSO.toREST();
-		
-		
-		return toClient;
+	protected Object doPut(Object in) {
+		return null;
 	}
 
 	@Override
-	protected Object doPut(Object in) {
-		Log.get().debug("Responding to PUT request.");
+	protected Object doPost(Object in) {
+		Log.get().debug("Responding to Post request.");
 				
 		WidgetREST receivedWidgetREST = (WidgetREST)in;
+		
+		WidgetDSO receivedWidgetDSO = receivedWidgetREST.toDSO();
 		
 		//TODO: Check consistency of query params and received widget data
 		 
@@ -88,75 +45,77 @@ public class WidgetResource extends GenericResource {
 		/*
 		 * Try to fetch the widget from the data store (it should not exist)
 		 */
-		WidgetDSO existingWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetREST.getId());
+		WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetREST.getId());
 		
-		/*
-		 * If the widget already exists in the data store throw an error back to the
-		 * client
-		 */
-		if (existingWidgetDSO != null) {
-			Log.get().debug("Client specified an existing widget to put.");
-			this.setStatus(Status.CLIENT_ERROR_CONFLICT);
-			return new ErrorREST(receivedWidgetREST, "Widget already exists. Use POST to update.");
-		} 
+		if ( null != storedWidgetDSO ) { 
+			/* 
+			 * Widget exists in data store so merge
+			 */
+			storedWidgetDSO.mergeWith(receivedWidgetDSO);
+			
+		} else {
+			/*
+			 * Widget does not exist so create and store 
+			 */
 		
-		/*
-		 * Convert the received REST widget to a DSO one 
-		 */
-		existingWidgetDSO = receivedWidgetREST.toDSO(); //new WidgetDSO(receivedWidgetREST.getId(), null, null);
-		
-		
-		/*
-		 * Get the Place from the store. Create one if it does not exist yet
-		 */
-	    existingPlaceDSO = PlaceDSO.getPlaceDSO(this.pm, this.placeId);
-	    if (null == existingPlaceDSO) {
-	    	Log.get().debug("The specified place was not found. Creating new...");
-	        existingPlaceDSO = new PlaceDSO(this.placeId, null);
-	    } 
+			storedWidgetDSO = receivedWidgetDSO;
+			
+			/*
+			 * Get the Place from the store. Create one if it does not exist yet
+			 */
+		    existingPlaceDSO = PlaceDSO.getPlaceDSO(this.pm, this.placeId);
+		    if (null == existingPlaceDSO) {
+		    	Log.get().debug("The specified place was not found. Creating new...");
+		        existingPlaceDSO = new PlaceDSO(this.placeId, null);
+		    } 
 	    
+		    /*
+		     * Get the Application from the store. Create one if it does not exist yet.
+		     */
+		    existingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+		    if (null == existingApplicationDSO) {
+		    	Log.get().debug("The specified application was not found. Creating new...");
+		        existingApplicationDSO = new ApplicationDSO(this.appId, existingPlaceDSO, null);
+		    }
 	    
-	    /*
-	     * Get the Application from the store. Create one if it does not exist yet.
-	     */
-	    existingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
-	    if (null == existingApplicationDSO) {
-	    	Log.get().debug("The specified application was not found. Creating new...");
-	        existingApplicationDSO = new ApplicationDSO(this.appId, existingPlaceDSO, null);
-	    }
+		    /*
+		     * Set the place for the application and add the application to the place. Set the application
+		     * for the widget and add the widget to the application.
+		     * These are (should be) idempotent operations.
+		     */
+		    existingApplicationDSO.setPlace(existingPlaceDSO);
+		    existingPlaceDSO.addApplication(existingApplicationDSO);
+		    
+		    existingApplicationDSO.addWidget(storedWidgetDSO);
+		    storedWidgetDSO.setApplication(existingApplicationDSO);
 	    
-	    /*
-	     * Set the place for the application and add the application to the place. Set the application
-	     * for the widget and add the widget to the application.
-	     * These are (should be) idempotent operations.
-	     */
-	    existingApplicationDSO.setPlace(existingPlaceDSO);
-	    existingPlaceDSO.addApplication(existingApplicationDSO);
-	    
-	    existingApplicationDSO.addWidget(existingWidgetDSO);
-	    existingWidgetDSO.setApplication(existingApplicationDSO);
-	    
-	    //TODO: Fill the rest of the widget fields (ref codes)
-	    
-	    /*
-	     * Make the objects persistent. This is only necessary in case the place does not yet exist
-	     * but it does harm to call it everytime...
-	     */
-		try {
-			pm.makePersistent(existingPlaceDSO);
-		} catch (Exception e) {
-			Log.get().error("Could not make the new place persistent.");
-			e.printStackTrace();
+		    
+		    
+		    /*
+		     * Make the objects persistent. This is only necessary in case the place does not yet exist
+		     * but it does harm to call it everytime...
+		     */
+			try {
+				pm.makePersistent(existingPlaceDSO);
+			} catch (Exception e) {
+				Log.get().error("Could not make the new place persistent.");
+				e.printStackTrace();
 
-			this.setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new ErrorREST(receivedWidgetREST, "Could not make the new place persistent." );
+				this.setStatus(Status.SERVER_ERROR_INTERNAL);
+				return new ErrorREST(receivedWidgetREST, "Could not make the new place persistent." );
+			}
+	    
 		}
+	  
+		//TODO: Assign reference codes correctly
+		storedWidgetDSO.copySuggestedReferenceCodesToReferenceCodes();
 		
 		
+	
 		/*
 		 * Return the complete widget back.
 		 */
-		return existingWidgetDSO.toREST();
+		return storedWidgetDSO.toREST();
 	}
 
 	@Override

@@ -89,7 +89,7 @@ public class WidgetOptionDSO {
 	}
 
 	public String getSuggestedReferenceCode() {
-		return suggestedReferenceCode;
+		return this.suggestedReferenceCode;
 	}
 
 	public void setReferenceCode(String referenceCode) {
@@ -133,7 +133,7 @@ public class WidgetOptionDSO {
 		Log.get().debug("Converting to REST " + this.toString());
 		WidgetOptionREST woREST = new WidgetOptionREST();
 		woREST.setId(this.id);
-		woREST.setSuggestedReferenceCode(this.referenceCode);
+		woREST.setReferenceCode(this.referenceCode);
 		woREST.setSuggestedReferenceCode(this.suggestedReferenceCode);
 		
 		Log.get().debug("Converted: " + woREST.toString());

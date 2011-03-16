@@ -36,23 +36,23 @@ public class InteractionManager implements EntryPoint {
 		//c.setEmail("jorge@ieee.com");
 		WidgetOptionJSON option = WidgetOptionJSON.getNew();
 		option.setId("option1");
-		option.setReferenceCode("option1");
+		
 		option.setSuggestedReferenceCode("suggestion1");
 		
 		WidgetOptionJSON option2 = WidgetOptionJSON.getNew();
 		option2.setId("option2");
-		option2.setReferenceCode("option2");
+		
 		option2.setSuggestedReferenceCode("suggestion2");
 		
 		WidgetJSON w = WidgetJSON.getNew();
 		w.setPlaceId("place:jorge");
 		w.setApplicationId("app:jorge");
-		w.setId("2");
+		w.setId("3");
 		w.addWidgetOption(option);
 		w.addWidgetOption(option2);
 		
 		Log.info(w.toJSON());
-		rb = new RequestBuilder(RequestBuilder.PUT, w.getURL());
+		rb = new RequestBuilder(RequestBuilder.POST, w.getURL());
 		rb.setHeader("Content-type", "application/json");
 		try {
 		      Request request = rb.sendRequest(w.toJSON(), new RequestCallback() {
