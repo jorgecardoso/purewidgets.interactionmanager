@@ -48,16 +48,19 @@ public class WidgetInputResource extends GenericResource {
 	protected Object doGet() {
 		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
 		long from = 0;
-		try {
-			from = Long.parseLong(fromParameter);
-		} catch (Exception e) {
-			String errorMessage =  "Sorry, 'from' query parameter must be an integer value.";
-	
-			Log.get().error(errorMessage);
-	
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
-			//Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
-			//fromParameter = "";
+		
+		if ( !fromParameter.equals("") ) { // if something was specified in the query try to parse it
+			try {
+				from = Long.parseLong(fromParameter);
+			} catch (Exception e) {
+				String errorMessage =  "Sorry, 'from' query parameter must be an integer value.";
+		
+				Log.get().error(errorMessage);
+		
+				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+				//Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
+				//fromParameter = "";
+			}
 		}
 		
 		if (this.widgetId != null) { //Return input for the specified widget only
