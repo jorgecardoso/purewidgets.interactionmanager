@@ -143,7 +143,7 @@ public class WidgetResource extends GenericResource {
 			/*
 			 * Return the list of widgets
 			 */
-			WidgetDSO[] widgets = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			ArrayList<WidgetDSO> widgets = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
 			
 			if ( widgets != null ) {
 				
@@ -151,9 +151,13 @@ public class WidgetResource extends GenericResource {
 				 * Convert all to WidgetREST
 				 */
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
+				for ( WidgetDSO widgetDSO : widgets ) {
+					widgetsREST.add(widgetDSO.toREST());
+				}
+				/*
 				for (int i = 0; i < widgets.length; i++) {
 					widgetsREST.add(widgets[i].toREST());
-				}
+				}*/
 				/*
 				 * We put the ArrayList into a custom WidgetArrayListREST
 				 * because I couldn't make JAXB work otherwise... :(

@@ -62,8 +62,8 @@ public class PlaceDSO {
 	}
 
 
-	public ApplicationDSO[] getApplications() {
-		return this.applications.toArray(new ApplicationDSO[0]);
+	public ArrayList<ApplicationDSO> getApplications() {
+		return this.applications;
 	}
 
 	public void setKey(Key key) {

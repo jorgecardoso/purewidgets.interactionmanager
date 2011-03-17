@@ -43,9 +43,11 @@ public class WidgetOptionDSO {
 		this(null, null);
 	}
 	
+	
 	public WidgetOptionDSO(String id, WidgetDSO widget) {
 		this(id, null, null, widget);
 	}
+	
 	
 	public WidgetOptionDSO(String id, String suggestedReferenceCode, String referenceCode, WidgetDSO widget) {
 		this.id = id;
@@ -54,6 +56,7 @@ public class WidgetOptionDSO {
 		this.widget = widget;
 	}
 
+	
 	public void setWidget(WidgetDSO w) {
 		this.widget = w;	
 	}

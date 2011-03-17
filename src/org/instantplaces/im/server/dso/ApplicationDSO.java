@@ -66,8 +66,8 @@ public class ApplicationDSO  {
 		
 	}
 
-	public WidgetDSO[] getWidgets() {
-		return this.widgets.toArray(new WidgetDSO[0]);
+	public ArrayList<WidgetDSO> getWidgets() {
+		return this.widgets;
 	}
 
 	public void setKey(Key key) {
@@ -90,7 +90,7 @@ public class ApplicationDSO  {
 		return ((ApplicationDSO) app).getKey().equals(this.key);
 	} 
 	
-	public static ApplicationDSO[] getApplicationsDSO( PersistenceManager pm, String placeId ) {
+	public static ArrayList<ApplicationDSO> getApplicationsDSO( PersistenceManager pm, String placeId ) {
 		Log.get().debug("Fetching applications for Place(" + placeId + ") from Data Store.");
 		
 		PlaceDSO place = PlaceDSO.getPlaceDSO(pm, placeId);
@@ -101,7 +101,7 @@ public class ApplicationDSO  {
 		if (place.getApplications() == null) {
 			Log.get().debug("Found 0 applications.");
 		} else {
-			Log.get().debug("Found " + place.getApplications().length + " applications.");
+			Log.get().debug("Found " + place.getApplications().size() + " applications.");
 		}
 		return place.getApplications();
 	}	
@@ -109,7 +109,7 @@ public class ApplicationDSO  {
 	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
 		Log.get().debug("Fetching application Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		
-		ApplicationDSO[] applications = getApplicationsDSO(pm, placeId);
+		ArrayList<ApplicationDSO> applications = getApplicationsDSO(pm, placeId);
 		if ( applications == null ) {
 			Log.get().debug("No applications found.");
 			return null;

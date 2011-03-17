@@ -86,14 +86,14 @@ public class WidgetDSO {
 	}
 
 
-	public WidgetOptionDSO[] getWidgetOptions() {
-		return this.options.toArray(new WidgetOptionDSO[0]);
+	public ArrayList<WidgetOptionDSO> getWidgetOptions() {
+		return this.options;//.toArray(new WidgetOptionDSO[0]);
 	}
-
+/*
 	public ArrayList<WidgetOptionDSO> getWidgetOptionsAsArrayList() {
 		return this.options;
 	}
-	
+	*/
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -147,7 +147,7 @@ public class WidgetDSO {
 	}
 
 	
-	public static WidgetDSO[] getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
+	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		ApplicationDSO application = ApplicationDSO.getApplicationDSO(pm, placeId, applicationId);
 		if (application == null) {
@@ -157,14 +157,14 @@ public class WidgetDSO {
 		if (application.getWidgets() == null) {
 			Log.get().debug("Found 0 widgets.");
 		} else {
-			Log.get().debug("Found " + application.getWidgets().length + " widgets.");
+			Log.get().debug("Found " + application.getWidgets().size() + " widgets.");
 		}
 		return application.getWidgets();
 	}
 	
 	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
 		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "), Widget(" + widgetId + ") from Data Store.");
-		WidgetDSO widgets[] = getWidgetsFromDSO(pm, placeId, applicationId);
+		ArrayList<WidgetDSO> widgets = getWidgetsFromDSO(pm, placeId, applicationId);
 		
 		if ( widgets == null ) {
 			Log.get().debug("No widget found.");
@@ -208,7 +208,7 @@ public class WidgetDSO {
 		Iterator<WidgetOptionDSO> it = this.options.iterator();
 		while (it.hasNext()) {
 			WidgetOptionDSO next = it.next();
-			if (!that.getWidgetOptionsAsArrayList().contains(next)) {
+			if (!that.getWidgetOptions().contains(next)) {
 				Log.get().debug("Deleting unused option " + it.toString());
 				it.remove();	
 			} 
@@ -217,7 +217,7 @@ public class WidgetDSO {
 		/*
 		 * Add new options to this
 		 */
-		it = that.getWidgetOptionsAsArrayList().iterator();
+		it = that.getWidgetOptions().iterator();
 		while (it.hasNext()) {
 			WidgetOptionDSO next = it.next();
 			if (!this.options.contains(next)) {

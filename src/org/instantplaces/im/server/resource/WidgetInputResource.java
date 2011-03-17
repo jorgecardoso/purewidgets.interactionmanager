@@ -29,11 +29,13 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doGet() {
+		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
 		long from = 0;
 		try {
-			from = Long.parseLong(this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "0"));
+			from = Long.parseLong(fromParameter);
 		} catch (Exception e) {
-			Log.get().warn("Error parsing 'from' URL parameter. Assuming 0.");
+			Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
+			fromParameter = "";
 		}
 		
 		if (this.widgetId != null) { //Return input for the specified widget only
@@ -47,7 +49,7 @@ public class WidgetInputResource extends GenericResource {
 			 * If the widget does not exist yet throw an error back to the client 
 			 */
 			if (storedWidgetDSO == null) {
-				Log.get().debug("Client specified an non-existing widget to update.");
+				Log.get().debug("Client specified an non-existing widget to fetch input from.");
 				return new ErrorREST(null, "Specified widget does not exist.");
 			}
 
@@ -55,14 +57,28 @@ public class WidgetInputResource extends GenericResource {
 			 * Get all inputs for all widget options
 			 */
 			ArrayList<WidgetInputREST> list = new ArrayList<WidgetInputREST>();
-			for (WidgetOptionDSO option: storedWidgetDSO.getWidgetOptions()) {
-				for ( WidgetInputDSO input : option.getWidgetInputs() ) {
+			for ( WidgetOptionDSO option: storedWidgetDSO.getWidgetOptions() ) {
+				
+				if ( !fromParameter.equals("") ) {
 					/*
+					 * If fromParameter was specified 
 					 * return only input more recent than the time the client specified
 					 */
-					if (input.getTimeStamp() > from) {
-						list.add(input.toREST());
+					for ( WidgetInputDSO input : option.getWidgetInputs() ) {
+						if (input.getTimeStamp() > from) {
+							list.add(input.toREST());
+						}
 					}
+					
+				} else {
+					/*
+					 * Return only the last input for each option
+					 */
+					ArrayList<WidgetInputDSO> inputs = option.getWidgetInputsAsArrayList();
+					if ( null != inputs && inputs.size() > 0 ) {
+						list.add( inputs.get(inputs.size()-1).toREST() );
+					}
+					
 				}
 			}
 			
@@ -72,12 +88,58 @@ public class WidgetInputResource extends GenericResource {
 			
 		} else {
 			/*
-			 * REturn input for all widgets for the specified application
+			 * Return input for all widgets for the specified application
 			 */
 			
+			/*
+			 * Fetch the widgets from the data store.
+			 */
+			ArrayList<WidgetDSO> storedWidgetsDSO = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			
+			if ( null == storedWidgetsDSO || storedWidgetsDSO.size() == 0 ) {
+				Log.get().debug("The specified application does not have any widget");
+				return new ErrorREST(null, "The specified application does not have any widget");
+			}
+			
+			ArrayList<WidgetInputREST> list = new ArrayList<WidgetInputREST>();
+			
+			for ( WidgetDSO storedWidgetDSO : storedWidgetsDSO ) {
+				/*
+				 * Get all inputs for all widget options
+				 */
+				
+				for ( WidgetOptionDSO option: storedWidgetDSO.getWidgetOptions() ) {
+				
+					if ( !fromParameter.equals("") ) {
+						/*
+						 * If fromParameter was specified 
+						 * return only input more recent than the time the client specified
+						 */
+						for ( WidgetInputDSO input : option.getWidgetInputs() ) {
+							if (input.getTimeStamp() > from) {
+								list.add(input.toREST());
+							}
+						}
+						
+					} else {
+						/*
+						 * Return only the last input for each option
+						 */
+						ArrayList<WidgetInputDSO> inputs = option.getWidgetInputsAsArrayList();
+						if ( null != inputs && inputs.size() > 0 ) {
+							list.add( inputs.get(inputs.size()-1).toREST() );
+						}
+						
+					}
+				}
+			}
+			
+			WidgetInputArrayListREST toClient = new WidgetInputArrayListREST();
+			toClient.inputs = list;
+			return toClient;
 			
 		}
-		return null;
+		//return null;
 	}
 
 	@Override
