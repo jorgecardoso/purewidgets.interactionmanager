@@ -29,9 +29,7 @@ public class WidgetResource extends GenericResource {
 	@Override
 	protected Object doPut(Object in) {
 		String errorMessage =  "Put not allowed. Sorry, only GET or POST methods allowed for this resource.";
-		
 		Log.get().error(errorMessage);
-
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
 	}
 
@@ -104,11 +102,9 @@ public class WidgetResource extends GenericResource {
 			try {
 				pm.makePersistent(existingPlaceDSO);
 			} catch (Exception e) {
-				Log.get().error("Could not make the new place persistent.");
-				e.printStackTrace();
-
-				this.setStatus(Status.SERVER_ERROR_INTERNAL);
-				return new ErrorREST(receivedWidgetREST, "Could not make the new place persistent." );
+				String errorMessage =  "Sorry, could not make the new place persistent.";
+				Log.get().error(errorMessage);
+				throw new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage);
 			}
 	    
 		}
@@ -136,10 +132,9 @@ public class WidgetResource extends GenericResource {
 			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
 			
 			if (widget == null) {
-				Log.get().debug("The specified widget was not found. ");
-				
-				this.setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-				return new ErrorREST(null, "Widget not found.");
+				String errorMessage =  "The specified widget was not found.";
+				Log.get().warn(errorMessage);
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
 				return widget.toREST();
@@ -174,7 +169,7 @@ public class WidgetResource extends GenericResource {
 				return walREST;
 			} else {
 				Log.get().debug("Could not find any widget for the specified application");
-				return null;
+				return new WidgetArrayListREST();
 			}
 			
 		}
