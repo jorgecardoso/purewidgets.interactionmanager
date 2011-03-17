@@ -1,15 +1,18 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetInputDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.instantplaces.im.server.resource.GenericResource.ContentType;
 import org.instantplaces.im.server.rest.ErrorREST;
 import org.instantplaces.im.server.rest.WidgetInputArrayListREST;
 import org.instantplaces.im.server.rest.WidgetInputREST;
 import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 
 public class WidgetInputResource extends GenericResource {
 
@@ -34,8 +37,13 @@ public class WidgetInputResource extends GenericResource {
 		try {
 			from = Long.parseLong(fromParameter);
 		} catch (Exception e) {
-			Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
-			fromParameter = "";
+			String errorMessage =  "Sorry, 'from' query parameter must be an integer value.";
+	
+			Log.get().error(errorMessage);
+	
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+			//Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
+			//fromParameter = "";
 		}
 		
 		if (this.widgetId != null) { //Return input for the specified widget only
@@ -49,8 +57,13 @@ public class WidgetInputResource extends GenericResource {
 			 * If the widget does not exist yet throw an error back to the client 
 			 */
 			if (storedWidgetDSO == null) {
-				Log.get().debug("Client specified an non-existing widget to fetch input from.");
-				return new ErrorREST(null, "Specified widget does not exist.");
+				String errorMessage =  "Sorry, the specified widget does not exist.";
+				
+				Log.get().error(errorMessage);
+		
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				//Log.get().debug("Client specified an non-existing widget to fetch input from.");
+				//return new ErrorREST(null, "Specified widget does not exist.");
 			}
 
 			/*
@@ -97,8 +110,14 @@ public class WidgetInputResource extends GenericResource {
 			ArrayList<WidgetDSO> storedWidgetsDSO = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
 			
 			if ( null == storedWidgetsDSO || storedWidgetsDSO.size() == 0 ) {
-				Log.get().debug("The specified application does not have any widget");
-				return new ErrorREST(null, "The specified application does not have any widget");
+				String errorMessage =  "Sorry, The specified application does not have any widget";
+				
+				Log.get().error(errorMessage);
+		
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				
+				//Log.get().debug("The specified application does not have any widget");
+				//return new ErrorREST(null, "The specified application does not have any widget");
 			}
 			
 			ArrayList<WidgetInputREST> list = new ArrayList<WidgetInputREST>();
