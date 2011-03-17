@@ -18,16 +18,24 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doPost(Object incoming) {
-		this.setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "Only GET methods allowed for this resource.");
+		String errorMessage =  "Post not allowed. Sorry, only GET methods allowed for this resource.";
 		
-		return null;
+		Log.get().error(errorMessage);
+
+		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
+		//this.setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "");
+		
+		//return null;
 	}
 
 	@Override
 	protected Object doPut(Object incoming) {
-		this.setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "Only GET methods allowed for this resource.");
+		String errorMessage =  "Put not allowed. Sorry, only GET methods allowed for this resource.";
 		
-		return null;
+		Log.get().error(errorMessage);
+
+		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
+	
 	}
 
 	@Override
