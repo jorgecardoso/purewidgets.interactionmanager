@@ -17,15 +17,22 @@ import org.restlet.resource.ResourceException;
 public class WidgetInputResource extends GenericResource {
 
 	@Override
+	protected Object doDelete() {
+		String errorMessage =  "Delete not allowed. Sorry, only GET methods allowed for this resource.";
+		
+		Log.get().error(errorMessage);
+
+		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
+	}
+	
+	
+	@Override
 	protected Object doPost(Object incoming) {
 		String errorMessage =  "Post not allowed. Sorry, only GET methods allowed for this resource.";
 		
 		Log.get().error(errorMessage);
 
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
-		//this.setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "");
-		
-		//return null;
 	}
 
 	@Override
@@ -35,7 +42,6 @@ public class WidgetInputResource extends GenericResource {
 		Log.get().error(errorMessage);
 
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
-	
 	}
 
 	@Override
@@ -174,4 +180,5 @@ public class WidgetInputResource extends GenericResource {
 		return WidgetInputREST.class;
 	}
 
+	
 }

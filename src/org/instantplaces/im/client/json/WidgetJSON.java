@@ -17,11 +17,11 @@ public class WidgetJSON extends GenericJSON implements Widget {
 
    public final String getBaseURL() {
 	   return  "/place/" + this.getPlaceId() + "/application/" + this.getApplicationId() + 
-	   	"/widget/";
+	   	"/widget";
    }
    
    public final String getURL() {
-	   return  this.getBaseURL() + this.getId() + "?output=json";
+	   return  this.getBaseURL() + "/" +this.getId() + "?output=json";
    }
    
 	@Override

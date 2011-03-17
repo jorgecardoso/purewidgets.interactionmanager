@@ -47,12 +47,14 @@ public class InteractionManager implements EntryPoint {
 		WidgetJSON w = WidgetJSON.getNew();
 		w.setPlaceId("place:jorge");
 		w.setApplicationId("app:jorge");
-		w.setId("3");
+		w.setId("2");
 		w.addWidgetOption(option);
 		w.addWidgetOption(option2);
 		
 		Log.info(w.toJSON());
-		rb = new RequestBuilder(RequestBuilder.POST, w.getURL());
+		//rb = new RequestBuilder(RequestBuilder.DELETE, w.getBaseURL()+"?output=json");
+		rb = new RequestBuilder(RequestBuilder.DELETE, w.getURL());
+		//rb = new RequestBuilder(RequestBuilder.POST, w.getURL());
 		rb.setHeader("Content-type", "application/json");
 		try {
 		      Request request = rb.sendRequest(w.toJSON(), new RequestCallback() {

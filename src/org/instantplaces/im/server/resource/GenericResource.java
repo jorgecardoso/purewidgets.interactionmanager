@@ -20,6 +20,7 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.jaxb.JaxbRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
@@ -180,8 +181,16 @@ public abstract class GenericResource extends ServerResource {
 	protected abstract Object doPost(Object incoming);
 	protected abstract Object doPut(Object incoming);
 	protected abstract Object doGet();
+	protected abstract Object doDelete();
 	protected abstract Class getResourceClass();
-
+	
+	// DELETE Methods
+	@Delete
+	public Representation delete() {
+		Object object = doDelete();
+		return this.representAsJSON(object);
+	}
+	
 	// GET Methods
 	@Get("html")
 	public Representation returnAsHTML() {

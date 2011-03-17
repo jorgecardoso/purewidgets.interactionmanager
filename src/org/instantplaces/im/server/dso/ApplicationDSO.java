@@ -65,6 +65,13 @@ public class ApplicationDSO  {
 		this.widgets.add(widget);
 		
 	}
+	
+	public void removeWidget(WidgetDSO widget) {
+		Log.get().debug("Deleting widget: " + widget.toString());
+		if ( null != this.widgets ) {
+			this.widgets.remove(widget);
+		}
+	}
 
 	public ArrayList<WidgetDSO> getWidgets() {
 		return this.widgets;

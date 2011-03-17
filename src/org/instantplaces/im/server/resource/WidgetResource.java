@@ -1,6 +1,7 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -19,6 +20,7 @@ import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
 import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 
 
 public class WidgetResource extends GenericResource {
@@ -26,7 +28,11 @@ public class WidgetResource extends GenericResource {
 		
 	@Override
 	protected Object doPut(Object in) {
-		return null;
+		String errorMessage =  "Put not allowed. Sorry, only GET or POST methods allowed for this resource.";
+		
+		Log.get().error(errorMessage);
+
+		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
 	}
 
 	@Override
@@ -174,11 +180,71 @@ public class WidgetResource extends GenericResource {
 		}
 		
 	}
+	
+	@Override
+	protected Object doDelete() {
+		Log.get().debug("Responding to DELETE request.");
+		
+		if (this.widgetId != null) { // Delete the specified widget
+			
+			/*
+			 * Fetch the widget from the data store 
+			 */
+			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
+			
+
+			if (widget == null) {
+				String errorMessage =  "The specified widget was not found.";
+				Log.get().warn(errorMessage);
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+			} else {
+				Log.get().debug("Widget found: " + widget.toString());
+				
+				/*
+				 * Delete the widget.
+				 * 1. Delete it from the application
+				 * 2. Delete from data store.
+				 */
+				widget.getApplication().removeWidget(widget);
+				this.pm.deletePersistent(widget);
+			}
+			
+			
+		} else { //Delete all widgets from this app!
+			
+			/*
+			 * Fetch the app from the store 
+			 */
+			ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+			
+			if ( null == app ) { // app doesn't exist, throw error
+				String errorMessage =  "The specified application was not found.";
+				Log.get().warn(errorMessage);
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				
+			} else {
+				Log.get().debug("Deleting all widgets from " + app.toString());
+				/*
+				 * Delete everything!
+				 */
+				Iterator<WidgetDSO> it = app.getWidgets().iterator();
+				while (it.hasNext()) {
+					WidgetDSO next = it.next();
+					it.remove(); 
+					this.pm.deletePersistent(next);
+				}
+			}
+		}
+		return null;
+	}
+	
 
 	@Override
 	protected Class getResourceClass() {
 		return WidgetREST.class;
 	}
+
+
 	
 	
 	
