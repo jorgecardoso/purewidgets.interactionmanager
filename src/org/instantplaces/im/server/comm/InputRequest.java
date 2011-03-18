@@ -35,6 +35,7 @@ public class InputRequest {
 	private static final String COMMAND_NAME_SEPARATOR = ".";
 	private static final String PARAM_SEPARATOR = ":";
 	
+	//TODO: Ask for input for each place
 	private static final String url ="http://193.137.8.107/instantplacesservice/instantplacesservice.svc/domain/dsi/place/jorge/presences/commands";
 	
 	private static ArrayList<String> lastCommands = new ArrayList<String>();
