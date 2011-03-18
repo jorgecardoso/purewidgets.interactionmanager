@@ -6,8 +6,8 @@ public interface WidgetInput {
 	public void setWidgetId(String widgetId);
 	public String getWidgetId();
 	
-	public void setReferenceCode(String referenceCode);
-	public String getReferenceCode();
+	public void setWidgetOptionId(String widgetOptionId);
+	public String getWidgetOptionId();
 	
 	public void setTimeStamp(Long timeStamp);
 	public Long getTimeStamp();

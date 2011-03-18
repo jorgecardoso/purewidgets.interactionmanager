@@ -24,7 +24,7 @@ public class WidgetInputREST implements WidgetInput{
 	private String widgetId;
 	
 	@XmlAttribute
-	private String referenceCode;
+	private String widgetOptionId;
 	
 	@XmlAttribute
 	private long timeStamp;	
@@ -50,13 +50,13 @@ public class WidgetInputREST implements WidgetInput{
 	}
 
 	@Override
-	public void setReferenceCode(String referenceCode) {
-		this.referenceCode = referenceCode;
+	public void setWidgetOptionId(String widgetOptionId) {
+		this.widgetOptionId = widgetOptionId;
 	}
 
 	@Override
-	public String getReferenceCode() {
-		return this.referenceCode;
+	public String getWidgetOptionId() {
+		return this.widgetOptionId;
 	}
 
 	@Override

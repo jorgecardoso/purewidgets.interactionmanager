@@ -20,13 +20,13 @@ public class WidgetInputJSON extends GenericJSON implements WidgetInput {
 	}-*/;
 
 	@Override
-	public final native void setReferenceCode(String referenceCode) /*-{ 
-		this.referenceCode = referenceCode;
+	public final native void setWidgetOptionId(String widgetOptionId) /*-{ 
+		this.widgetOptionId = widgetOptionId;
 	}-*/;
 
 	@Override
-	public final native String getReferenceCode() /*-{ 
-		return this.referenceCode;
+	public final native String getWidgetOptionId() /*-{ 
+		return this.widgetOptionId;
 	}-*/;
 
 	@Override

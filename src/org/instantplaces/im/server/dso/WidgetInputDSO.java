@@ -85,7 +85,7 @@ public class WidgetInputDSO {
 		WidgetInputREST  w = new WidgetInputREST();
 	
 		if (this.widgetOption != null) {
-			w.setReferenceCode(this.widgetOption.getReferenceCode());
+			w.setWidgetOptionId(this.widgetOption.getId());
 			w.setWidgetId(this.widgetOption.getWidget().getId());
 		}
 		w.setParameters(this.parameters);
