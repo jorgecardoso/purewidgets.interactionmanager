@@ -9,8 +9,8 @@ public interface WidgetInput {
 	public void setWidgetOptionId(String widgetOptionId);
 	public String getWidgetOptionId();
 	
-	public void setTimeStamp(Long timeStamp);
-	public Long getTimeStamp();
+	public void setTimeStamp(String timeStamp);
+	public String getTimeStamp();
 	
 	public void setParameters(String []parameters);
 	public String[] getParameters();

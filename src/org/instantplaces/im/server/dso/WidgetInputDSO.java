@@ -90,7 +90,7 @@ public class WidgetInputDSO {
 		}
 		w.setParameters(this.parameters);
 		w.setPersona(this.persona);
-		w.setTimeStamp(this.timeStamp);
+		w.setTimeStamp(""+this.timeStamp);
 		
 		Log.get().debug("Converted: " + w.toString());
 		return w; 

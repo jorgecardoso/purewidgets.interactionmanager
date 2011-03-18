@@ -30,12 +30,12 @@ public class WidgetInputJSON extends GenericJSON implements WidgetInput {
 	}-*/;
 
 	@Override
-	public final native void setTimeStamp(Long timeStamp) /*-{ 
+	public final native void setTimeStamp(String timeStamp) /*-{ 
 		this.timeStamp = timeStamp;
 	}-*/;
 	
 	@Override
-	public final native Long getTimeStamp() /*-{ 
+	public final native String getTimeStamp() /*-{ 
 		return this.timeStamp;
 	}-*/;
 

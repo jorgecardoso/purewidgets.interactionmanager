@@ -27,7 +27,7 @@ public class WidgetInputREST implements WidgetInput{
 	private String widgetOptionId;
 	
 	@XmlAttribute
-	private long timeStamp;	
+	private String timeStamp;	
 	
 	@XmlElement
 	private String[] parameters;
@@ -60,12 +60,12 @@ public class WidgetInputREST implements WidgetInput{
 	}
 
 	@Override
-	public void setTimeStamp(Long timeStamp) {
+	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
 	@Override
-	public Long getTimeStamp() {
+	public String getTimeStamp() {
 		return this.timeStamp;
 	}
 
