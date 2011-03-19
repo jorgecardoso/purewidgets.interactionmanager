@@ -110,10 +110,11 @@ public class WidgetResource extends GenericResource {
 		}
 	  
 		//TODO: Assign reference codes correctly
-		storedWidgetDSO.copySuggestedReferenceCodesToReferenceCodes();
+		storedWidgetDSO.assignReferenceCodes(pm);
 		
+		//storedWidgetDSO.copySuggestedReferenceCodesToReferenceCodes();
 		
-	
+
 		/*
 		 * Return the complete widget back.
 		 */
@@ -201,6 +202,7 @@ public class WidgetResource extends GenericResource {
 				 * 2. Delete from data store.
 				 */
 				widget.getApplication().removeWidget(widget);
+				widget.recycleReferenceCodes(pm);
 				this.pm.deletePersistent(widget);
 			}
 			
@@ -225,6 +227,7 @@ public class WidgetResource extends GenericResource {
 				Iterator<WidgetDSO> it = app.getWidgets().iterator();
 				while (it.hasNext()) {
 					WidgetDSO next = it.next();
+					next.recycleReferenceCodes(pm);
 					it.remove(); 
 					this.pm.deletePersistent(next);
 				}

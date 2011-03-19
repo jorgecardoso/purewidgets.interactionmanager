@@ -29,6 +29,8 @@ import org.restlet.resource.ServerResource;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 
+import com.google.gwt.core.ext.Generator;
+
 /**
  * This class provides generic functions for resources. It provides subclasses with
  * automatic generation of XML, JSON and JSONP formats for GET requests.
@@ -107,6 +109,7 @@ public abstract class GenericResource extends ServerResource {
 	public void doInit() {
 		InputRequest.getPresences();
 		
+		
 		/*
 		 * JDO Queries only retrieve child objects when they are accessed so
 		 * we keep an instance of PersistanceManager throughout the whole request and
@@ -114,6 +117,8 @@ public abstract class GenericResource extends ServerResource {
 		 */
 		pm = PMF.get().getPersistenceManager();
 		
+		
+	
 		/*
 		 * Extract the parameters from the URL (including the ones from
 		 * the query part) and put them on object fields

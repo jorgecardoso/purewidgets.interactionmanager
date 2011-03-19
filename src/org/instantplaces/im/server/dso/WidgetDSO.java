@@ -10,6 +10,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
 import org.instantplaces.im.server.rest.WidgetREST;
 
 
@@ -225,6 +226,35 @@ public class WidgetDSO {
 				this.addWidgetOption(next);	
 			} 
 		}
+		
+	}
+
+	public void recycleReferenceCodes(PersistenceManager pm) {
+		ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
+		for (WidgetOptionDSO option : this.options) {
+			rcg.recycleCode(option.getReferenceCode());
+				
+			Log.get().debug("Recycling reference code: " + option.toString());
+		
+		
+		}
+	}
+
+	public void assignReferenceCodes(PersistenceManager pm) {
+		//RCGF r = new RCGF();
+		//ReferenceCodeGenerator g = r.get();~
+		ReferenceCodeGenerator g = ReferenceCodeGenerator.getFromDSO(pm);
+		//Log.get().debug(this.toString());
+		String code;
+		for (WidgetOptionDSO option : this.options) {
+			if ( null == option.getReferenceCode() ) {
+				code = g.getNextCodeAsString();
+				Log.get().debug("Assigning reference code: " + code +" to " + this.toString());
+				option.setReferenceCode(code);
+			}
+		}
+		
+		//Log.get().debug("Generator code: " + g.getNextCode());
 		
 	}
 }
