@@ -23,7 +23,7 @@ public class CronResource extends ServerResource {
 	 * Applications that don't communicate over OLD minutes
 	 * will have all their widgets deleted.
 	 */
-	private static final long OLD = 10; // minutes
+	private static final long OLD = 5; // minutes
 	
 	@Override
 	public void doInit() {

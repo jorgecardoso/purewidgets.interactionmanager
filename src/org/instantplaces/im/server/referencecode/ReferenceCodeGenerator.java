@@ -18,6 +18,8 @@ import com.google.appengine.api.datastore.Key;
 @PersistenceCapable
 public class ReferenceCodeGenerator {
 	
+	
+	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
@@ -25,14 +27,19 @@ public class ReferenceCodeGenerator {
 	@Persistent
 	private ArrayList<Integer> codes;
 	
+	private static final int MAX_CODE = 1000;
+	
+
+	
 	public ReferenceCodeGenerator() {
     	codes = new ArrayList<Integer>(1000);
-    	for (int i = 0; i < 1000; i++) {
+    	for (int i = 0; i < MAX_CODE; i++) {
     		codes.add(new Integer(i));
     	}
 	}
 	
     public String getNextCodeAsString() {
+    	
     	return String.format("%03d", this.getNextCode());
     }
     
