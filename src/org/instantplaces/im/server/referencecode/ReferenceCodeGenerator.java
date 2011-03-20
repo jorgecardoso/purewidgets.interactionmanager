@@ -27,7 +27,7 @@ public class ReferenceCodeGenerator {
 	@Persistent
 	private ArrayList<Integer> codes;
 	
-	private static final int MAX_CODE = 1000;
+	private static final int MAX_CODE = 50;
 	
 
 	

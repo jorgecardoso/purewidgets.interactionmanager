@@ -81,6 +81,8 @@ public class ApplicationDSO  {
 		if ( null != this.widgets ) {
 			widget.recycleReferenceCodes();
 			this.widgets.remove(widget);
+			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
+			pm.deletePersistent(widget);
 		}
 	}
 	
@@ -91,6 +93,8 @@ public class ApplicationDSO  {
 			Log.get().debug("Deleting widget: " + widget.toString());
 			widget.recycleReferenceCodes();
 			it.remove();
+			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
+			pm.deletePersistent(widget);
 		}
 	}
 	

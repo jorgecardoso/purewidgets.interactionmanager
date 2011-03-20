@@ -204,8 +204,8 @@ public class WidgetResource extends GenericResource {
 				 * 2. Delete from data store.
 				 */
 				widget.getApplication().removeWidget(widget);
-				widget.recycleReferenceCodes();
-				this.pm.deletePersistent(widget);
+				//widget.recycleReferenceCodes();
+				//this.pm.deletePersistent(widget);
 			}
 			
 			
@@ -226,13 +226,15 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Delete everything!
 				 */
+				app.removeAllWidgets();
+				/*
 				Iterator<WidgetDSO> it = app.getWidgets().iterator();
 				while (it.hasNext()) {
 					WidgetDSO next = it.next();
 					next.recycleReferenceCodes();
 					it.remove(); 
 					this.pm.deletePersistent(next);
-				}
+				}*/
 			}
 		}
 		return null;
