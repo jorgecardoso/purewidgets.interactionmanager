@@ -75,13 +75,7 @@ public class CronResource extends ServerResource {
 						//
 						Log.get().debug("Will delete all widgets from application: " + app.toString());
 						
-						Iterator<WidgetDSO> widgetIt = app.getWidgets().iterator();
-						while(widgetIt.hasNext()) {
-							WidgetDSO w = widgetIt.next();
-							Log.get().debug("Deleting: " + w.toString());
-							
-							widgetIt.remove();
-						}
+						app.removeAllWidgets();
 					}
 				}
 			}

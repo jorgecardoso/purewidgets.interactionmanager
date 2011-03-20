@@ -1,7 +1,9 @@
 package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -77,10 +79,21 @@ public class ApplicationDSO  {
 	public void removeWidget(WidgetDSO widget) {
 		Log.get().debug("Deleting widget: " + widget.toString());
 		if ( null != this.widgets ) {
+			widget.recycleReferenceCodes();
 			this.widgets.remove(widget);
 		}
 	}
-
+	
+	public void removeAllWidgets() {
+		Iterator<WidgetDSO> it = this.widgets.iterator();
+		while ( it.hasNext() ) {
+			WidgetDSO widget = it.next();
+			Log.get().debug("Deleting widget: " + widget.toString());
+			widget.recycleReferenceCodes();
+			it.remove();
+		}
+	}
+	
 	public ArrayList<WidgetDSO> getWidgets() {
 		return this.widgets;
 	}

@@ -229,7 +229,7 @@ public class WidgetDSO {
 		
 	}
 
-	public void recycleReferenceCodes(PersistenceManager pm) {
+	public void recycleReferenceCodes() {
 		//ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
 		for (WidgetOptionDSO option : this.options) {
 			this.application.getPlace().getCodeGenerator().recycleCode(option.getReferenceCode());
