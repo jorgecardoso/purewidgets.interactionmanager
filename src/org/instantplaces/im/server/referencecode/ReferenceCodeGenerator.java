@@ -1,13 +1,8 @@
 package org.instantplaces.im.server.referencecode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.jdo.Extent;
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
+
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -15,7 +10,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.PMF;
+
 
 import com.google.appengine.api.datastore.Key;
 
@@ -27,15 +22,14 @@ public class ReferenceCodeGenerator {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 	
-	@Element(dependent = "true")
 	@Persistent
 	private ArrayList<Integer> codes;
 	
-	private static ReferenceCodeGenerator gen = null;
-	
-	
 	public ReferenceCodeGenerator() {
-		
+    	codes = new ArrayList<Integer>(1000);
+    	for (int i = 0; i < 1000; i++) {
+    		codes.add(new Integer(i));
+    	}
 	}
 	
     public String getNextCodeAsString() {
@@ -60,7 +54,7 @@ public class ReferenceCodeGenerator {
     		
     	}
     }
-    
+    /*
     public static ReferenceCodeGenerator getFromDSO(PersistenceManager pm) {
     	try {
 	    	Extent e = pm.getExtent(ReferenceCodeGenerator.class);
@@ -75,24 +69,13 @@ public class ReferenceCodeGenerator {
 	        	
 	        	return (ReferenceCodeGenerator)iter.next();
 	        	
-	        }  else {
-	        	Log.get().debug("Generator not found in data store, creating...");
-	        	ReferenceCodeGenerator gen = new ReferenceCodeGenerator();
-	        	ArrayList<Integer>codes = new ArrayList<Integer>(1000);
-	        	for (int i = 0; i < 1000; i++) {
-	        		codes.add(new Integer(i));
-	        	}
-	        	gen.setCodes(codes);
-	        	
-	        	pm.makePersistent(gen);
-	        	//gen.getCodes().remove(0);
-	        	return gen;
-	        }
+	        }  
 	    } catch (Exception e) {
 	    	Log.get().error("Could not access data store." + e.getMessage());
 	    }  
 	    return null;
     }
+    */
 /*
 	private static void loadGeneratorFromDatastore() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();

@@ -57,6 +57,7 @@ public class WidgetResource extends GenericResource {
 			 */
 			storedWidgetDSO.mergeWith(receivedWidgetDSO);
 			
+			
 		} else {
 			/*
 			 * Widget does not exist so create and store 
@@ -93,27 +94,28 @@ public class WidgetResource extends GenericResource {
 		    existingApplicationDSO.addWidget(storedWidgetDSO);
 		    storedWidgetDSO.setApplication(existingApplicationDSO);
 	    
+		    //Log.get().debug("Applications: "  + existingPlaceDSO.getApplications().size());
+		    //Log.get().debug("Widgets: " + existingPlaceDSO.getApplications().get(0).getWidgets().size());
 		    
+		  
+		    // Assign the reference codes to the widget.
+		    storedWidgetDSO.assignReferenceCodes();
 		    
 		    /*
 		     * Make the objects persistent. This is only necessary in case the place does not yet exist
 		     * but it does harm to call it everytime...
 		     */
 			try {
-				pm.makePersistent(existingPlaceDSO);
+				existingPlaceDSO = pm.makePersistent(existingPlaceDSO);
 			} catch (Exception e) {
 				String errorMessage =  "Sorry, could not make the new place persistent.";
 				Log.get().error(errorMessage);
 				throw new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage);
 			}
+			
 	    
 		}
-	  
-		//TODO: Assign reference codes correctly
-		storedWidgetDSO.assignReferenceCodes(pm);
-		
-		//storedWidgetDSO.copySuggestedReferenceCodesToReferenceCodes();
-		
+			
 
 		/*
 		 * Return the complete widget back.

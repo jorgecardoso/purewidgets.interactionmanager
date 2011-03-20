@@ -180,6 +180,7 @@ public abstract class GenericResource extends ServerResource {
 	
 	@Override
 	public void doRelease() {
+		Log.get().debug("Closing Persistance Manager.");
 		pm.close();
 	}
 	

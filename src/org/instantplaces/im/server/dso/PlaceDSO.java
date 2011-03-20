@@ -11,6 +11,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
 
 
 import com.google.appengine.api.datastore.Key;
@@ -30,17 +31,24 @@ public class PlaceDSO {
 	@Persistent(mappedBy = "place")
 	private ArrayList<ApplicationDSO> applications;
 	
+	@Persistent
+	private ReferenceCodeGenerator codeGenerator;
+	
 	public PlaceDSO() {
 		this(null, null);
 	}
 	
 	public PlaceDSO(String id, ArrayList<ApplicationDSO> applications) {
 		this.id = id;
+		
+		
 		if (applications != null) {
 			this.applications = applications;
 		} else {
 			this.applications = new ArrayList<ApplicationDSO>();
 		}
+		this.codeGenerator = new ReferenceCodeGenerator();
+		
 	}
 	
 
@@ -108,6 +116,15 @@ public class PlaceDSO {
 	
 	public String toString() {
 		return "Place(id: " + this.id + ")";
+	}
+
+	public void setCodeGenerator(ReferenceCodeGenerator codeGenerator) {
+		this.codeGenerator = codeGenerator;
+	}
+
+	public ReferenceCodeGenerator getCodeGenerator() {
+		return codeGenerator;
+		//return null;
 	}
 
 }

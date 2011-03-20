@@ -230,9 +230,9 @@ public class WidgetDSO {
 	}
 
 	public void recycleReferenceCodes(PersistenceManager pm) {
-		ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
+		//ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
 		for (WidgetOptionDSO option : this.options) {
-			rcg.recycleCode(option.getReferenceCode());
+			this.application.getPlace().getCodeGenerator().recycleCode(option.getReferenceCode());
 				
 			Log.get().debug("Recycling reference code: " + option.toString());
 		
@@ -240,10 +240,10 @@ public class WidgetDSO {
 		}
 	}
 
-	public void assignReferenceCodes(PersistenceManager pm) {
+	public void assignReferenceCodes() {
 		//RCGF r = new RCGF();
 		//ReferenceCodeGenerator g = r.get();~
-		ReferenceCodeGenerator g = ReferenceCodeGenerator.getFromDSO(pm);
+		ReferenceCodeGenerator g = this.application.getPlace().getCodeGenerator();//ReferenceCodeGenerator.getFromDSO(pm);
 		//Log.get().debug(this.toString());
 		String code;
 		for (WidgetOptionDSO option : this.options) {
