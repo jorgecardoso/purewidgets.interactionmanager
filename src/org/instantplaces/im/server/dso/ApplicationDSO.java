@@ -28,6 +28,13 @@ public class ApplicationDSO  {
 	@Persistent(mappedBy = "application")
 	private ArrayList<WidgetDSO> widgets;
 	
+	/**
+	 * The timestamp of the last request made by this app.
+	 * This is used to determine if an application is still active or not.
+	 */
+	@Persistent 
+	private long lastRequestTimestamp;
+	
 	public ApplicationDSO() {
 		this(null, null, null);
 	}
@@ -41,6 +48,7 @@ public class ApplicationDSO  {
 		} else {
 			this.widgets = new ArrayList<WidgetDSO>();
 		}
+		this.lastRequestTimestamp = System.currentTimeMillis();
 	}
 	
 	
@@ -130,6 +138,14 @@ public class ApplicationDSO  {
 		}
 		Log.get().debug("Application not found.");
 		return null;
+	}
+
+	public void setLastRequestTimestamp(long lastRequestTimestamp) {
+		this.lastRequestTimestamp = lastRequestTimestamp;
+	}
+
+	public long getLastRequestTimestamp() {
+		return lastRequestTimestamp;
 	}	
 
 }

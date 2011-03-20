@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.DeserializationProblemHandler;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.comm.InputRequest;
+import org.instantplaces.im.server.dso.ApplicationDSO;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -88,6 +89,11 @@ public abstract class GenericResource extends ServerResource {
 	
 	
 	/**
+	 * The id of the application making the request.
+	 */
+	protected String requestingAppId;
+	
+	/**
 	 * The PersistanceManager used to retrieve objects from the data store.
 	 * This is created at the beginning of the request (doInit) and released at
 	 * the end (doRelease).
@@ -125,6 +131,24 @@ public abstract class GenericResource extends ServerResource {
 		 */
 		extractURLParameters();
 
+		if ( this.requestingAppId.equals("") ) {
+			/*
+			 * We need an appid...
+			 */
+			String errorMessage =  "Sorry, you have to specify a valid application id using 'appid' query parameter.";
+			
+			Log.get().error(errorMessage);
+	
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+		}
+		
+		/*
+		 * Update the requesting app's last request timestamp
+		 */
+		ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
+		if ( null != app ) {
+			app.setLastRequestTimestamp(System.currentTimeMillis());
+		}
 		
 		/*
 		 * Check if the user specified content-type (if any) matches any of the 
@@ -158,6 +182,8 @@ public abstract class GenericResource extends ServerResource {
 		 * Read the user specified content-type. 
 		 */
 		contentType = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("output", "");
+	
+		this.requestingAppId = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("appid", "");
 		
 		/*
 		 * Read the user specified callback function name (used for JSONP only)
@@ -174,6 +200,7 @@ public abstract class GenericResource extends ServerResource {
 		this.placeId = (String)this.getRequestAttributes().get("placeid");
 		this.appId = (String)getRequestAttributes().get("appid");
 		this.widgetId = (String)getRequestAttributes().get("widgetid");
+		
 		
 		Log.get().debug("Client request query parameters: placeid: " + placeId + " appid: " + appId + " widgetId: " + widgetId);
 	}

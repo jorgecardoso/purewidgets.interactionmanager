@@ -54,7 +54,7 @@ public class InteractionManager implements EntryPoint {
 		Log.info(w.toJSON());
 		//rb = new RequestBuilder(RequestBuilder.DELETE, w.getBaseURL()+"?output=json");
 		//rb = new RequestBuilder(RequestBuilder.DELETE, w.getURL());
-		rb = new RequestBuilder(RequestBuilder.POST, w.getURL());
+		rb = new RequestBuilder(RequestBuilder.POST, w.getURL()+"&appid=app:jorge");
 		rb.setHeader("Content-type", "application/json");
 		try {
 		      Request request = rb.sendRequest(w.toJSON(), new RequestCallback() {
