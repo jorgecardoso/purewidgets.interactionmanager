@@ -1,5 +1,6 @@
 package org.instantplaces.im.server;
 
+import org.instantplaces.im.server.resource.CronResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
 import org.restlet.Application;
@@ -34,6 +35,8 @@ public class InteractionManagerApplication extends Application {
         router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}/input", WidgetInputResource.class);
         router.attach("/place/{placeid}/application/{appid}/input", WidgetInputResource.class);
      
+        router.attach("/cron", CronResource.class);
+        
         return router;
 	}    
 }

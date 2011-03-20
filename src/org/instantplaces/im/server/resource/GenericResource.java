@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Transaction;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonDeserializer;
@@ -98,7 +100,9 @@ public abstract class GenericResource extends ServerResource {
 	 * This is created at the beginning of the request (doInit) and released at
 	 * the end (doRelease).
 	 */
-	protected PersistenceManager pm; 
+	protected PersistenceManager pm;
+	
+	private Transaction tx; 
 	
 	public GenericResource() {
 		//pm = null;
@@ -122,8 +126,14 @@ public abstract class GenericResource extends ServerResource {
 		 * release it at the end (see doRelease())
 		 */
 		pm = PMF.get().getPersistenceManager();
-		
-		
+		tx= pm.currentTransaction();
+		try
+		{
+			Log.get().debug("Beginning JDO transaction");
+		    tx.begin();
+		} catch (JDOUserException e) {
+			Log.get().error("Error beginnig JDO transaction: " + e.getMessage());
+		}
 	
 		/*
 		 * Extract the parameters from the URL (including the ones from
@@ -207,8 +217,23 @@ public abstract class GenericResource extends ServerResource {
 	
 	@Override
 	public void doRelease() {
-		Log.get().debug("Closing Persistance Manager.");
-		pm.close();
+		Log.get().debug("Commiting transaction");
+		try {
+			tx.commit();
+		} catch (JDOUserException e) {
+			Log.get().error("Could not commit transaction.");
+		} finally	{
+			if (tx.isActive())
+			{
+				Log.get().error("Could not finish transaction. Rolling back.");
+				tx.rollback();
+			}
+			Log.get().debug("Closing Persistance Manager.");
+			pm.close();
+		}	
+	
+		
+		
 	}
 	
 	protected abstract Object doPost(Object incoming);
