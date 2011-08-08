@@ -2,8 +2,8 @@ package org.instantplaces.im.shared;
 
 public interface WidgetOption {
 	
-	public void setId(String id);
-	public String getId();
+	public void setWidgetOptionId(String id);
+	public String getWidgetOptionId();
 	
 	public void setSuggestedReferenceCode(String refCode);
 	public String getSuggestedReferenceCode();

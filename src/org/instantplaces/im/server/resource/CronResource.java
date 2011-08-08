@@ -21,7 +21,7 @@ import org.restlet.resource.ServerResource;
 public class CronResource extends ServerResource {
 	/*
 	 * Applications that don't communicate over OLD minutes
-	 * will have all their widgets deleted.
+	 * will have all their volatile widgets deleted.
 	 */
 	private static final long OLD = 5; // minutes
 	
@@ -74,8 +74,9 @@ public class CronResource extends ServerResource {
 					if ( current-app.getLastRequestTimestamp() > OLD*60*1000 ) {
 						//
 						Log.get().debug("Will delete all widgets from application: " + app.toString());
-						
-						app.removeAllWidgets();
+						//TODO: This should only remove non-persistent widgets.
+						//app.removeAllWidgets();
+						app.removeVolatileWidgets();
 					}
 				}
 			}

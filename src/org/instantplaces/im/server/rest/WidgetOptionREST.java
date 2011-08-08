@@ -1,16 +1,13 @@
 package org.instantplaces.im.server.rest;
 
-import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.instantplaces.im.shared.Widget;
 import org.instantplaces.im.shared.WidgetOption;
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 
@@ -23,7 +20,7 @@ public class WidgetOptionREST implements WidgetOption {
 	
 	
 	@XmlAttribute
-	private String id;
+	private String widgetOptionId;
 	
 	@XmlAttribute
 	private String suggestedReferenceCode;
@@ -38,13 +35,13 @@ public class WidgetOptionREST implements WidgetOption {
 	
 
 	@Override
-	public void setId(String id) {
-		this.id = id;
+	public void setWidgetOptionId(String id) {
+		this.widgetOptionId = id;
 	}
 
 	@Override
-	public String getId() {
-		return this.id;
+	public String getWidgetOptionId() {
+		return this.widgetOptionId;
 	}
 
 	@Override
@@ -72,7 +69,7 @@ public class WidgetOptionREST implements WidgetOption {
 		
 		WidgetOptionDSO woDSO = new WidgetOptionDSO();
 		
-		woDSO.setId(this.id);
+		woDSO.setWidgetOptionId(this.widgetOptionId);
 		woDSO.setSuggestedReferenceCode(this.suggestedReferenceCode);
 		woDSO.setReferenceCode(this.referenceCode);
 		
@@ -83,7 +80,7 @@ public class WidgetOptionREST implements WidgetOption {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("WidgetOption(id: ").append(this.id).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
+		sb.append("WidgetOption(id: ").append(this.widgetOptionId).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
 		sb.append("; referenceCode: ").append(this.referenceCode);
 		sb.append(")");
 		return sb.toString();

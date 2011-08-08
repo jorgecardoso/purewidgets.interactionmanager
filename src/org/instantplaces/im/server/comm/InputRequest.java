@@ -36,6 +36,7 @@ public class InputRequest {
 	private static final String PARAM_SEPARATOR = ":";
 	
 	//TODO: Ask for input for each place
+	//TODO: Ask Bruno for a way to ask for all input regardless of place or domain, i.e., ask all input for an application
 	private static final String url ="http://193.137.8.107/instantplacesservice/instantplacesservice.svc/domain/dsi/place/jorge/presences/commands";
 	
 	private static ArrayList<String> lastCommands = new ArrayList<String>();

@@ -85,8 +85,8 @@ public class WidgetInputDSO {
 		WidgetInputREST  w = new WidgetInputREST();
 	
 		if (this.widgetOption != null) {
-			w.setWidgetOptionId(this.widgetOption.getId());
-			w.setWidgetId(this.widgetOption.getWidget().getId());
+			w.setWidgetOptionId(this.widgetOption.getWidgetOptionId());
+			w.setWidgetId(this.widgetOption.getWidget().getWidgetId());
 		}
 		w.setParameters(this.parameters);
 		w.setPersona(this.persona);

@@ -25,8 +25,9 @@ public class PlaceDSO {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 	
+	// Careful: changing this field name implies changing the jdo query parameter in getPlaceDSO.
 	@Persistent
-	private String id;
+	private String placeId;
 	
 	@Persistent(mappedBy = "place")
 	private ArrayList<ApplicationDSO> applications;
@@ -39,7 +40,7 @@ public class PlaceDSO {
 	}
 	
 	public PlaceDSO(String id, ArrayList<ApplicationDSO> applications) {
-		this.id = id;
+		this.placeId = id;
 		
 		
 		if (applications != null) {
@@ -52,13 +53,13 @@ public class PlaceDSO {
 	}
 	
 
-	public void setPlaceID(String placeID) {
-		this.id = placeID;
+	public void setPlaceId(String placeID) {
+		this.placeId = placeID;
 	}
 
 
-	public String getPlaceID() {
-		return this.id;
+	public String getPlaceId() {
+		return this.placeId;
 	}
 
 
@@ -94,7 +95,7 @@ public class PlaceDSO {
 		Log.get().debug("Fetching place Place(" + placeId + ") from Data Store.");
 		
 		Query query = pm.newQuery(PlaceDSO.class);
-	    query.setFilter("id == idParam");
+	    query.setFilter("placeId == idParam");
 	    query.declareParameters("String idParam");
 	    
 	    try {
@@ -115,7 +116,7 @@ public class PlaceDSO {
 	}
 	
 	public String toString() {
-		return "Place(id: " + this.id + ")";
+		return "Place(placeId: " + this.placeId + ")";
 	}
 
 	public void setCodeGenerator(ReferenceCodeGenerator codeGenerator) {

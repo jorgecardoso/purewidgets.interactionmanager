@@ -49,7 +49,7 @@ public class WidgetResource extends GenericResource {
 		/*
 		 * Try to fetch the widget from the data store (it should not exist)
 		 */
-		WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetREST.getId());
+		WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetREST.getWidgetId());
 		
 		if ( null != storedWidgetDSO ) { 
 			/* 

@@ -18,7 +18,7 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doDelete() {
-		String errorMessage =  "Delete not allowed. Sorry, only GET methods allowed for this resource.";
+		String errorMessage =  "Delete not allowed. Sorry, only GET  methods allowed for this resource.";
 		
 		Log.get().error(errorMessage);
 
@@ -28,7 +28,7 @@ public class WidgetInputResource extends GenericResource {
 	
 	@Override
 	protected Object doPost(Object incoming) {
-		String errorMessage =  "Post not allowed. Sorry, only GET methods allowed for this resource.";
+		String errorMessage =  "Post not allowed. Sorry, only GET  methods allowed for this resource.";
 		
 		Log.get().error(errorMessage);
 
@@ -37,7 +37,7 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doPut(Object incoming) {
-		String errorMessage =  "Put not allowed. Sorry, only GET methods allowed for this resource.";
+		String errorMessage =  "Put not allowed. Sorry, only GET  methods allowed for this resource.";
 		
 		Log.get().error(errorMessage);
 

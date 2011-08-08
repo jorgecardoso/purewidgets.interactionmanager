@@ -24,7 +24,7 @@ public class WidgetOptionDSO {
     private Key key;
 	
 	@Persistent
-	private String id;
+	private String widgetOptionId;
 	
 	@Persistent
 	private String suggestedReferenceCode;
@@ -50,7 +50,7 @@ public class WidgetOptionDSO {
 	
 	
 	public WidgetOptionDSO(String id, String suggestedReferenceCode, String referenceCode, WidgetDSO widget) {
-		this.id = id;
+		this.widgetOptionId = id;
 		this.suggestedReferenceCode = suggestedReferenceCode;
 		this.referenceCode = referenceCode;
 		this.widget = widget;
@@ -67,14 +67,14 @@ public class WidgetOptionDSO {
 	}
 
 
-	public void setId(String id) {
-		this.id = id;
+	public void setWidgetOptionId(String id) {
+		this.widgetOptionId = id;
 		
 	}
 
 
-	public String getId() {
-		return this.id;
+	public String getWidgetOptionId() {
+		return this.widgetOptionId;
 	}
 
 	public void setKey(Key key) {
@@ -126,7 +126,7 @@ public class WidgetOptionDSO {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("WidgetOption(id: ").append(this.id).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
+		sb.append("WidgetOption(id: ").append(this.widgetOptionId).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
 		sb.append("; referenceCode: ").append(this.referenceCode);
 		sb.append(")");
 		return sb.toString();
@@ -135,7 +135,7 @@ public class WidgetOptionDSO {
 	public WidgetOptionREST toREST() {
 		Log.get().debug("Converting to REST " + this.toString());
 		WidgetOptionREST woREST = new WidgetOptionREST();
-		woREST.setId(this.id);
+		woREST.setWidgetOptionId(this.widgetOptionId);
 		woREST.setReferenceCode(this.referenceCode);
 		woREST.setSuggestedReferenceCode(this.suggestedReferenceCode);
 		
@@ -149,13 +149,13 @@ public class WidgetOptionDSO {
 			return false;
 		}
 		//Key thatKey = ((WidgetOptionDSO)that).getKey();
-		String thatId = ((WidgetOptionDSO)that).getId();
+		String thatId = ((WidgetOptionDSO)that).getWidgetOptionId();
 		
 		
-		if (this.id == null || thatId == null) {
+		if (this.widgetOptionId == null || thatId == null) {
 			return false;
 		}
-		return this.id.equals(thatId);
+		return this.widgetOptionId.equals(thatId);
 		
 	}
 	

@@ -26,13 +26,17 @@ public class WidgetREST implements Widget {
 	private String applicationId;
 	
 	@XmlAttribute
-	private String id;
+	private String widgetId;
 
 	@XmlElement
 	private ArrayList<WidgetOptionREST>widgetOptions;
+
+	@XmlElement
+	private boolean volatileWidget;
 	
 	public WidgetREST() {
 		this.widgetOptions = new ArrayList<WidgetOptionREST>();
+		this.volatileWidget = false;
 	}	
 	
 	@Override
@@ -58,14 +62,14 @@ public class WidgetREST implements Widget {
 	}
 
 	@Override
-	public void setId(String id) {
-		this.id = id;
+	public void setWidgetId(String id) {
+		this.widgetId = id;
 		
 	}
 
 	@Override
-	public String getId() {
-		return this.id;
+	public String getWidgetId() {
+		return this.widgetId;
 	}
 
 
@@ -101,7 +105,8 @@ public class WidgetREST implements Widget {
 	public WidgetDSO toDSO() {
 		WidgetDSO wDSO = new WidgetDSO();
 		Log.get().debug("Converting WidgetREST to DSO");
-		wDSO.setId(this.id);
+		wDSO.setWidgetId(this.widgetId);
+		wDSO.setVolatileWidget(this.volatileWidget);
 		for (WidgetOption wo : this.widgetOptions) {
 			
 			WidgetOptionREST woREST = (WidgetOptionREST)wo;
@@ -115,7 +120,7 @@ public class WidgetREST implements Widget {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Widget(id: ").append(this.id).append("; options: ");
+		sb.append("Widget(id: ").append(this.widgetId).append("; options: ");
 		if ( this.widgetOptions != null ) {
 			for (WidgetOption wo : this.widgetOptions) {
 				sb.append(wo.toString());
@@ -124,5 +129,15 @@ public class WidgetREST implements Widget {
 		sb.append(")");
 		return sb.toString();
 	}
+
+	public boolean isVolatileWidget() {
+		return volatileWidget;
+	}
+
+	public void setVolatileWidget(boolean volatileWidget) {
+		this.volatileWidget = volatileWidget;
+	}
+
+
 
 }

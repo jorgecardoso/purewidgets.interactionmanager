@@ -30,7 +30,10 @@ public class WidgetDSO {
 	
 	
 	@Persistent
-	private String id;
+	private String widgetId;
+	
+	@Persistent
+	private boolean volatileWidget;
 	
 	
 	@Persistent(mappedBy = "widget")
@@ -43,7 +46,7 @@ public class WidgetDSO {
 
 	
 	public WidgetDSO(String id, ApplicationDSO app, ArrayList<WidgetOptionDSO>options) {
-		this.id = id;
+		this.widgetId = id;
 		this.application = app;
 		
 		if (options != null) {
@@ -67,15 +70,15 @@ public class WidgetDSO {
 
 
 
-	public void setId(String id) {
-		this.id = id;
+	public void setWidgetId(String id) {
+		this.widgetId = id;
 		
 	}
 
 
 
-	public String getId() {
-		return this.id;
+	public String getWidgetId() {
+		return this.widgetId;
 	}
 
 
@@ -109,17 +112,17 @@ public class WidgetDSO {
 		WidgetREST  w = new WidgetREST();
 	
 		if (this.application != null) {
-			w.setApplicationId(this.application.getId());
+			w.setApplicationId(this.application.getApplicationId());
 			
 			if (this.application.getPlace() != null) {
-				w.setPlaceId(this.application.getPlace().getPlaceID());
+				w.setPlaceId(this.application.getPlace().getPlaceId());
 			}
 		}
 		for (WidgetOptionDSO option : this.options) {
 			w.addWidgetOption( option.toREST() );
 		}
 		
-		w.setId(this.id);
+		w.setWidgetId(this.widgetId);
 		
 		Log.get().debug("Converted: " + w.toString());
 		return w; 
@@ -137,7 +140,7 @@ public class WidgetDSO {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Widget(id: ").append(this.id).append("; options: ");
+		sb.append("Widget(id: ").append(this.widgetId).append("; options: ");
 		if ( this.options != null ) {
 			for (WidgetOptionDSO wo : this.options) {
 				sb.append(wo.toString()).append(" ");
@@ -173,7 +176,7 @@ public class WidgetDSO {
 		}
 		
 		for ( WidgetDSO widget : widgets ) {
-			if (widget.getId().equals(widgetId)) {
+			if (widget.getWidgetId().equals(widgetId)) {
 				Log.get().debug("Returning widget.");
 				return widget;
 			}
@@ -256,5 +259,15 @@ public class WidgetDSO {
 		
 		//Log.get().debug("Generator code: " + g.getNextCode());
 		
+	}
+
+
+	public boolean isVolatileWidget() {
+		return volatileWidget;
+	}
+
+
+	public void setVolatileWidget(boolean volatileWidget) {
+		this.volatileWidget = volatileWidget;
 	}
 }

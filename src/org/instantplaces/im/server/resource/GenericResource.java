@@ -32,7 +32,6 @@ import org.restlet.resource.ServerResource;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 
-import com.google.gwt.core.ext.Generator;
 
 /**
  * This class provides generic functions for resources. It provides subclasses with
@@ -299,6 +298,8 @@ public abstract class GenericResource extends ServerResource {
 		}
 		return representAsJSON(toClient);
 	}
+	
+	
 
 	/**
 	 * Deserializes JSON objects using JacksonRepresentation. 

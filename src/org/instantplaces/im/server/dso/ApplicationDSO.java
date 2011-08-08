@@ -22,7 +22,7 @@ public class ApplicationDSO  {
     private Key key;
 	
 	@Persistent
-	private String id;
+	private String applicationId;
 	
 	@Persistent
 	private PlaceDSO place;
@@ -42,7 +42,7 @@ public class ApplicationDSO  {
 	}
 	
 	public ApplicationDSO(String id, PlaceDSO place, ArrayList<WidgetDSO> widgets) {
-		this.id = id;
+		this.applicationId = id;
 		this.place = place;
 		
 		if (widgets != null) {
@@ -54,12 +54,12 @@ public class ApplicationDSO  {
 	}
 	
 	
-	public void setId(String appID) {
-		this.id = appID;
+	public void setApplicationId(String appID) {
+		this.applicationId = appID;
 	}
 
-	public String getId() {
-		return this.id;
+	public String getApplicationId() {
+		return this.applicationId;
 	}
 
 	public void setPlace(PlaceDSO place) {
@@ -83,6 +83,20 @@ public class ApplicationDSO  {
 			this.widgets.remove(widget);
 			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 			pm.deletePersistent(widget);
+		}
+	}
+	
+	public void removeVolatileWidgets() {
+		Iterator<WidgetDSO> it = this.widgets.iterator();
+		while ( it.hasNext() ) {
+			WidgetDSO widget = it.next();
+			if (widget.isVolatileWidget()) {
+				Log.get().debug("Deleting widget: " + widget.toString());
+				widget.recycleReferenceCodes();
+				it.remove();
+				PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
+				pm.deletePersistent(widget);
+			}
 		}
 	}
 	
@@ -111,7 +125,7 @@ public class ApplicationDSO  {
 	}
 	
 	public String toString() {
-		return "application(id: " + this.id + ")";
+		return "application(id: " + this.applicationId + ")";
 	}
 	
 	@Override
@@ -148,7 +162,7 @@ public class ApplicationDSO  {
 		}
 		
 		for ( ApplicationDSO app : applications ) {
-			if (app.getId().equals(applicationId)) {
+			if (app.getApplicationId().equals(applicationId)) {
 				Log.get().debug("Returning application.");
 				return app;
 			}

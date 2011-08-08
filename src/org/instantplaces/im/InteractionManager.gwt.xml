@@ -15,8 +15,7 @@
   <set-configuration-property name="log_pattern" value="(%F:%L) %d [%-5p] %m%n" />
   <extend-property name="log_level" values="INFO"/>
 	
-  <!-- Specify the app entry point class.                         -->
-  <entry-point class='org.instantplaces.im.client.InteractionManager'/> 
+  <!-- Specify the app entry point class.                         --> 
 
 	
   <!-- Specify the paths for translatable code                    -->
