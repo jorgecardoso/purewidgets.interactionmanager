@@ -110,25 +110,25 @@ public class WidgetDSO {
 	}
 
 	
-	public WidgetREST toREST() {
-		Log.get().debug("Converting to REST " + this.toString());
-		WidgetREST  w = new WidgetREST();
-	
-		if (this.application != null) {
-			w.setApplicationId(this.application.getApplicationId());
+	/**
+	 * Converts a WidgetREST object to a WidgetDSO object.
+	 * 
+	 * @param widgetREST
+	 * @return
+	 */
+	public static WidgetDSO fromREST(WidgetREST widgetREST) {
+		WidgetDSO wDSO = new WidgetDSO();
+		Log.get().debug("Converting WidgetREST to DSO");
+		wDSO.setWidgetId(widgetREST.getWidgetId());
+		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
+		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
 			
-			if (this.application.getPlace() != null) {
-				w.setPlaceId(this.application.getPlace().getPlaceId());
-			}
-		}
-		for (WidgetOptionDSO option : this.options) {
-			w.addWidgetOption( option.toREST() );
+			WidgetOptionREST woREST = (WidgetOptionREST)wo;
+			
+			wDSO.addWidgetOption(WidgetOptionDSO.fromREST(woREST));
 		}
 		
-		w.setWidgetId(this.widgetId);
-		
-		Log.get().debug("Converted: " + w.toString());
-		return w; 
+		return wDSO;
 	}
 
 	
@@ -289,19 +289,19 @@ public class WidgetDSO {
 		
 		for ( WidgetREST wREST : widgetArrayListREST.widgets ) {
 			
-			Log.get().debug("Converting WidgetREST to DSO");
+//			Log.get().debug("Converting WidgetREST to DSO");
+//			
+//			WidgetDSO wDSO = new WidgetDSO();
+//			wDSO.setWidgetId(wREST.getWidgetId());
+//			wDSO.setVolatileWidget(wREST.isVolatileWidget());
+//			for (WidgetOption wo : wREST.getWidgetOptions()) {
+//				
+//				WidgetOptionREST woREST = (WidgetOptionREST)wo;
+//				
+//				wDSO.addWidgetOption(WidgetOptionDSO.fromREST(woREST));
+//			}
 			
-			WidgetDSO wDSO = new WidgetDSO();
-			wDSO.setWidgetId(wREST.getWidgetId());
-			wDSO.setVolatileWidget(wREST.isVolatileWidget());
-			for (WidgetOption wo : wREST.getWidgetOptions()) {
-				
-				WidgetOptionREST woREST = (WidgetOptionREST)wo;
-				
-				wDSO.addWidgetOption(woREST.toDSO());
-			}
-			
-			widgetListDSO.add(wDSO);
+			widgetListDSO.add(WidgetDSO.fromREST(wREST));
 		}
 		
 		

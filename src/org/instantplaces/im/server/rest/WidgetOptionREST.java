@@ -64,16 +64,21 @@ public class WidgetOptionREST implements WidgetOption {
 		return this.referenceCode;
 	}
 	
-	public WidgetOptionDSO toDSO() {
-		Log.get().debug("Converting WidgetOptionREST to DSO");
+	/**
+	 * Converts a WidgetOptionDSO object to a WidgetOptionREST object
+	 * 
+	 * @param widgetOptionDSO
+	 * @return
+	 */
+	public static WidgetOptionREST fromDSO(WidgetOptionDSO widgetOptionDSO) {
+		Log.get().debug("Converting to REST " + widgetOptionDSO.toString());
+		WidgetOptionREST woREST = new WidgetOptionREST();
+		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
+		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
+		woREST.setSuggestedReferenceCode(widgetOptionDSO.getSuggestedReferenceCode());
 		
-		WidgetOptionDSO woDSO = new WidgetOptionDSO();
-		
-		woDSO.setWidgetOptionId(this.widgetOptionId);
-		woDSO.setSuggestedReferenceCode(this.suggestedReferenceCode);
-		woDSO.setReferenceCode(this.referenceCode);
-		
-		return woDSO;
+		Log.get().debug("Converted: " + woREST.toString());
+		return woREST;
 	}
 	
 	

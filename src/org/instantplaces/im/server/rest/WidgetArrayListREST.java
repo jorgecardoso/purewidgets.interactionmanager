@@ -33,7 +33,7 @@ public class WidgetArrayListREST {
 		
 		ArrayList<WidgetREST> widgetListREST = new ArrayList<WidgetREST>();
 		for ( WidgetDSO wDSO : widgetDSOList ) {
-			WidgetREST wREST = wDSO.toREST();
+			WidgetREST wREST = WidgetREST.fromDSO(wDSO);
 			widgetListREST.add(wREST);
 		}
 		

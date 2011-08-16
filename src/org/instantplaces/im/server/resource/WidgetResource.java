@@ -142,7 +142,7 @@ public class WidgetResource extends GenericResource {
 				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
-				return widget.toREST();
+				return WidgetREST.fromDSO(widget);
 			}
 			
 		} else {
@@ -158,7 +158,7 @@ public class WidgetResource extends GenericResource {
 				 */
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
 				for ( WidgetDSO widgetDSO : widgets ) {
-					widgetsREST.add(widgetDSO.toREST());
+					widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
 				}
 				/*
 				for (int i = 0; i < widgets.length; i++) {
@@ -200,7 +200,7 @@ public class WidgetResource extends GenericResource {
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
 				
-				WidgetREST toReturn = widget.toREST();
+				WidgetREST toReturn = WidgetREST.fromDSO(widget);
 				
 				/*
 				 * Delete the widget from the application
@@ -232,7 +232,7 @@ public class WidgetResource extends GenericResource {
 				 */
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
 				for ( WidgetDSO widgetDSO : app.getWidgets() ) {
-					widgetsREST.add(widgetDSO.toREST());
+					widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
 				}
 				
 				WidgetArrayListREST walREST = new WidgetArrayListREST();

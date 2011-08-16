@@ -12,6 +12,7 @@ import org.instantplaces.im.shared.Widget;
 import org.instantplaces.im.shared.WidgetOption;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.WidgetDSO;
+import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -102,20 +103,35 @@ public class WidgetREST implements Widget {
 	}
 	
 	
-	public WidgetDSO toDSO() {
-		WidgetDSO wDSO = new WidgetDSO();
-		Log.get().debug("Converting WidgetREST to DSO");
-		wDSO.setWidgetId(this.widgetId);
-		wDSO.setVolatileWidget(this.volatileWidget);
-		for (WidgetOption wo : this.widgetOptions) {
+	/**
+	 * Converts a WidgetDSO object to a WidgetREST object.
+	 * 
+	 * @param widgetDSO
+	 * @return
+	 */
+	public static WidgetREST fromDSO(WidgetDSO widgetDSO) {
+		Log.get().debug("Converting to REST " + widgetDSO.toString());
+		WidgetREST  w = new WidgetREST();
+	
+		if (widgetDSO.getApplication() != null) {
+			w.setApplicationId(widgetDSO.getApplication().getApplicationId());
 			
-			WidgetOptionREST woREST = (WidgetOptionREST)wo;
-			
-			wDSO.addWidgetOption(woREST.toDSO());
+			if (widgetDSO.getApplication().getPlace() != null) {
+				w.setPlaceId(widgetDSO.getApplication().getPlace().getPlaceId());
+			}
+		}
+		for (WidgetOptionDSO option : widgetDSO.getWidgetOptions()) {
+			w.addWidgetOption( WidgetOptionREST.fromDSO(option) );
 		}
 		
-		return wDSO;
+		w.setWidgetId(widgetDSO.getWidgetId());
+		
+		Log.get().debug("Converted: " + w.toString());
+		return w; 
 	}
+	
+	
+
 	
 	@Override
 	public String toString() {

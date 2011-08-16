@@ -132,15 +132,17 @@ public class WidgetOptionDSO {
 		return sb.toString();
 	}
 	
-	public WidgetOptionREST toREST() {
-		Log.get().debug("Converting to REST " + this.toString());
-		WidgetOptionREST woREST = new WidgetOptionREST();
-		woREST.setWidgetOptionId(this.widgetOptionId);
-		woREST.setReferenceCode(this.referenceCode);
-		woREST.setSuggestedReferenceCode(this.suggestedReferenceCode);
+	
+	public static WidgetOptionDSO fromREST(WidgetOptionREST widgetOptionREST) {
+		Log.get().debug("Converting WidgetOptionREST to DSO");
 		
-		Log.get().debug("Converted: " + woREST.toString());
-		return woREST;
+		WidgetOptionDSO woDSO = new WidgetOptionDSO();
+		
+		woDSO.setWidgetOptionId(widgetOptionREST.getWidgetOptionId());
+		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
+		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
+		
+		return woDSO;
 	}
 	
 	@Override
