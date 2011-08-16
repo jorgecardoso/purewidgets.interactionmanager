@@ -17,7 +17,7 @@ import org.restlet.resource.ResourceException;
 public class WidgetInputResource extends GenericResource {
 
 	@Override
-	protected Object doDelete() {
+	protected Object doDelete(Object incoming) {
 		String errorMessage =  "Delete not allowed. Sorry, only GET  methods allowed for this resource.";
 		
 		Log.get().error(errorMessage);

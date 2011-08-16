@@ -182,16 +182,27 @@ public class WidgetResource extends GenericResource {
 	}
 	
 	@Override
-	protected Object doDelete() {
+	protected Object doDelete(Object in) {
 		Log.get().debug("Responding to DELETE request.");
 		
-		if (this.widgetId != null) { // Delete the specified widget
+		
+		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST)in;
+		
+		ArrayList<WidgetDSO> receivedWidgetListDSO = WidgetDSO.fromREST(receivedWidgetListREST);
+		
+		/*
+		 * The list of widgets, with ref codes, that will be sent back to the client
+		 */
+		ArrayList<WidgetDSO> storedWidgetListDSO = new ArrayList<WidgetDSO>();
+		
+		for ( WidgetDSO receivedWidgetDSO : receivedWidgetListDSO ) {
 			
+		
 			/*
 			 * Fetch the widget from the data store 
 			 */
-			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
-			
+			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetDSO.getWidgetId());
+		
 
 			if (widget == null) {
 				String errorMessage =  "The specified widget was not found.";
@@ -200,55 +211,22 @@ public class WidgetResource extends GenericResource {
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
 				
-				WidgetREST toReturn = WidgetREST.fromDSO(widget);
+				//WidgetREST toReturn = WidgetREST.fromDSO(widget);
 				
 				/*
 				 * Delete the widget from the application
 				 */
 				widget.getApplication().removeWidget(widget);
 				
-				return toReturn;
-			}
-			
-			
-		} else { //Delete all widgets from this app!
-			
-			/*
-			 * Fetch the app from the store 
-			 */
-			ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
-			
-			if ( null == app ) { // app doesn't exist, throw error
-				String errorMessage =  "The specified application was not found.";
-				Log.get().warn(errorMessage);
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
-				
-			} else {
-				Log.get().debug("Deleting all widgets from " + app.toString());
-				
-				
-				/*
-				 * Convert all app widgets to WidgetREST, so that we can return them
-				 */
-				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
-				for ( WidgetDSO widgetDSO : app.getWidgets() ) {
-					widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
-				}
-				
-				WidgetArrayListREST walREST = new WidgetArrayListREST();
-				walREST.widgets = widgetsREST;
-				
-				
-				/*
-				 * Delete everything!
-				 */
-				app.removeAllWidgets();
-				
-				
-				return walREST;
-				
+				storedWidgetListDSO.add(receivedWidgetDSO);
 			}
 		}
+			
+		/*
+		 * Send back the list of added widgets
+		 */
+		return WidgetArrayListREST.fromDSO(storedWidgetListDSO);
+		
 		
 	}
 	

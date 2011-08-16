@@ -238,14 +238,20 @@ public abstract class GenericResource extends ServerResource {
 	protected abstract Object doPost(Object incoming);
 	protected abstract Object doPut(Object incoming);
 	protected abstract Object doGet();
-	protected abstract Object doDelete();
+	protected abstract Object doDelete(Object incoming);
 	protected abstract Class getResourceClass();
 	
 	// DELETE Methods
 	@Delete
-	public Representation delete() {
-		Object object = doDelete();
-		return this.representAsJSON(object);
+	public Representation delete(Representation entity) {
+		Object object = deserializeJSON(entity);
+		Object toClient = doDelete(object);
+		
+		if (toClient instanceof ErrorREST) {
+			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
+		}
+		
+		return this.representAsJSON(toClient);
 	}
 	
 	// GET Methods
