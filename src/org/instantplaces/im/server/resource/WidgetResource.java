@@ -206,6 +206,7 @@ public class WidgetResource extends GenericResource {
 				widget.getApplication().removeWidget(widget);
 				//widget.recycleReferenceCodes();
 				//this.pm.deletePersistent(widget);
+				return widget.toREST();
 			}
 			
 			
@@ -226,18 +227,26 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Delete everything!
 				 */
-				app.removeAllWidgets();
+				ArrayList<WidgetDSO> removed = app.removeAllWidgets();
+				
+				
 				/*
-				Iterator<WidgetDSO> it = app.getWidgets().iterator();
-				while (it.hasNext()) {
-					WidgetDSO next = it.next();
-					next.recycleReferenceCodes();
-					it.remove(); 
-					this.pm.deletePersistent(next);
-				}*/
+				 * Convert all to WidgetREST
+				 */
+				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
+				for ( WidgetDSO widgetDSO : removed ) {
+					widgetsREST.add(widgetDSO.toREST());
+				}
+				
+				
+				WidgetArrayListREST walREST = new WidgetArrayListREST();
+				walREST.widgets = widgetsREST;
+				
+				return walREST;
+				
 			}
 		}
-		return null;
+		
 	}
 	
 
