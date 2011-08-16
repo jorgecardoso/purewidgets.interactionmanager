@@ -199,13 +199,10 @@ public class WidgetResource extends GenericResource {
 				Log.get().debug("Widget found: " + widget.toString());
 				
 				/*
-				 * Delete the widget.
-				 * 1. Delete it from the application
-				 * 2. Delete from data store.
+				 * Delete the widget from the application
 				 */
 				widget.getApplication().removeWidget(widget);
-				//widget.recycleReferenceCodes();
-				//this.pm.deletePersistent(widget);
+				
 				return widget.toREST();
 			}
 			
