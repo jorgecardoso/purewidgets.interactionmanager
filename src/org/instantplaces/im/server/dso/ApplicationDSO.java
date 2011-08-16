@@ -100,8 +100,7 @@ public class ApplicationDSO  {
 		}
 	}
 	
-	public ArrayList<WidgetDSO> removeAllWidgets() {
-		ArrayList<WidgetDSO> removed = new ArrayList<WidgetDSO>();
+	public void removeAllWidgets() {
 		
 		Iterator<WidgetDSO> it = this.widgets.iterator();
 		while ( it.hasNext() ) {
@@ -111,9 +110,8 @@ public class ApplicationDSO  {
 			it.remove();
 			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 			pm.deletePersistent(widget);
-			removed.add(widget);
+			
 		}
-		return removed;
 	}
 	
 	public ArrayList<WidgetDSO> getWidgets() {

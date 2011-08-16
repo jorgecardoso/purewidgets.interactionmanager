@@ -198,12 +198,14 @@ public class WidgetResource extends GenericResource {
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
 				
+				WidgetREST toReturn = widget.toREST();
+				
 				/*
 				 * Delete the widget from the application
 				 */
 				widget.getApplication().removeWidget(widget);
 				
-				return widget.toREST();
+				return toReturn;
 			}
 			
 			
@@ -221,23 +223,25 @@ public class WidgetResource extends GenericResource {
 				
 			} else {
 				Log.get().debug("Deleting all widgets from " + app.toString());
-				/*
-				 * Delete everything!
-				 */
-				ArrayList<WidgetDSO> removed = app.removeAllWidgets();
 				
 				
 				/*
-				 * Convert all to WidgetREST
+				 * Convert all app widgets to WidgetREST, so that we can return them
 				 */
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
-				for ( WidgetDSO widgetDSO : removed ) {
+				for ( WidgetDSO widgetDSO : app.getWidgets() ) {
 					widgetsREST.add(widgetDSO.toREST());
 				}
 				
-				
 				WidgetArrayListREST walREST = new WidgetArrayListREST();
 				walREST.widgets = widgetsREST;
+				
+				
+				/*
+				 * Delete everything!
+				 */
+				app.removeAllWidgets();
+				
 				
 				return walREST;
 				
