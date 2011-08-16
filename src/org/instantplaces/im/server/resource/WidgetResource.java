@@ -255,7 +255,7 @@ public class WidgetResource extends GenericResource {
 
 	@Override
 	protected Class getResourceClass() {
-		return WidgetREST.class;
+		return WidgetArrayListREST.class;
 	}
 
 
