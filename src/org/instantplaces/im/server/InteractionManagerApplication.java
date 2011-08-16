@@ -29,7 +29,7 @@ public class InteractionManagerApplication extends Application {
         //this.getMetadataService().addCommonExtensions()
         //router.attachDefault(HelloWorldResource.class);
 
-        router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);
+        //router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);
         router.attach("/place/{placeid}/application/{appid}/widget", WidgetResource.class);
         
         router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}/input", WidgetInputResource.class);

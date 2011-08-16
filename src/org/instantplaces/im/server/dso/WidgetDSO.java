@@ -11,7 +11,10 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
+import org.instantplaces.im.server.rest.WidgetArrayListREST;
+import org.instantplaces.im.server.rest.WidgetOptionREST;
 import org.instantplaces.im.server.rest.WidgetREST;
+import org.instantplaces.im.shared.WidgetOption;
 
 
 import com.google.appengine.api.datastore.Key;
@@ -269,5 +272,39 @@ public class WidgetDSO {
 
 	public void setVolatileWidget(boolean volatileWidget) {
 		this.volatileWidget = volatileWidget;
+	}
+	
+	
+	/**
+	 * Converts a WidgetArrayListREST object to an ArrayList of WidgetDSO.
+	 * 
+	 * @param widgetArrayListREST
+	 * @return
+	 */
+	public static ArrayList<WidgetDSO> fromREST(WidgetArrayListREST widgetArrayListREST) {
+		
+		ArrayList<WidgetDSO> widgetListDSO = new ArrayList<WidgetDSO>();
+		
+		Log.get().debug("Converting WidgetArrayListREST to ArrayList of WidgetDSO");
+		
+		for ( WidgetREST wREST : widgetArrayListREST.widgets ) {
+			
+			Log.get().debug("Converting WidgetREST to DSO");
+			
+			WidgetDSO wDSO = new WidgetDSO();
+			wDSO.setWidgetId(wREST.getWidgetId());
+			wDSO.setVolatileWidget(wREST.isVolatileWidget());
+			for (WidgetOption wo : wREST.getWidgetOptions()) {
+				
+				WidgetOptionREST woREST = (WidgetOptionREST)wo;
+				
+				wDSO.addWidgetOption(woREST.toDSO());
+			}
+			
+			widgetListDSO.add(wDSO);
+		}
+		
+		
+		return widgetListDSO;
 	}
 }
