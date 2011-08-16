@@ -19,6 +19,7 @@ import org.instantplaces.im.server.dso.ApplicationDSO;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
@@ -207,7 +208,10 @@ public class WidgetResource extends GenericResource {
 				 */
 				widget.getApplication().removeWidget(widget);
 				
-				return toReturn;
+				WidgetArrayListREST walr = new WidgetArrayListREST();
+				walr.widgets = new ArrayList<WidgetREST>();
+				walr.widgets.add(toReturn);
+				return walr;
 			}
 			
 			
@@ -255,7 +259,11 @@ public class WidgetResource extends GenericResource {
 
 	@Override
 	protected Class getResourceClass() {
-		return WidgetArrayListREST.class;
+		if ( this.getMethod().equals(Method.DELETE) ) {
+			return WidgetREST.class;
+		} else {
+			return WidgetArrayListREST.class;
+		}
 	}
 
 
