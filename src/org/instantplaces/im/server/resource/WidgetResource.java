@@ -1,24 +1,15 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
-import org.instantplaces.im.server.rest.ErrorREST;
 import org.instantplaces.im.server.rest.WidgetArrayListREST;
-import org.instantplaces.im.server.rest.WidgetOptionREST;
 import org.instantplaces.im.server.rest.WidgetREST;
-import org.instantplaces.im.shared.WidgetOption;
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.comm.InputRequest;
 import org.instantplaces.im.server.dso.ApplicationDSO;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
+
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;

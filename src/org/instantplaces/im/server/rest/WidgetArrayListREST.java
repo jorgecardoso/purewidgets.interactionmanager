@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.shared.WidgetOption;
+
 
 
 @XmlRootElement(name="widgets")

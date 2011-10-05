@@ -1,5 +1,6 @@
 package org.instantplaces.im.server;
 
+import org.instantplaces.im.server.resource.ApplicationResource;
 import org.instantplaces.im.server.resource.CronResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
@@ -28,13 +29,30 @@ public class InteractionManagerApplication extends Application {
         
         //this.getMetadataService().addCommonExtensions()
         //router.attachDefault(HelloWorldResource.class);
-
-        router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);
-        router.attach("/place/{placeid}/application/{appid}/widget", WidgetResource.class);
         
+        /*
+         * WidgetInput
+         */
         router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}/input", WidgetInputResource.class);
         router.attach("/place/{placeid}/application/{appid}/input", WidgetInputResource.class);
      
+        /*
+         * Widget
+         */
+        router.attach("/place/{placeid}/application/{appid}/widget/{widgetid}", WidgetResource.class);
+        router.attach("/place/{placeid}/application/{appid}/widget", WidgetResource.class);
+        
+      
+        /*
+         * Application
+         */
+        //router.attach("/place/{placeid}/application/{appid}", WidgetResource.class);
+        router.attach("/place/{placeid}/application", ApplicationResource.class);
+              
+        
+        /*
+         * Cron
+         */
         router.attach("/cron", CronResource.class);
         
         return router;
