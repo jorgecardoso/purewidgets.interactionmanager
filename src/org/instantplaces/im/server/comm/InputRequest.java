@@ -150,7 +150,8 @@ public class InputRequest {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		WidgetOptionDSO widgetOption = WidgetOptionDSO.getWidgetOptionDSOByReferenceCode(pm, refCode);
-		
+	
+		//TODO: save statistics in PlaceDSO here. Save input to existing widgets and to non-existing widgets
 		if ( widgetOption == null ) {
 			Log.get().debug("No widgets are using this reference code.");
 			return;

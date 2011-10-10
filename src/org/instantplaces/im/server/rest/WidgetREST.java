@@ -140,6 +140,8 @@ public class WidgetREST implements Widget {
 		}
 		
 		w.setWidgetId(widgetDSO.getWidgetId());
+		w.setShortDescription(widgetDSO.getShortDescription());
+		w.setLongDescription(widgetDSO.getLongDescription());
 		
 		Log.get().debug("Converted: " + w.toString());
 		return w; 
