@@ -38,6 +38,21 @@ public class WidgetDSO {
 	@Persistent
 	private boolean volatileWidget;
 	
+	/**
+	 * A short description (label) for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 *
+	 */
+	@Persistent
+	private String shortDescription;
+	
+	/**
+	 * A long description for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 */
+	@Persistent
+	private String longDescription;
+	
 	
 	@Persistent(mappedBy = "widget")
 	private ArrayList <WidgetOptionDSO> options; 
@@ -121,6 +136,9 @@ public class WidgetDSO {
 		Log.get().debug("Converting WidgetREST to DSO");
 		wDSO.setWidgetId(widgetREST.getWidgetId());
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
+		wDSO.setShortDescription(widgetREST.getShortDescription());
+		wDSO.setLongDescription(widgetREST.getLongDescription());
+		
 		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
 			
 			WidgetOptionREST woREST = (WidgetOptionREST)wo;
@@ -306,5 +324,37 @@ public class WidgetDSO {
 		
 		
 		return widgetListDSO;
+	}
+
+
+	/**
+	 * @return the shortDescription
+	 */
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+
+	/**
+	 * @param shortDescription the shortDescription to set
+	 */
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+
+	/**
+	 * @return the longDescription
+	 */
+	public String getLongDescription() {
+		return longDescription;
+	}
+
+
+	/**
+	 * @param longDescription the longDescription to set
+	 */
+	public void setLongDescription(String longDescription) {
+		this.longDescription = longDescription;
 	}
 }

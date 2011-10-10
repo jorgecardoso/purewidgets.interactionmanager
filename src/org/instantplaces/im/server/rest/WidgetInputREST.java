@@ -35,8 +35,19 @@ public class WidgetInputREST implements WidgetInput{
 	@XmlAttribute
 	private String persona;	
 	
+	/**
+	 * The input mechanism that was used to generate this input
+	 */
+	@XmlAttribute
+	private String inputMechanism;
+	
+	/**
+	 * Indicates whether this input has already been delivered to the owner application
+	 */
+	private boolean delivered;
+	
 	public WidgetInputREST() {
-		
+		this.delivered = false;
 	}
 
 	@Override
@@ -87,5 +98,33 @@ public class WidgetInputREST implements WidgetInput{
 	@Override
 	public String getPersona() {
 		return this.persona;
+	}
+
+	/**
+	 * @return the inputMechanism
+	 */
+	public String getInputMechanism() {
+		return inputMechanism;
+	}
+
+	/**
+	 * @param inputMechanism the inputMechanism to set
+	 */
+	public void setInputMechanism(String inputMechanism) {
+		this.inputMechanism = inputMechanism;
+	}
+
+	/**
+	 * @return the delivered
+	 */
+	public boolean isDelivered() {
+		return delivered;
+	}
+
+	/**
+	 * @param delivered the delivered to set
+	 */
+	public void setDelivered(boolean delivered) {
+		this.delivered = delivered;
 	}
 }

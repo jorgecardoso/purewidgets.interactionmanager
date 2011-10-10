@@ -35,6 +35,21 @@ public class WidgetREST implements Widget {
 	@XmlElement
 	private boolean volatileWidget;
 	
+	/**
+	 * A short description (label) for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 *
+	 */	
+	@XmlElement
+	private String shortDescription;
+	
+	/**
+	 * A long description for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 */	
+	@XmlElement
+	private String longDescription;
+	
 	public WidgetREST() {
 		this.widgetOptions = new ArrayList<WidgetOptionREST>();
 		this.volatileWidget = false;
@@ -152,6 +167,34 @@ public class WidgetREST implements Widget {
 
 	public void setVolatileWidget(boolean volatileWidget) {
 		this.volatileWidget = volatileWidget;
+	}
+
+	/**
+	 * @return the shortDescription
+	 */
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	/**
+	 * @param shortDescription the shortDescription to set
+	 */
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+	/**
+	 * @return the longDescription
+	 */
+	public String getLongDescription() {
+		return longDescription;
+	}
+
+	/**
+	 * @param longDescription the longDescription to set
+	 */
+	public void setLongDescription(String longDescription) {
+		this.longDescription = longDescription;
 	}
 
 
