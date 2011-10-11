@@ -90,29 +90,44 @@ public class ApplicationDSO  {
 	
 	public void removeVolatileWidgets() {
 		Iterator<WidgetDSO> it = this.widgets.iterator();
+		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
+		
 		while ( it.hasNext() ) {
 			WidgetDSO widget = it.next();
 			if (widget.isVolatileWidget()) {
 				Log.get().debug("Deleting widget: " + widget.toString());
 				widget.recycleReferenceCodes();
-				it.remove();
+				
 				PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 				pm.deletePersistent(widget);
+				//it.remove();
+				toDelete.add(widget);
 			}
+		}
+		
+		for ( WidgetDSO widget : toDelete ) {
+			this.widgets.remove(widget);
 		}
 	}
 	
 	public void removeAllWidgets() {
 		
 		Iterator<WidgetDSO> it = this.widgets.iterator();
+		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 		while ( it.hasNext() ) {
 			WidgetDSO widget = it.next();
 			Log.get().debug("Deleting widget: " + widget.toString());
 			widget.recycleReferenceCodes();
-			it.remove();
+			
 			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 			pm.deletePersistent(widget);
 			
+			//it.remove();
+			toDelete.add(widget);
+			
+		}
+		for ( WidgetDSO widget : toDelete ) {
+			this.widgets.remove(widget);
 		}
 	}
 	
