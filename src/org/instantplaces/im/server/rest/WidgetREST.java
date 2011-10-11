@@ -140,6 +140,7 @@ public class WidgetREST implements Widget {
 		}
 		
 		w.setWidgetId(widgetDSO.getWidgetId());
+		w.setVolatileWidget(widgetDSO.isVolatileWidget());
 		w.setShortDescription(widgetDSO.getShortDescription());
 		w.setLongDescription(widgetDSO.getLongDescription());
 		
