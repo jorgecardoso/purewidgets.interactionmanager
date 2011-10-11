@@ -5,6 +5,7 @@ package org.instantplaces.im.server.rest;
 
 import java.util.ArrayList;
 
+import javax.jdo.annotations.Persistent;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -35,6 +36,12 @@ public class ApplicationREST {
 	@XmlElement
 	private ArrayList<WidgetREST> widgets;
 
+	/**
+	 * The timestamp of the last request made by this app.
+	 * This is used to determine if an application is still active or not.
+	 */
+	@XmlElement
+	private long lastRequestTimestamp;
 	
 	public ApplicationREST() {
 		this.widgets = new ArrayList<WidgetREST>();
@@ -98,11 +105,30 @@ public class ApplicationREST {
 			a.addWidget( WidgetREST.fromDSO( widget ));
 		}
 		
-	
+		a.setLastRequestTimestamp(applicationDSO.getLastRequestTimestamp());
 		
 		Log.get().debug("Converted: " + a.toString());
 		return a; 
 	}
-	
+
+
+	/**
+	 * @return the lastRequestTimestamp
+	 */
+	public long getLastRequestTimestamp() {
+		return lastRequestTimestamp;
+	}
+
+
+	/**
+	 * @param lastRequestTimestamp the lastRequestTimestamp to set
+	 */
+	public void setLastRequestTimestamp(long lastRequestTimestamp) {
+		this.lastRequestTimestamp = lastRequestTimestamp;
+	}
+
+	public boolean isActive() {
+		return (System.currentTimeMillis()-this.lastRequestTimestamp) < ApplicationDSO.MAXIMUM_ACTIVITY_INTERVAL;
+	}
 	
 }

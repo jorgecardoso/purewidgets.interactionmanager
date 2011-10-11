@@ -17,7 +17,7 @@ import com.google.appengine.api.datastore.Key;
 @PersistenceCapable
 public class ApplicationDSO  {
 	
-	private static final int MAXIMUM_ACTIVITY_INTERVAL = 30*1000; // milliseconds
+	public static final int MAXIMUM_ACTIVITY_INTERVAL = 30*1000; // milliseconds
 	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
