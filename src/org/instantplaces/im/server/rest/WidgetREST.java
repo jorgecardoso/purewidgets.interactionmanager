@@ -28,6 +28,10 @@ public class WidgetREST implements Widget {
 	
 	@XmlAttribute
 	private String widgetId;
+	
+	
+	@XmlAttribute
+	private String controlType;
 
 	@XmlElement
 	private ArrayList<WidgetOptionREST>widgetOptions;
@@ -140,9 +144,11 @@ public class WidgetREST implements Widget {
 		}
 		
 		w.setWidgetId(widgetDSO.getWidgetId());
+		w.setControlType(widgetDSO.getControlType());
 		w.setVolatileWidget(widgetDSO.isVolatileWidget());
 		w.setShortDescription(widgetDSO.getShortDescription());
 		w.setLongDescription(widgetDSO.getLongDescription());
+		
 		
 		Log.get().debug("Converted: " + w.toString());
 		return w; 
@@ -198,6 +204,20 @@ public class WidgetREST implements Widget {
 	 */
 	public void setLongDescription(String longDescription) {
 		this.longDescription = longDescription;
+	}
+
+	/**
+	 * @return the controlType
+	 */
+	public String getControlType() {
+		return controlType;
+	}
+
+	/**
+	 * @param controlType the controlType to set
+	 */
+	public void setControlType(String controlType) {
+		this.controlType = controlType;
 	}
 
 

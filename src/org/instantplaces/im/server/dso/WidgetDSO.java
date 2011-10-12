@@ -36,6 +36,9 @@ public class WidgetDSO {
 	private String widgetId;
 	
 	@Persistent
+	private String controlType;
+	
+	@Persistent
 	private boolean volatileWidget;
 	
 	/**
@@ -135,6 +138,7 @@ public class WidgetDSO {
 		WidgetDSO wDSO = new WidgetDSO();
 		Log.get().debug("Converting WidgetREST to DSO");
 		wDSO.setWidgetId(widgetREST.getWidgetId());
+		wDSO.setControlType(widgetREST.getControlType());
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
 		wDSO.setShortDescription(widgetREST.getShortDescription());
 		wDSO.setLongDescription(widgetREST.getLongDescription());
@@ -356,5 +360,21 @@ public class WidgetDSO {
 	 */
 	public void setLongDescription(String longDescription) {
 		this.longDescription = longDescription;
+	}
+
+
+	/**
+	 * @return the controlType
+	 */
+	public String getControlType() {
+		return controlType;
+	}
+
+
+	/**
+	 * @param controlType the controlType to set
+	 */
+	public void setControlType(String controlType) {
+		this.controlType = controlType;
 	}
 }
