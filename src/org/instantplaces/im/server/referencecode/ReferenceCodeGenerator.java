@@ -54,7 +54,10 @@ public class ReferenceCodeGenerator {
     public void recycleCode(String code) {
     	try {
     		Integer c = Integer.valueOf(code);
-    		this.codes.add(c);
+    		if (!this.codes.contains(c) ) {
+    			this.codes.add(c);
+    		}
+    		
     	} catch (NumberFormatException e) {
     		Log.get().equals(e.getMessage());
     		e.printStackTrace();

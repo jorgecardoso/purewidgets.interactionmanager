@@ -82,6 +82,9 @@ public class CronResource extends ServerResource {
 			}
 	    } catch (Exception e) {
 	    	Log.get().error("Error deleting widgets: " + e.getMessage());
+	    	for ( StackTraceElement ste : e.getStackTrace() ) {
+	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
+	    	}
 	    } 
 	}
 }

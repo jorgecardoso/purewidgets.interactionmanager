@@ -17,6 +17,8 @@ import com.google.appengine.api.datastore.Key;
 @PersistenceCapable
 public class ApplicationDSO  {
 	
+	public static final int MAXIMUM_ACTIVITY_INTERVAL = 30*1000; // milliseconds
+	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
@@ -88,29 +90,44 @@ public class ApplicationDSO  {
 	
 	public void removeVolatileWidgets() {
 		Iterator<WidgetDSO> it = this.widgets.iterator();
+		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
+		
 		while ( it.hasNext() ) {
 			WidgetDSO widget = it.next();
 			if (widget.isVolatileWidget()) {
 				Log.get().debug("Deleting widget: " + widget.toString());
 				widget.recycleReferenceCodes();
-				it.remove();
+				
 				PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 				pm.deletePersistent(widget);
+				//it.remove();
+				toDelete.add(widget);
 			}
+		}
+		
+		for ( WidgetDSO widget : toDelete ) {
+			this.widgets.remove(widget);
 		}
 	}
 	
 	public void removeAllWidgets() {
 		
 		Iterator<WidgetDSO> it = this.widgets.iterator();
+		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 		while ( it.hasNext() ) {
 			WidgetDSO widget = it.next();
 			Log.get().debug("Deleting widget: " + widget.toString());
 			widget.recycleReferenceCodes();
-			it.remove();
+			
 			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
 			pm.deletePersistent(widget);
 			
+			//it.remove();
+			toDelete.add(widget);
+			
+		}
+		for ( WidgetDSO widget : toDelete ) {
+			this.widgets.remove(widget);
 		}
 	}
 	
@@ -181,4 +198,7 @@ public class ApplicationDSO  {
 		return lastRequestTimestamp;
 	}	
 
+	public boolean isActive() {
+		return (System.currentTimeMillis()-this.lastRequestTimestamp) < MAXIMUM_ACTIVITY_INTERVAL;
+	}
 }

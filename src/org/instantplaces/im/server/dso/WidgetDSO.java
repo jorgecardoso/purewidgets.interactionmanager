@@ -36,7 +36,25 @@ public class WidgetDSO {
 	private String widgetId;
 	
 	@Persistent
+	private String controlType;
+	
+	@Persistent
 	private boolean volatileWidget;
+	
+	/**
+	 * A short description (label) for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 *
+	 */
+	@Persistent
+	private String shortDescription;
+	
+	/**
+	 * A long description for the widget. The descriptions
+	 * can be used to generate a more informative GUI by other system applications.
+	 */
+	@Persistent
+	private String longDescription;
 	
 	
 	@Persistent(mappedBy = "widget")
@@ -120,7 +138,11 @@ public class WidgetDSO {
 		WidgetDSO wDSO = new WidgetDSO();
 		Log.get().debug("Converting WidgetREST to DSO");
 		wDSO.setWidgetId(widgetREST.getWidgetId());
+		wDSO.setControlType(widgetREST.getControlType());
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
+		wDSO.setShortDescription(widgetREST.getShortDescription());
+		wDSO.setLongDescription(widgetREST.getLongDescription());
+		
 		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
 			
 			WidgetOptionREST woREST = (WidgetOptionREST)wo;
@@ -306,5 +328,53 @@ public class WidgetDSO {
 		
 		
 		return widgetListDSO;
+	}
+
+
+	/**
+	 * @return the shortDescription
+	 */
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+
+	/**
+	 * @param shortDescription the shortDescription to set
+	 */
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+
+	/**
+	 * @return the longDescription
+	 */
+	public String getLongDescription() {
+		return longDescription;
+	}
+
+
+	/**
+	 * @param longDescription the longDescription to set
+	 */
+	public void setLongDescription(String longDescription) {
+		this.longDescription = longDescription;
+	}
+
+
+	/**
+	 * @return the controlType
+	 */
+	public String getControlType() {
+		return controlType;
+	}
+
+
+	/**
+	 * @param controlType the controlType to set
+	 */
+	public void setControlType(String controlType) {
+		this.controlType = controlType;
 	}
 }

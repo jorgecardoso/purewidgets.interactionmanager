@@ -9,7 +9,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.rest.WidgetInputREST;
-import org.instantplaces.im.server.rest.WidgetREST;
+
 
 import com.google.appengine.api.datastore.Key;
 
@@ -31,9 +31,21 @@ public class WidgetInputDSO {
 	
 	@Persistent
 	private String persona;
+	
+	@Persistent
+	/**
+	 * The input mechanism that was used to generate this input
+	 */
+	private String inputMechanism;
+	
+	@Persistent
+	/**
+	 * Indicates whether this input has already been delivered to the owner application
+	 */
+	private boolean delivered;
 
 	public WidgetInputDSO() {
-		
+		delivered = false;
 	}
 	
 	public void setKey(Key key) {
@@ -43,7 +55,6 @@ public class WidgetInputDSO {
 	public Key getKey() {
 		return key;
 	}
-
 	
 
 	public void setTimeStamp(long timeStamp) {
@@ -91,6 +102,8 @@ public class WidgetInputDSO {
 		w.setParameters(this.parameters);
 		w.setPersona(this.persona);
 		w.setTimeStamp(""+this.timeStamp);
+		w.setInputMechanism(this.inputMechanism);
+		w.setDelivered(this.delivered);
 		
 		Log.get().debug("Converted: " + w.toString());
 		return w; 
@@ -134,6 +147,34 @@ public class WidgetInputDSO {
 	public String toString() {
 		
 		return "WidgetInput(" + "persona: " + this.persona + "; parameters " + Arrays.toString(this.parameters) + ")";
+	}
+
+	/**
+	 * @return the inputMechanism
+	 */
+	public String getInputMechanism() {
+		return inputMechanism;
+	}
+
+	/**
+	 * @param inputMechanism the inputMechanism to set
+	 */
+	public void setInputMechanism(String inputMechanism) {
+		this.inputMechanism = inputMechanism;
+	}
+
+	/**
+	 * @return the delivered
+	 */
+	public boolean isDelivered() {
+		return delivered;
+	}
+
+	/**
+	 * @param delivered the delivered to set
+	 */
+	public void setDelivered(boolean delivered) {
+		this.delivered = delivered;
 	}
 	
 }
