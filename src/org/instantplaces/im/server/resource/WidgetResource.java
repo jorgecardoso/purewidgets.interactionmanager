@@ -186,9 +186,20 @@ public class WidgetResource extends GenericResource {
 			
 
 			if (widget == null) {
-				String errorMessage =  "The specified widget was not found.";
+				/*String errorMessage =  "The specified widget was not found.";
 				Log.get().warn(errorMessage);
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);*/
+				WidgetREST toReturn = new WidgetREST();
+				toReturn.setPlaceId(this.placeId);
+				toReturn.setApplicationId(this.appId);
+				toReturn.setWidgetId(this.widgetId);
+				
+				
+				WidgetArrayListREST walr = new WidgetArrayListREST();
+				walr.widgets = new ArrayList<WidgetREST>();
+				walr.widgets.add(toReturn);
+				return walr;
+				
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
 				
