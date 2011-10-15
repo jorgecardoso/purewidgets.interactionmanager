@@ -39,7 +39,7 @@ public class ReferenceCodeGenerator {
 	}
 	
     public String getNextCodeAsString() {
-    	
+    	// TODO: Check nulls!!!!
     	return String.format("%03d", this.getNextCode());
     }
     
