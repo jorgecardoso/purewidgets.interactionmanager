@@ -40,7 +40,9 @@ public class WidgetResource extends GenericResource {
 	    	Log.get().debug("The specified place was not found. Creating new...");
 	        existingPlaceDSO = new PlaceDSO(this.placeId, null);
 	    } 
-    
+	    
+	    
+		
 	    /*
 	     * Get the Application from the store. Create one if it does not exist yet.
 	     */
@@ -58,17 +60,7 @@ public class WidgetResource extends GenericResource {
 	    existingApplicationDSO.setPlace(existingPlaceDSO);
 	    existingPlaceDSO.addApplication(existingApplicationDSO);
 	    
-	    /*
-	     * Make the objects persistent. This is only necessary in case the place does not yet exist
-	     * but it does harm to call it everytime...
-	     */
-		try {
-			existingPlaceDSO = pm.makePersistent(existingPlaceDSO);
-		} catch (Exception e) {
-			String errorMessage =  "Sorry, could not make the new place persistent.";
-			Log.get().error(errorMessage);
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage);
-		}
+	   
 		
 		
 		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST)in;
@@ -109,6 +101,18 @@ public class WidgetResource extends GenericResource {
 			    storedWidgetDSO.assignReferenceCodes();
 			}
 			storedWidgetListDSO.add(storedWidgetDSO);
+		}
+		
+		/*
+	     * Make the objects persistent. This is only necessary in case the place does not yet exist
+	     * but it does harm to call it everytime...
+	     */
+		try {
+			existingPlaceDSO = pm.makePersistent(existingPlaceDSO);
+		} catch (Exception e) {
+			String errorMessage =  "Sorry, could not make the new place persistent.";
+			Log.get().error(errorMessage);
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage);
 		}
 		
 		/*

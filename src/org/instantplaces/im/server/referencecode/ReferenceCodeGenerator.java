@@ -36,16 +36,19 @@ public class ReferenceCodeGenerator {
     	for (int i = 0; i < MAX_CODE; i++) {
     		codes.add(new Integer(i));
     	}
+    	Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
 	}
 	
-    public String getNextCodeAsString() {
+    public synchronized String getNextCodeAsString() {
     	// TODO: Check nulls!!!!
     	return String.format("%03d", this.getNextCode());
     }
     
     public int getNextCode() {
+    	Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
     	Integer i = codes.remove(0);
-    	
+    	Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
+    	Log.get().debug("Next code: " + i.toString());
     	//this.getCodes().remove(0);
     	//pm.deletePersistent(i);
     	return i.intValue();
