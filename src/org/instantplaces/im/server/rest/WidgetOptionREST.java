@@ -28,6 +28,12 @@ public class WidgetOptionREST implements WidgetOption {
 	@XmlAttribute
 	private String referenceCode;
 	
+	@XmlAttribute
+	private String shortDescription;
+	
+	@XmlAttribute
+	private String longDescription;
+	
 	
 	public WidgetOptionREST() {
 		
@@ -72,10 +78,13 @@ public class WidgetOptionREST implements WidgetOption {
 	 */
 	public static WidgetOptionREST fromDSO(WidgetOptionDSO widgetOptionDSO) {
 		Log.get().debug("Converting to REST " + widgetOptionDSO.toString());
+		
 		WidgetOptionREST woREST = new WidgetOptionREST();
 		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
 		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
 		woREST.setSuggestedReferenceCode(widgetOptionDSO.getSuggestedReferenceCode());
+		woREST.setLongDescription(widgetOptionDSO.getLongDescripton());
+		woREST.setShortDescription(widgetOptionDSO.getShortDescription());
 		
 		Log.get().debug("Converted: " + woREST.toString());
 		return woREST;
@@ -89,6 +98,38 @@ public class WidgetOptionREST implements WidgetOption {
 		sb.append("; referenceCode: ").append(this.referenceCode);
 		sb.append(")");
 		return sb.toString();
+	}
+
+
+	/**
+	 * @return the shortDescription
+	 */
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+
+	/**
+	 * @param shortDescription the shortDescription to set
+	 */
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+
+	/**
+	 * @return the longDescription
+	 */
+	public String getLongDescription() {
+		return longDescription;
+	}
+
+
+	/**
+	 * @param longDescription the longDescription to set
+	 */
+	public void setLongDescription(String longDescription) {
+		this.longDescription = longDescription;
 	}
 
 

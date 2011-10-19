@@ -38,6 +38,11 @@ public class WidgetOptionDSO {
 	@Persistent(mappedBy = "widgetOption")
 	private ArrayList <WidgetInputDSO> inputs; 
 	
+	@Persistent
+	private String shortDescription;
+	
+	@Persistent
+	private String longDescripton;
 	
 	public WidgetOptionDSO() {
 		this(null, null);
@@ -141,6 +146,8 @@ public class WidgetOptionDSO {
 		woDSO.setWidgetOptionId(widgetOptionREST.getWidgetOptionId());
 		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
 		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
+		woDSO.setLongDescripton(widgetOptionREST.getLongDescription());
+		woDSO.setShortDescription(widgetOptionREST.getShortDescription());
 		
 		return woDSO;
 	}
@@ -185,5 +192,37 @@ public class WidgetOptionDSO {
 	        query.closeAll();
 	    }
 	    return null;
+	}
+
+
+	/**
+	 * @return the shortDescription
+	 */
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+
+	/**
+	 * @param shortDescription the shortDescription to set
+	 */
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+
+	/**
+	 * @return the longDescripton
+	 */
+	public String getLongDescripton() {
+		return longDescripton;
+	}
+
+
+	/**
+	 * @param longDescripton the longDescripton to set
+	 */
+	public void setLongDescripton(String longDescripton) {
+		this.longDescripton = longDescripton;
 	}	
 }

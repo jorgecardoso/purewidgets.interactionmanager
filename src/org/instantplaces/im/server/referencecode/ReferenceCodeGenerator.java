@@ -45,9 +45,9 @@ public class ReferenceCodeGenerator {
     }
     
     public int getNextCode() {
-    	Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
+    	//Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
     	Integer i = codes.remove(0);
-    	Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
+    	//Log.get().debug("ReferenceCodeManager codes: " + this.codes.toString());
     	Log.get().debug("Next code: " + i.toString());
     	//this.getCodes().remove(0);
     	//pm.deletePersistent(i);
