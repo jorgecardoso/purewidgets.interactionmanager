@@ -230,8 +230,7 @@ public abstract class GenericResource extends ServerResource {
 			Log.get().debug("Closing Persistance Manager.");
 			pm.close();
 		}	
-	
-		
+		Log.get().debug("Returning status" +  this.getResponse().getStatus().toString());	
 		
 	}
 	
@@ -245,6 +244,7 @@ public abstract class GenericResource extends ServerResource {
 	@Delete
 	public Representation delete() {
 		Object object = doDelete();
+		
 		return this.representAsJSON(object);
 	}
 	
@@ -258,6 +258,7 @@ public abstract class GenericResource extends ServerResource {
 	@Get("xml")
 	public Representation returnAsXML() {
 		Object object = doGet();
+		
 		return this.representAsXML(object);
 	}
 	

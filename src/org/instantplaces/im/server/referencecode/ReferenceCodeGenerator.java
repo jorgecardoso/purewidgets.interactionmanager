@@ -36,7 +36,7 @@ public class ReferenceCodeGenerator {
     	for (int i = 0; i < MAX_CODE; i++) {
     		codes.add(new Integer(i));
     	}
-    	Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
+    	//Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
 	}
 	
     public synchronized String getNextCodeAsString() {
