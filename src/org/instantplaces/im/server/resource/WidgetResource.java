@@ -223,6 +223,8 @@ public class WidgetResource extends GenericResource {
 			
 		} else { //Delete all widgets from this app!
 			
+			boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
+			
 			/*
 			 * Fetch the app from the store 
 			 */
@@ -234,7 +236,7 @@ public class WidgetResource extends GenericResource {
 				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
 				
 			} else {
-				Log.get().debug("Deleting all widgets from " + app.toString());
+				Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + app.toString());
 				
 				
 				/*
@@ -242,7 +244,13 @@ public class WidgetResource extends GenericResource {
 				 */
 				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
 				for ( WidgetDSO widgetDSO : app.getWidgets() ) {
-					widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
+					if ( volatileOnly ){
+						if ( widgetDSO.isVolatileWidget() ) {
+							widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
+						}
+					} else {
+						widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
+					}
 				}
 				
 				WidgetArrayListREST walREST = new WidgetArrayListREST();
@@ -252,8 +260,11 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Delete everything!
 				 */
-				app.removeAllWidgets();
-				
+				if ( volatileOnly ) {
+					app.removeVolatileWidgets();
+				} else {
+					app.removeAllWidgets();
+				}
 				
 				return walREST;
 				
