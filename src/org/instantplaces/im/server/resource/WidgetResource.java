@@ -221,53 +221,101 @@ public class WidgetResource extends GenericResource {
 			}
 			
 			
-		} else { //Delete all widgets from this app!
+		} else {
+			String widgetsToDelete =  this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("widgets", "");
 			
-			boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
-			
-			/*
-			 * Fetch the app from the store 
-			 */
-			ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
-			
-			if ( null == app ) { // app doesn't exist, throw error
-				String errorMessage =  "The specified application was not found.";
-				Log.get().warn(errorMessage);
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+			if ( widgetsToDelete.length() > 0 ) {
+				String widgetIds[] = widgetsToDelete.split(",");
 				
-			} else {
-				Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + app.toString());
+				WidgetArrayListREST walr = new WidgetArrayListREST();
+				walr.widgets = new ArrayList<WidgetREST>();
 				
+				for (String widgetId : widgetIds) {
+					/*
+					 * Fetch the widget from the data store 
+					 */
+					WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
+					
+	
+					if (widget == null) {
+						/*String errorMessage =  "The specified widget was not found.";
+						Log.get().warn(errorMessage);
+						throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);*/
+						WidgetREST toReturn = new WidgetREST();
+						toReturn.setPlaceId(this.placeId);
+						toReturn.setApplicationId(this.appId);
+						toReturn.setWidgetId(widgetId);
+						
+						
+						
+						walr.widgets.add(toReturn);
+						
+						
+					} else {
+						Log.get().debug("Widget found: " + widget.toString());
+						
+						WidgetREST toReturn = WidgetREST.fromDSO(widget);
+						
+						/*
+						 * Delete the widget from the application
+						 */
+						widget.getApplication().removeWidget(widget);
+						
+						
+						walr.widgets.add(toReturn);
+						
+					}	
+				}
+				
+				return walr;
+				
+			} else {  //Delete all widgets from this app!
+				
+				boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
 				
 				/*
-				 * Convert all app widgets to WidgetREST, so that we can return them
+				 * Fetch the app from the store 
 				 */
-				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
-				for ( WidgetDSO widgetDSO : app.getWidgets() ) {
-					if ( volatileOnly ){
-						if ( widgetDSO.isVolatileWidget() ) {
+				ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+				
+				if ( null == app ) { // app doesn't exist, throw error
+					String errorMessage =  "The specified application was not found.";
+					Log.get().warn(errorMessage);
+					throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+					
+				} else {
+					Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + app.toString());
+					
+					
+					/*
+					 * Convert all app widgets to WidgetREST, so that we can return them
+					 */
+					ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
+					for ( WidgetDSO widgetDSO : app.getWidgets() ) {
+						if ( volatileOnly ){
+							if ( widgetDSO.isVolatileWidget() ) {
+								widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
+							}
+						} else {
 							widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
 						}
-					} else {
-						widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
 					}
+					
+					WidgetArrayListREST walREST = new WidgetArrayListREST();
+					walREST.widgets = widgetsREST;
+					
+					
+					/*
+					 * Delete everything!
+					 */
+					if ( volatileOnly ) {
+						app.removeVolatileWidgets();
+					} else {
+						app.removeAllWidgets();
+					}
+					
+					return walREST;
 				}
-				
-				WidgetArrayListREST walREST = new WidgetArrayListREST();
-				walREST.widgets = widgetsREST;
-				
-				
-				/*
-				 * Delete everything!
-				 */
-				if ( volatileOnly ) {
-					app.removeVolatileWidgets();
-				} else {
-					app.removeAllWidgets();
-				}
-				
-				return walREST;
-				
 			}
 		}
 		
