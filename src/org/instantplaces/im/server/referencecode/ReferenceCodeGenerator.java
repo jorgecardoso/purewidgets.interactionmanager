@@ -33,9 +33,7 @@ public class ReferenceCodeGenerator {
 	
 	public ReferenceCodeGenerator() {
     	codes = new ArrayList<Integer>(1000);
-    	for (int i = 0; i < MAX_CODE; i++) {
-    		codes.add(new Integer(i));
-    	}
+    	this.rebuild();
     	//Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
 	}
 	
@@ -62,9 +60,28 @@ public class ReferenceCodeGenerator {
     		}
     		
     	} catch (NumberFormatException e) {
-    		Log.get().equals(e.getMessage());
+    		Log.get().error(e.getMessage());
     		e.printStackTrace();
     		
+    	}
+    }
+    
+    public void remove(String code) {
+    	try {
+    		Integer c = Integer.valueOf(code);
+    		this.codes.remove(c);
+    		
+    	} catch (NumberFormatException e) {
+    		Log.get().error(e.getMessage());
+    		e.printStackTrace();
+    		
+    	}
+    }
+    
+    public void rebuild() {
+    	this.codes.clear();
+    	for (int i = 0; i < MAX_CODE; i++) {
+    		codes.add(new Integer(i));
     	}
     }
     /*
