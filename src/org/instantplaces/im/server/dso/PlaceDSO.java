@@ -1,8 +1,10 @@
 package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -68,6 +70,21 @@ public class PlaceDSO {
 			this.applications.add(app);
 		}
 		
+	}
+	
+	public boolean deleteApplication(ApplicationDSO app) {
+		
+		if ( this.applications.contains(app) ) {
+			app.removeAllWidgets();
+			this.applications.remove(app);
+			PersistenceManager pm = JDOHelper.getPersistenceManager(app);
+			pm.deletePersistent(app);
+			
+			return true;
+		} else {
+			return false;
+		}
+	
 	}
 
 

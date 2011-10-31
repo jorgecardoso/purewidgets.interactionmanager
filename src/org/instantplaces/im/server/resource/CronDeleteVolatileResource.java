@@ -16,7 +16,7 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-public class CronResource extends ServerResource {
+public class CronDeleteVolatileResource extends ServerResource {
 	/*
 	 * Applications that don't communicate over OLD minutes
 	 * will have all their volatile widgets deleted.
@@ -25,7 +25,7 @@ public class CronResource extends ServerResource {
 	
 	@Override
 	public void doInit() {
-		Log.get().debug("Running Cron");
+		Log.get().debug("Cron: deleting widgets from inactive applications.");
 	}
 	
 	@Get
@@ -45,7 +45,7 @@ public class CronResource extends ServerResource {
 		{
 		    if (tx.isActive())
 		    {
-		    	Log.get().error("Could not finish transaction. Rolling back.");
+		    	Log.get().error("Cron: Could not finish transaction. Rolling back.");
 		        tx.rollback();
 		    }
 		}
@@ -57,7 +57,7 @@ public class CronResource extends ServerResource {
 	}
 	
 	private void deleteOldWidgets(PersistenceManager pm) {
-		Log.get().debug("Deleting widgets from inactive applications.");
+		
 		try {
 			
 			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
@@ -70,34 +70,13 @@ public class CronResource extends ServerResource {
 				
 				for (ApplicationDSO app : place.getApplications()) {
 					if ( current-app.getLastRequestTimestamp() > OLD*60*1000 ) {
-						//
-						Log.get().debug("Will delete all widgets from application: " + app.toString());
-						//TODO: This should only remove non-persistent widgets.
-						//app.removeAllWidgets();
-						app.removeVolatileWidgets();
-					}
-				}
-				
-				
-				/*
-				 * sometimes codes are not recycled correctly, so rebuild the code generator from the currently used codes.
-				 */
-				Log.get().debug("Rebuilding ReferenceCode Generator.");
-				ReferenceCodeGenerator rcg = place.getCodeGenerator();
-				rcg.rebuild();
-				for (ApplicationDSO app : place.getApplications()) {
-					if ( null != app ) {
-						for ( WidgetDSO widget : app.getWidgets() ) {
-							
-							for ( WidgetOptionDSO option : widget.getWidgetOptions() ) {
-								rcg.remove(option.getReferenceCode());
-								Log.get().debug("Removing used code: " + option.getReferenceCode());
-							}
+						
+						if (  app.removeVolatileWidgets() ) {
+							Log.get().info("Cron: deleted volatile widgets from application " + app.getApplicationId());
+						
 						}
 					}
 				}
-				
-				
 			}
 	    } catch (Exception e) {
 	    	Log.get().error("Error deleting widgets: " + e.getMessage());

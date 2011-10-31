@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/cron</url>
-    <description>Cron</description>
+    <url>/cron-delete-volatile</url>
+    <description>Cron delete volatile widgets from inactive apps</description>
     <schedule>every 1 minutes</schedule>
+  </cron>
+  
+    <cron>
+    <url>/cron-rebuild-codes</url>
+    <description>Cron rebuild reference codes</description>
+    <schedule>every 10 minutes</schedule>
+  </cron>
+  
+      <cron>
+    <url>/cron-delete-old-apps</url>
+    <description>Cron delete old apps that dont communicate for 1 day</description>
+    <schedule>every day 01:00</schedule>
   </cron>
 </cronentries>

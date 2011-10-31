@@ -88,13 +88,15 @@ public class ApplicationDSO  {
 		}
 	}
 	
-	public void removeVolatileWidgets() {
+	public boolean removeVolatileWidgets() {
 		Iterator<WidgetDSO> it = this.widgets.iterator();
 		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 		
+		boolean any = false;
 		while ( it.hasNext() ) {
 			WidgetDSO widget = it.next();
 			if (widget.isVolatileWidget()) {
+				any = true;
 				Log.get().debug("Deleting widget: " + widget.toString());
 				widget.recycleReferenceCodes();
 				
@@ -108,13 +110,15 @@ public class ApplicationDSO  {
 		for ( WidgetDSO widget : toDelete ) {
 			this.widgets.remove(widget);
 		}
+		return any;
 	}
 	
-	public void removeAllWidgets() {
-		
+	public boolean removeAllWidgets() {
+		boolean any = false;
 		Iterator<WidgetDSO> it = this.widgets.iterator();
 		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 		while ( it.hasNext() ) {
+			any = true;
 			WidgetDSO widget = it.next();
 			Log.get().debug("Deleting widget: " + widget.toString());
 			widget.recycleReferenceCodes();
@@ -129,11 +133,14 @@ public class ApplicationDSO  {
 		for ( WidgetDSO widget : toDelete ) {
 			this.widgets.remove(widget);
 		}
+		return any;
 	}
 	
 	public ArrayList<WidgetDSO> getWidgets() {
 		return this.widgets;
 	}
+	
+	
 
 	public void setKey(Key key) {
 		this.key = key;
