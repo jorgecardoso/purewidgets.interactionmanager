@@ -116,8 +116,6 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	@Override
 	public void doInit() {
-		InputRequest.getPresences();
-		
 		
 		/*
 		 * JDO Queries only retrieve child objects when they are accessed so

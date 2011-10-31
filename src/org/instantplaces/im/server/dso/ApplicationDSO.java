@@ -136,6 +136,16 @@ public class ApplicationDSO  {
 		return any;
 	}
 	
+	public WidgetDSO getWidget(String widgetId) {
+	
+		for ( WidgetDSO widget : this.widgets ) {
+			if ( widget.getWidgetId().equals(widgetId) ) {
+				return widget;
+			}
+		}
+		return null;
+	}
+	
 	public ArrayList<WidgetDSO> getWidgets() {
 		return this.widgets;
 	}

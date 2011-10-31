@@ -230,12 +230,15 @@ public class WidgetResource extends GenericResource {
 				WidgetArrayListREST walr = new WidgetArrayListREST();
 				walr.widgets = new ArrayList<WidgetREST>();
 				
+				ApplicationDSO application = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+				
+				
 				for (String widgetId : widgetIds) {
 					/*
 					 * Fetch the widget from the data store 
 					 */
-					WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
-					
+					//WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
+					WidgetDSO widget = application.getWidget( widgetId );
 	
 					if (widget == null) {
 						/*String errorMessage =  "The specified widget was not found.";

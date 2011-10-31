@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.comm.InputRequest;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetInputDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
@@ -46,6 +47,8 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doGet() {
+		InputRequest.getPresences();
+		
 		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
 		long from = 0;
 		
