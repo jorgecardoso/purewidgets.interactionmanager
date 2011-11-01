@@ -231,7 +231,7 @@ public class WidgetResource extends GenericResource {
 				WidgetArrayListREST walr = new WidgetArrayListREST();
 				walr.widgets = new ArrayList<WidgetREST>();
 				
-			
+				//ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 				
 				for (String widgetId : widgetIds) {
 					/*
@@ -247,7 +247,7 @@ public class WidgetResource extends GenericResource {
 						 * Delete the widget from the application
 						 */
 						app.removeWidget(widget);
-
+						//toDelete.add(widget);
 					}	
 					
 					WidgetREST toReturn = new WidgetREST();
@@ -256,6 +256,7 @@ public class WidgetResource extends GenericResource {
 					toReturn.setWidgetId(widgetId);
 					walr.widgets.add(toReturn);
 				}
+				//app.removeWidgets(toDelete);
 				
 				return walr;
 				

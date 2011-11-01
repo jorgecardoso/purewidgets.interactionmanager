@@ -2,10 +2,13 @@ package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -92,6 +95,14 @@ public class ApplicationDSO  {
 		}
 	}
 	
+	public void removeWidgets(ArrayList<WidgetDSO> widgets) {
+		for (WidgetDSO widget : widgets) {
+			this.widgets.remove(widget);
+		}
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		pm.deletePersistentAll(widgets);
+	}
+	
 	public boolean removeVolatileWidgets() {
 		Iterator<WidgetDSO> it = this.widgets.iterator();
 		ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
@@ -104,12 +115,15 @@ public class ApplicationDSO  {
 				
 				widget.recycleReferenceCodes();
 				
-				PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
-				pm.deletePersistent(widget);
+				//PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
+				//pm.deletePersistent(widget);
 				//it.remove();
 				toDelete.add(widget);
 			}
 		}
+		
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		pm.deletePersistentAll(toDelete);
 		
 		for ( WidgetDSO widget : toDelete ) {
 			this.widgets.remove(widget);
@@ -127,13 +141,16 @@ public class ApplicationDSO  {
 			Log.get().debug("Deleting widget: " + widget.toString());
 			widget.recycleReferenceCodes();
 			
-			PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
-			pm.deletePersistent(widget);
+			
 			
 			//it.remove();
 			toDelete.add(widget);
 			
 		}
+		
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		pm.deletePersistentAll(toDelete);
+		
 		for ( WidgetDSO widget : toDelete ) {
 			this.widgets.remove(widget);
 		}
@@ -179,17 +196,31 @@ public class ApplicationDSO  {
 	public static ArrayList<ApplicationDSO> getApplicationsDSO( PersistenceManager pm, String placeId ) {
 		Log.get().debug("Fetching applications for Place(" + placeId + ") from Data Store.");
 		
-		PlaceDSO place = PlaceDSO.getPlaceDSO(pm, placeId);
-		if ( place == null ) {
-			Log.get().debug("Place not found.");
-			return null;
-		}
-		if (place.getApplications() == null) {
-			Log.get().debug("Found 0 applications.");
-		} else {
-			Log.get().debug("Found " + place.getApplications().size() + " applications.");
-		}
-		return place.getApplications();
+		Query query = pm.newQuery(ApplicationDSO.class);
+	    query.setFilter("placeId == placeIdParam ");
+	    query.declareParameters("String placeIdParam");
+	    
+	    
+	    try {
+	    	List<ApplicationDSO> result = (List<ApplicationDSO>) query.execute(placeId);
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Applications not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found applications");
+	    	}
+	    	
+	    	ArrayList<ApplicationDSO> toReturn = new ArrayList<ApplicationDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
 	}	
 	
 	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {

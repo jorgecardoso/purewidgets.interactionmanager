@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -158,7 +160,11 @@ public class WidgetDSO {
 			
 			WidgetOptionREST woREST = (WidgetOptionREST)wo;
 			
-			wDSO.addWidgetOption(WidgetOptionDSO.fromREST(woREST));
+			WidgetOptionDSO woDso = WidgetOptionDSO.fromREST(woREST);
+			woDso.setWidgetId(wDSO.getWidgetId());
+			woDso.setApplicationId(wDSO.getApplicationId());
+			woDso.setPlaceId(wDSO.getPlaceId());
+			wDSO.addWidgetOption(woDso);
 		}
 		
 		return wDSO;
@@ -176,16 +182,67 @@ public class WidgetDSO {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Widget(id: ").append(this.widgetId).append("; options: ");
-		if ( this.options != null ) {
-			for (WidgetOptionDSO wo : this.options) {
-				sb.append(wo.toString()).append(" ");
-			}
-		}
-		sb.append(")");
+		sb.append("Widget(id: ").append(this.widgetId).append("; ");
+		
 		return sb.toString();
 	}
 
+	
+	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId) {
+		Log.get().debug("Fetching widgets for Place(" + placeId + ") from Data Store.");
+		
+		Query query = pm.newQuery(WidgetDSO.class);
+	    query.setFilter("placeId == placeIdParam ");
+	    query.declareParameters("String placeIdParam");
+	    try {
+	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId);
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Widgets not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + result.size() + " widgets");
+	    	}
+	    	
+	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
+	
+	public static ArrayList<WidgetOptionDSO> getWidgetOptionsFromDSO( PersistenceManager pm, String placeId) {
+		Log.get().debug("Fetching widgets options for Place(" + placeId + ") from Data Store.");
+		
+		Query query = pm.newQuery(WidgetOptionDSO.class);
+	    query.setFilter("placeId == placeIdParam ");
+	    query.declareParameters("String placeIdParam");
+	    try {
+	    	List<WidgetOptionDSO> result = (List<WidgetOptionDSO>) query.execute(placeId);
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Widgets not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + result.size() + " widgets");
+	    	}
+	    	
+	    	ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
 	
 	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");

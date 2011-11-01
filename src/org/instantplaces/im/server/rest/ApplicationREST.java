@@ -94,10 +94,7 @@ public class ApplicationREST {
 		Log.get().debug("Converting to REST " + applicationDSO.toString());
 		ApplicationREST  a = new ApplicationREST();
 	
-		if (applicationDSO.getPlace() != null ) {
-			a.setPlaceId( applicationDSO.getPlace().getPlaceId() );
-		}
-		
+		a.setPlaceId( applicationDSO.getPlaceId() );
 		a.setApplicationId( applicationDSO.getApplicationId() );
 		
 		

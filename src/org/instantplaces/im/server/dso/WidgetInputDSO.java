@@ -21,8 +21,20 @@ public class WidgetInputDSO {
     private Key key;
 	
 	@Persistent
+	private String placeId;
+	
+	@Persistent
+	private String applicationId;
+	
+	@Persistent
+	private String widgetId;
+	
+	@Persistent
+	private String widgetOptionId;
+	
+	@Persistent
 	private WidgetOptionDSO widgetOption;
-		
+	
 	@Persistent
 	private long timeStamp;
 	
@@ -83,6 +95,10 @@ public class WidgetInputDSO {
 
 	public void setWidgetOptionDSO(WidgetOptionDSO widgetOption) {
 		this.widgetOption = widgetOption;
+		this.widgetOptionId = widgetOption.getWidgetOptionId();
+		this.widgetId = widgetOption.getWidgetId();
+		this.applicationId = widgetOption.getApplicationId();
+		this.placeId = widgetOption.getPlaceId();
 	}
 
 	public WidgetOptionDSO getWidgetOptionDSO() {
@@ -175,6 +191,62 @@ public class WidgetInputDSO {
 	 */
 	public void setDelivered(boolean delivered) {
 		this.delivered = delivered;
+	}
+
+	/**
+	 * @return the widgetOptionId
+	 */
+	public String getWidgetOptionId() {
+		return widgetOptionId;
+	}
+
+	/**
+	 * @param widgetOptionId the widgetOptionId to set
+	 */
+	public void setWidgetOptionId(String widgetOptionId) {
+		this.widgetOptionId = widgetOptionId;
+	}
+
+	/**
+	 * @return the widgetId
+	 */
+	public String getWidgetId() {
+		return widgetId;
+	}
+
+	/**
+	 * @param widgetId the widgetId to set
+	 */
+	public void setWidgetId(String widgetId) {
+		this.widgetId = widgetId;
+	}
+
+	/**
+	 * @return the applicationId
+	 */
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	/**
+	 * @param applicationId the applicationId to set
+	 */
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
+
+	/**
+	 * @return the placeId
+	 */
+	public String getPlaceId() {
+		return placeId;
+	}
+
+	/**
+	 * @param placeId the placeId to set
+	 */
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}
 	
 }

@@ -4,10 +4,13 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.WidgetDSO;
+import org.instantplaces.im.server.dso.WidgetOptionDSO;
 import org.instantplaces.im.server.rest.ApplicationArrayListREST;
 import org.instantplaces.im.server.rest.ApplicationREST;
 import org.restlet.data.Status;
@@ -63,7 +66,7 @@ public class ApplicationResource extends GenericResource {
 			} else if (activeParameter.equalsIgnoreCase("false")) {
 				active = 0;
 			} else {
-				String errorMessage = "Sorry, 'active' query parameter must be non-existent, 'true', or 'false'.";
+				String errorMessage = "Sorry, 'active' query parameter must be, 'true', or 'false'.";
 
 				Log.get().error(errorMessage);
 
@@ -75,47 +78,67 @@ public class ApplicationResource extends GenericResource {
 		/*
 		 * Return the list of applications
 		 */
-		ArrayList<ApplicationDSO> applications = ApplicationDSO
-				.getApplicationsDSO(this.pm, this.placeId);
-
 		
+		ArrayList<WidgetDSO> widgetsDetached = (ArrayList<WidgetDSO>) this.pm.detachCopyAll(WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId));
+		ArrayList<WidgetOptionDSO> widgetOptionsDetached = (ArrayList<WidgetOptionDSO>) this.pm.detachCopyAll(WidgetDSO.getWidgetOptionsFromDSO(this.pm, this.placeId));
+		ArrayList<ApplicationDSO> applicationsDetached = (ArrayList<ApplicationDSO>) this.pm.detachCopyAll(ApplicationDSO.getApplicationsDSO(this.pm, this.placeId));
+	
+		if ( null == applicationsDetached || null == widgetsDetached || null == widgetOptionsDetached) {
+			return  new ApplicationArrayListREST();
+		}
 		
-		if (applications != null) {
-			/*
-			 * We put the ArrayList into a custom WidgetArrayListREST because I
-			 * couldn't make JAXB work otherwise... :(
-			 */
-			ApplicationArrayListREST aalREST = ApplicationArrayListREST
-					.fromDSO(applications);
+		for ( WidgetOptionDSO widgetOption : widgetOptionsDetached ) {
 			
-			/*
-			 * Filter the app list, based on the active parameter
-			 */
-			Iterator<ApplicationREST> it = aalREST.applications.iterator();
-			while (it.hasNext()) {
-				ApplicationREST app = it.next();
-
-				/*
-				 * We only want inactive apps
-				 */
-				if (app.isActive() && active == 0) {
-					it.remove();
-					/*
-					 * We only want active apps
-					 */
-				} else if ( !app.isActive() && active == 1) {
-					it.remove();
+			for ( WidgetDSO widget : widgetsDetached ) {
+				
+				if ( widgetOption.getWidgetId().equals(widget.getWidgetId()) ) {
+					widget.addWidgetOption(widgetOption);
+				}
+			}
+			
+		}
+		
+		for ( ApplicationDSO app : applicationsDetached ) {
+			
+			for ( WidgetDSO widget : widgetsDetached ) {
+				if ( widget.getApplicationId().equals(app.getApplicationId()) ) {
+					app.addWidget(widget);
 				}
 			}
 			
 			
-
-			return aalREST;
-		} else {
-			Log.get().debug(
-					"Could not find any application for the specified place");
-			return new ApplicationArrayListREST();
 		}
+		
+		
+		/*
+		 * We put the ArrayList into a custom WidgetArrayListREST because I
+		 * couldn't make JAXB work otherwise... :(
+		 */
+		ApplicationArrayListREST aalREST = ApplicationArrayListREST
+				.fromDSO(applicationsDetached);
+		
+		/*
+		 * Filter the app list, based on the active parameter
+		 */
+		Iterator<ApplicationREST> it = aalREST.applications.iterator();
+		while (it.hasNext()) {
+			ApplicationREST app = it.next();
+
+			/*
+			 * We only want inactive apps
+			 */
+			if (app.isActive() && active == 0) {
+				it.remove();
+				/*
+				 * We only want active apps
+				 */
+			} else if ( !app.isActive() && active == 1) {
+				it.remove();
+			}
+		}
+		
+		return aalREST;
+	
 
 	}
 

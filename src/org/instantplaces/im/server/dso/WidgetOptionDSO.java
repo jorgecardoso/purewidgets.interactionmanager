@@ -22,6 +22,15 @@ public class WidgetOptionDSO {
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
+
+	@Persistent
+	private String placeId;
+	
+	@Persistent
+	private String applicationId;
+	
+	@Persistent
+	private String widgetId;
 	
 	@Persistent
 	private String widgetOptionId;
@@ -35,8 +44,7 @@ public class WidgetOptionDSO {
 	@Persistent
 	private WidgetDSO widget;
 	
-	@Persistent
-	private String widgetId;
+
 	
 	@Persistent(mappedBy = "widgetOption")
 	private ArrayList <WidgetInputDSO> inputs; 
@@ -61,12 +69,20 @@ public class WidgetOptionDSO {
 		this.widgetOptionId = id;
 		this.suggestedReferenceCode = suggestedReferenceCode;
 		this.referenceCode = referenceCode;
-		this.widget = widget;
+		if (null != widget ) {
+			this.widget = widget;
+			this.widgetId = widget.getWidgetId();
+			this.applicationId = widget.getApplicationId();
+			this.placeId = widget.getPlaceId();
+		}
 	}
 
 	
 	public void setWidget(WidgetDSO w) {
 		this.widget = w;	
+		this.widgetId = w.getWidgetId();
+		this.applicationId = w.getApplicationId();
+		this.placeId = w.getPlaceId();
 	}
 
 
@@ -243,5 +259,37 @@ public class WidgetOptionDSO {
 	 */
 	public void setWidgetId(String widgetId) {
 		this.widgetId = widgetId;
+	}
+
+
+	/**
+	 * @return the applicationId
+	 */
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+
+	/**
+	 * @param applicationId the applicationId to set
+	 */
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
+
+
+	/**
+	 * @return the placeId
+	 */
+	public String getPlaceId() {
+		return placeId;
+	}
+
+
+	/**
+	 * @param placeId the placeId to set
+	 */
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}	
 }
