@@ -1,7 +1,6 @@
 package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -114,18 +113,19 @@ public class PlaceDSO {
 		Query query = pm.newQuery(PlaceDSO.class);
 	    query.setFilter("placeId == idParam");
 	    query.declareParameters("String idParam");
+	    query.setUnique(true);
 	    
 	    try {
-	        List<Object> results = (List<Object>) query.execute(placeId);
-	        if (!results.isEmpty()) {
-	        	Log.get().debug("Found " + results.size() + " places. Returning first.");
-	        	PlaceDSO place = (PlaceDSO)results.get(0);
-	        	return place;
+	        PlaceDSO result = (PlaceDSO) query.execute(placeId);
+	        if ( null != result ) {
+	        	Log.get().debug("Found places. Returning first.");
+	        	
+	        	return result;
 	        } else {
 	        	Log.get().debug("Place not found.");
 	        }
 	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store.");
+	    	Log.get().error("Could not access data store." + e.getMessage());
 	    }  finally {
 	        query.closeAll();
 	    }

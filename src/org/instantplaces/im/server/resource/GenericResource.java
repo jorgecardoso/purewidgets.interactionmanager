@@ -94,6 +94,10 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	protected String requestingAppId;
 	
+	protected ApplicationDSO applicationDSO;
+	
+	protected ApplicationDSO requestingApplicationDSO;
+	
 	/**
 	 * The PersistanceManager used to retrieve objects from the data store.
 	 * This is created at the beginning of the request (doInit) and released at
@@ -152,9 +156,10 @@ public abstract class GenericResource extends ServerResource {
 		/*
 		 * Update the requesting app's last request timestamp
 		 */
-		ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
-		if ( null != app ) {
-			app.setLastRequestTimestamp(System.currentTimeMillis());
+		this.requestingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
+		//this.pm.detachCopy(arg0)
+		if ( null != this.requestingApplicationDSO ) {
+			this.requestingApplicationDSO.setLastRequestTimestamp(System.currentTimeMillis());
 		}
 		
 		/*

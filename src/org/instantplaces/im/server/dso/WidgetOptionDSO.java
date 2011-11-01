@@ -35,6 +35,9 @@ public class WidgetOptionDSO {
 	@Persistent
 	private WidgetDSO widget;
 	
+	@Persistent
+	private String widgetId;
+	
 	@Persistent(mappedBy = "widgetOption")
 	private ArrayList <WidgetInputDSO> inputs; 
 	
@@ -224,5 +227,21 @@ public class WidgetOptionDSO {
 	 */
 	public void setLongDescripton(String longDescripton) {
 		this.longDescripton = longDescripton;
+	}
+
+
+	/**
+	 * @return the widgetId
+	 */
+	public String getWidgetId() {
+		return widgetId;
+	}
+
+
+	/**
+	 * @param widgetId the widgetId to set
+	 */
+	public void setWidgetId(String widgetId) {
+		this.widgetId = widgetId;
 	}	
 }

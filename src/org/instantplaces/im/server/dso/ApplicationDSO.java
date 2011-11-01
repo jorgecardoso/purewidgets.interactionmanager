@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -28,6 +29,10 @@ public class ApplicationDSO  {
 	
 	@Persistent
 	private PlaceDSO place;
+	
+	@Persistent 
+	private String placeId;
+	
 	
 	@Persistent(mappedBy = "application")
 	private ArrayList<WidgetDSO> widgets;
@@ -66,7 +71,7 @@ public class ApplicationDSO  {
 
 	public void setPlace(PlaceDSO place) {
 		this.place = place;
-		
+		this.placeId = place.getPlaceId();
 	}
 
 	public PlaceDSO getPlace() {
@@ -191,22 +196,29 @@ public class ApplicationDSO  {
 	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
 		Log.get().debug("Fetching application Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		
-		ArrayList<ApplicationDSO> applications = getApplicationsDSO(pm, placeId);
-		if ( applications == null ) {
-			Log.get().debug("No applications found.");
-			return null;
+			
+			Query query = pm.newQuery(ApplicationDSO.class);
+		    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
+		    query.declareParameters("String placeIdParam, String applicationIdParam");
+		    query.setUnique(true);
+		    
+		    try {
+		    	ApplicationDSO result = (ApplicationDSO) query.execute(placeId, applicationId);
+		        if ( null != result ) {
+		        	Log.get().debug("Found applications. Returning first.");
+		        	
+		        	return result;
+		        } else {
+		        	Log.get().debug("Application not found.");
+		        }
+		    } catch (Exception e) {
+		    	Log.get().error("Could not access data store." + e.getMessage());
+		    }  finally {
+		        query.closeAll();
+		    }
+		    return null;
 		}
-		
-		for ( ApplicationDSO app : applications ) {
-			if (app.getApplicationId().equals(applicationId)) {
-				Log.get().debug("Returning application.");
-				return app;
-			}
-		}
-		Log.get().debug("Application not found.");
-		return null;
-	}
-
+	
 	public void setLastRequestTimestamp(long lastRequestTimestamp) {
 		this.lastRequestTimestamp = lastRequestTimestamp;
 	}
@@ -217,5 +229,19 @@ public class ApplicationDSO  {
 
 	public boolean isActive() {
 		return (System.currentTimeMillis()-this.lastRequestTimestamp) < MAXIMUM_ACTIVITY_INTERVAL;
+	}
+
+	/**
+	 * @return the placeId
+	 */
+	public String getPlaceId() {
+		return placeId;
+	}
+
+	/**
+	 * @param placeId the placeId to set
+	 */
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}
 }

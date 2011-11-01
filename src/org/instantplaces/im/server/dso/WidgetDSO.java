@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -15,6 +16,7 @@ import org.instantplaces.im.server.rest.WidgetArrayListREST;
 import org.instantplaces.im.server.rest.WidgetOptionREST;
 import org.instantplaces.im.server.rest.WidgetREST;
 import org.instantplaces.im.shared.WidgetOption;
+
 
 
 import com.google.appengine.api.datastore.Key;
@@ -31,6 +33,11 @@ public class WidgetDSO {
 	@Persistent
 	private ApplicationDSO application;
 	
+	@Persistent 
+	private String placeId;
+	
+	@Persistent
+	private String applicationId;
 	
 	@Persistent
 	private String widgetId;
@@ -81,7 +88,8 @@ public class WidgetDSO {
 
 	public void setApplication(	ApplicationDSO app) {
 		this.application = app;
-		
+		this.applicationId = app.getApplicationId();
+		this.placeId = app.getPlaceId();
 	}
 
 
@@ -142,6 +150,8 @@ public class WidgetDSO {
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
 		wDSO.setShortDescription(widgetREST.getShortDescription());
 		wDSO.setLongDescription(widgetREST.getLongDescription());
+		wDSO.setApplicationId(widgetREST.getApplicationId());
+		wDSO.setPlaceId(widgetREST.getPlaceId());
 		
 		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
 			
@@ -193,22 +203,28 @@ public class WidgetDSO {
 	
 	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
 		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "), Widget(" + widgetId + ") from Data Store.");
-		ArrayList<WidgetDSO> widgets = getWidgetsFromDSO(pm, placeId, applicationId);
-		
-		if ( widgets == null ) {
-			Log.get().debug("No widget found.");
-			return null;
-		}
-		
-		for ( WidgetDSO widget : widgets ) {
-			if (widget.getWidgetId().equals(widgetId)) {
-				Log.get().debug("Returning widget.");
-				return widget;
-			}
-		}
-		Log.get().debug("Widget not found.");
-		return null;
-	}	
+	
+		Query query = pm.newQuery(WidgetDSO.class);
+	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
+	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
+	    query.setUnique(true);
+	    
+	    try {
+	    	WidgetDSO result = (WidgetDSO) query.execute(placeId, applicationId, widgetId);
+	        if ( null != result ) {
+	        	Log.get().debug("Found widgets. Returning first.");
+	        	
+	        	return result;
+	        } else {
+	        	Log.get().debug("Widget not found.");
+	        }
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
 	
 	public void copySuggestedReferenceCodesToReferenceCodes() {
 		//Log.get().debug(this.toString());
@@ -376,5 +392,37 @@ public class WidgetDSO {
 	 */
 	public void setControlType(String controlType) {
 		this.controlType = controlType;
+	}
+
+
+	/**
+	 * @return the applicationId
+	 */
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+
+	/**
+	 * @param applicationId the applicationId to set
+	 */
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
+
+
+	/**
+	 * @return the placeId
+	 */
+	public String getPlaceId() {
+		return placeId;
+	}
+
+
+	/**
+	 * @param placeId the placeId to set
+	 */
+	public void setPlaceId(String placeId) {
+		this.placeId = placeId;
 	}
 }
