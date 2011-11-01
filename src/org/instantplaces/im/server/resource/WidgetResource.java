@@ -59,10 +59,10 @@ public class WidgetResource extends GenericResource {
 	     */
 	    existingApplicationDSO.setPlace(existingPlaceDSO);
 	    existingPlaceDSO.addApplication(existingApplicationDSO);
-	    
 	   
-		
-		
+	    
+	    ArrayList<WidgetDSO> widgetsFromApplication = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+	    
 		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST)in;
 		
 		ArrayList<WidgetDSO> receivedWidgetListDSO = WidgetDSO.fromREST(receivedWidgetListREST);
@@ -76,7 +76,7 @@ public class WidgetResource extends GenericResource {
 			/*
 			 * Try to fetch the widget from the data store (it should not exist)
 			 */
-			WidgetDSO storedWidgetDSO = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetDSO.getWidgetId());
+			WidgetDSO storedWidgetDSO = this.containsWidgetDSO(receivedWidgetDSO, widgetsFromApplication); //WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetDSO.getWidgetId());
 			
 			if ( null != storedWidgetDSO ) { 
 				/* 
@@ -92,16 +92,18 @@ public class WidgetResource extends GenericResource {
 			
 				storedWidgetDSO = receivedWidgetDSO;
 				
+				storedWidgetDSO.setApplication(existingApplicationDSO);
+				 // Assign the reference codes to the widget.
+			    storedWidgetDSO.assignReferenceCodes();
 			    
 			    existingApplicationDSO.addWidget(storedWidgetDSO);
-			    storedWidgetDSO.setApplication(existingApplicationDSO);
 			    
-			  
-			    // Assign the reference codes to the widget.
-			    storedWidgetDSO.assignReferenceCodes();
+
 			}
 			storedWidgetListDSO.add(storedWidgetDSO);
 		}
+		
+		
 		
 		/*
 	     * Make the objects persistent. This is only necessary in case the place does not yet exist
@@ -121,6 +123,15 @@ public class WidgetResource extends GenericResource {
 		return WidgetArrayListREST.fromDSO(storedWidgetListDSO);
 	}
 
+	private WidgetDSO containsWidgetDSO(WidgetDSO widgetDSO, ArrayList<WidgetDSO> widgetList) {
+		for (WidgetDSO widget : widgetList) {
+			if ( widgetDSO.getWidgetId().equals(widget.getWidgetId()) ) {
+				return widget;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	protected Object doGet() {
 				
@@ -152,22 +163,8 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Convert all to WidgetREST
 				 */
-				ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
-				for ( WidgetDSO widgetDSO : widgets ) {
-					widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
-				}
-				/*
-				for (int i = 0; i < widgets.length; i++) {
-					widgetsREST.add(widgets[i].toREST());
-				}*/
-				/*
-				 * We put the ArrayList into a custom WidgetArrayListREST
-				 * because I couldn't make JAXB work otherwise... :(
-				 */
-				WidgetArrayListREST walREST = new WidgetArrayListREST();
-				walREST.widgets = widgetsREST;
+				return WidgetArrayListREST.fromDSO(widgets);
 				
-				return walREST;
 			} else {
 				Log.get().debug("Could not find any widget for the specified application");
 				return new WidgetArrayListREST();
@@ -180,6 +177,10 @@ public class WidgetResource extends GenericResource {
 	@Override
 	protected Object doDelete() {
 		Log.get().debug("Responding to DELETE request.");
+		/*
+		 * Fetch the app from the store 
+		 */
+		ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
 		
 		if (this.widgetId != null) { // Delete the specified widget
 			
@@ -212,7 +213,7 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Delete the widget from the application
 				 */
-				widget.getApplication().removeWidget(widget);
+				app.removeWidget(widget);
 				
 				WidgetArrayListREST walr = new WidgetArrayListREST();
 				walr.widgets = new ArrayList<WidgetREST>();
@@ -230,44 +231,30 @@ public class WidgetResource extends GenericResource {
 				WidgetArrayListREST walr = new WidgetArrayListREST();
 				walr.widgets = new ArrayList<WidgetREST>();
 				
-				ApplicationDSO application = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
-				
+			
 				
 				for (String widgetId : widgetIds) {
 					/*
 					 * Fetch the widget from the data store 
 					 */
 					//WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
-					WidgetDSO widget = application.getWidget( widgetId );
+					WidgetDSO widget = app.getWidget( widgetId );
 	
-					if (widget == null) {
-						/*String errorMessage =  "The specified widget was not found.";
-						Log.get().warn(errorMessage);
-						throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);*/
-						WidgetREST toReturn = new WidgetREST();
-						toReturn.setPlaceId(this.placeId);
-						toReturn.setApplicationId(this.appId);
-						toReturn.setWidgetId(widgetId);
-						
-						
-						
-						walr.widgets.add(toReturn);
-						
-						
-					} else {
-						Log.get().debug("Widget found: " + widget.toString());
-						
-						WidgetREST toReturn = WidgetREST.fromDSO(widget);
-						
+					if (widget != null) {
+						Log.get().debug("Widget found: " + widgetId);
+	
 						/*
 						 * Delete the widget from the application
 						 */
-						widget.getApplication().removeWidget(widget);
-						
-						
-						walr.widgets.add(toReturn);
-						
+						app.removeWidget(widget);
+
 					}	
+					
+					WidgetREST toReturn = new WidgetREST();
+					toReturn.setPlaceId(this.placeId);
+					toReturn.setApplicationId(this.appId);
+					toReturn.setWidgetId(widgetId);
+					walr.widgets.add(toReturn);
 				}
 				
 				return walr;
@@ -276,10 +263,7 @@ public class WidgetResource extends GenericResource {
 				
 				boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
 				
-				/*
-				 * Fetch the app from the store 
-				 */
-				ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+				
 				
 				if ( null == app ) { // app doesn't exist, throw error
 					String errorMessage =  "The specified application was not found.";

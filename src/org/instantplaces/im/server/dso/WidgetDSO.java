@@ -2,6 +2,7 @@ package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -188,17 +189,30 @@ public class WidgetDSO {
 	
 	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
-		ApplicationDSO application = ApplicationDSO.getApplicationDSO(pm, placeId, applicationId);
-		if (application == null) {
-			Log.get().debug("Application not found.");
-			return null;
-		}
-		if (application.getWidgets() == null) {
-			Log.get().debug("Found 0 widgets.");
-		} else {
-			Log.get().debug("Found " + application.getWidgets().size() + " widgets.");
-		}
-		return application.getWidgets();
+		
+		Query query = pm.newQuery(WidgetDSO.class);
+	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
+	    query.declareParameters("String placeIdParam, String applicationIdParam");
+	    try {
+	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId, applicationId);
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Widgets not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + result.size() + " widgets");
+	    	}
+	    	
+	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
 	}
 	
 	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
@@ -277,10 +291,6 @@ public class WidgetDSO {
 		//ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
 		for (WidgetOptionDSO option : this.options) {
 			this.application.getPlace().getCodeGenerator().recycleCode(option.getReferenceCode());
-				
-			Log.get().debug("Recycling reference code: " + option.toString());
-		
-		
 		}
 	}
 

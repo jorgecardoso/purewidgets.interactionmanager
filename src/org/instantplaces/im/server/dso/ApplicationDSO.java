@@ -84,7 +84,6 @@ public class ApplicationDSO  {
 	}
 	
 	public void removeWidget(WidgetDSO widget) {
-		Log.get().debug("Deleting widget: " + widget.toString());
 		if ( null != this.widgets ) {
 			widget.recycleReferenceCodes();
 			this.widgets.remove(widget);
@@ -102,7 +101,7 @@ public class ApplicationDSO  {
 			WidgetDSO widget = it.next();
 			if (widget.isVolatileWidget()) {
 				any = true;
-				Log.get().debug("Deleting widget: " + widget.toString());
+				
 				widget.recycleReferenceCodes();
 				
 				PersistenceManager pm = JDOHelper.getPersistenceManager(widget);
