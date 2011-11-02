@@ -75,6 +75,8 @@ public class ApplicationResource extends GenericResource {
 			}
 		}
 
+		
+		this.beginTransaction();
 		/*
 		 * Return the list of applications
 		 */
@@ -82,7 +84,8 @@ public class ApplicationResource extends GenericResource {
 		ArrayList<WidgetDSO> widgetsDetached = (ArrayList<WidgetDSO>) this.pm.detachCopyAll(WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId));
 		ArrayList<WidgetOptionDSO> widgetOptionsDetached = (ArrayList<WidgetOptionDSO>) this.pm.detachCopyAll(WidgetDSO.getWidgetOptionsFromDSO(this.pm, this.placeId));
 		ArrayList<ApplicationDSO> applicationsDetached = (ArrayList<ApplicationDSO>) this.pm.detachCopyAll(ApplicationDSO.getApplicationsDSO(this.pm, this.placeId));
-	
+		this.commitTransaction();
+		
 		if ( null == applicationsDetached || null == widgetsDetached || null == widgetOptionsDetached) {
 			return  new ApplicationArrayListREST();
 		}

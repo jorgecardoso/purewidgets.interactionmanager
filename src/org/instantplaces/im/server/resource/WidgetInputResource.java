@@ -47,6 +47,9 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Object doGet() {
+		WidgetInputArrayListREST toReturn = new WidgetInputArrayListREST();
+		
+		this.beginTransaction();
 		InputRequest.getPresences();
 		
 		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
@@ -58,11 +61,7 @@ public class WidgetInputResource extends GenericResource {
 			} catch (Exception e) {
 				String errorMessage =  "Sorry, 'from' query parameter must be an integer value.";
 		
-				Log.get().error(errorMessage);
-		
-				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
-				//Log.get().warn("Error parsing 'from' URL parameter. Assuming not specified.");
-				//fromParameter = "";
+				this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage));
 			}
 		}
 		
@@ -79,9 +78,7 @@ public class WidgetInputResource extends GenericResource {
 			if (storedWidgetDSO == null) {
 				String errorMessage =  "Sorry, the specified widget does not exist.";
 				
-				Log.get().error(errorMessage);
-		
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
 				//Log.get().debug("Client specified an non-existing widget to fetch input from.");
 				//return new ErrorREST(null, "Specified widget does not exist.");
 			}
@@ -115,9 +112,9 @@ public class WidgetInputResource extends GenericResource {
 				}
 			}
 			
-			WidgetInputArrayListREST toClient = new WidgetInputArrayListREST();
-			toClient.inputs = list;
-			return toClient;
+			
+			toReturn.inputs = list;
+			
 			
 		} else {
 			/*
@@ -132,12 +129,7 @@ public class WidgetInputResource extends GenericResource {
 			if ( null == storedWidgetsDSO || storedWidgetsDSO.size() == 0 ) {
 				String errorMessage =  "Sorry, The specified application does not have any widget";
 				
-				Log.get().error(errorMessage);
-		
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
-				
-				//Log.get().debug("The specified application does not have any widget");
-				//return new ErrorREST(null, "The specified application does not have any widget");
+				this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
 			}
 			
 			ArrayList<WidgetInputREST> list = new ArrayList<WidgetInputREST>();
@@ -173,12 +165,15 @@ public class WidgetInputResource extends GenericResource {
 				}
 			}
 			
-			WidgetInputArrayListREST toClient = new WidgetInputArrayListREST();
-			toClient.inputs = list;
-			return toClient;
+			toReturn.inputs = list;
+			
 			
 		}
-		//return null;
+		
+		if ( !this.commitTransaction() ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
+		}
+		return toReturn;
 	}
 
 	@Override

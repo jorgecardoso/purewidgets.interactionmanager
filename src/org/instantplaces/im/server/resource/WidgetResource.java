@@ -32,6 +32,7 @@ public class WidgetResource extends GenericResource {
 		PlaceDSO existingPlaceDSO = null;
 		ApplicationDSO existingApplicationDSO = null;
 		
+		this.beginTransaction();
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
 		 */
@@ -40,8 +41,6 @@ public class WidgetResource extends GenericResource {
 	    	Log.get().debug("The specified place was not found. Creating new...");
 	        existingPlaceDSO = new PlaceDSO(this.placeId, null);
 	    } 
-	    
-	    
 		
 	    /*
 	     * Get the Application from the store. Create one if it does not exist yet.
@@ -112,15 +111,21 @@ public class WidgetResource extends GenericResource {
 		try {
 			existingPlaceDSO = pm.makePersistent(existingPlaceDSO);
 		} catch (Exception e) {
-			String errorMessage =  "Sorry, could not make the new place persistent.";
-			Log.get().error(errorMessage);
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage);
+			String errorMessage = "Sorry, could not make the new place persistent.";
+			
+			this.rollbackAndThrowException(new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage));
 		}
 		
 		/*
 		 * Send back the list of added widgets
 		 */
-		return WidgetArrayListREST.fromDSO(storedWidgetListDSO);
+		WidgetArrayListREST walr = WidgetArrayListREST.fromDSO(storedWidgetListDSO);
+		
+		if ( !this.commitTransaction() ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
+		}
+		
+		return walr;
 	}
 
 	private WidgetDSO containsWidgetDSO(WidgetDSO widgetDSO, ArrayList<WidgetDSO> widgetList) {
@@ -136,6 +141,9 @@ public class WidgetResource extends GenericResource {
 	protected Object doGet() {
 				
 		Log.get().debug("Responding to GET request.");
+		Object toReturn = null;
+		this.beginTransaction();
+		
 		
 		if (this.widgetId != null) { 
 			/* 
@@ -145,11 +153,10 @@ public class WidgetResource extends GenericResource {
 			
 			if (widget == null) {
 				String errorMessage =  "The specified widget was not found.";
-				Log.get().warn(errorMessage);
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+				this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
-				return WidgetREST.fromDSO(widget);
+				toReturn =  WidgetREST.fromDSO(widget);
 			}
 			
 		} else {
@@ -163,20 +170,33 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Convert all to WidgetREST
 				 */
-				return WidgetArrayListREST.fromDSO(widgets);
+				toReturn =  WidgetArrayListREST.fromDSO(widgets);
 				
 			} else {
 				Log.get().debug("Could not find any widget for the specified application");
-				return new WidgetArrayListREST();
+				toReturn = new WidgetArrayListREST();
 			}
 			
 		}
+		
+		if ( !this.commitTransaction() ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
+		}
+		return toReturn;
 		
 	}
 	
 	@Override
 	protected Object doDelete() {
 		Log.get().debug("Responding to DELETE request.");
+		
+		/*
+		 * To be returned
+		 */
+		WidgetArrayListREST walr = new WidgetArrayListREST();
+		walr.widgets = new ArrayList<WidgetREST>();
+		
+		this.beginTransaction();
 		/*
 		 * Fetch the app from the store 
 		 */
@@ -200,10 +220,8 @@ public class WidgetResource extends GenericResource {
 				toReturn.setWidgetId(this.widgetId);
 				
 				
-				WidgetArrayListREST walr = new WidgetArrayListREST();
-				walr.widgets = new ArrayList<WidgetREST>();
 				walr.widgets.add(toReturn);
-				return walr;
+				
 				
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
@@ -215,8 +233,7 @@ public class WidgetResource extends GenericResource {
 				 */
 				app.removeWidget(widget);
 				
-				WidgetArrayListREST walr = new WidgetArrayListREST();
-				walr.widgets = new ArrayList<WidgetREST>();
+				
 				walr.widgets.add(toReturn);
 				return walr;
 			}
@@ -228,8 +245,7 @@ public class WidgetResource extends GenericResource {
 			if ( widgetsToDelete.length() > 0 ) {
 				String widgetIds[] = widgetsToDelete.split(",");
 				
-				WidgetArrayListREST walr = new WidgetArrayListREST();
-				walr.widgets = new ArrayList<WidgetREST>();
+				
 				
 				//ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
 				
@@ -258,7 +274,7 @@ public class WidgetResource extends GenericResource {
 				}
 				//app.removeWidgets(toDelete);
 				
-				return walr;
+				
 				
 			} else {  //Delete all widgets from this app!
 				
@@ -268,8 +284,8 @@ public class WidgetResource extends GenericResource {
 				
 				if ( null == app ) { // app doesn't exist, throw error
 					String errorMessage =  "The specified application was not found.";
-					Log.get().warn(errorMessage);
-					throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
+					
+					this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
 					
 				} else {
 					Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + app.toString());
@@ -289,8 +305,8 @@ public class WidgetResource extends GenericResource {
 						}
 					}
 					
-					WidgetArrayListREST walREST = new WidgetArrayListREST();
-					walREST.widgets = widgetsREST;
+					
+					walr.widgets = widgetsREST;
 					
 					
 					/*
@@ -302,10 +318,16 @@ public class WidgetResource extends GenericResource {
 						app.removeAllWidgets();
 					}
 					
-					return walREST;
+					
 				}
 			}
 		}
+		
+		if ( !this.commitTransaction() ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
+		}
+		
+		return walr;
 		
 	}
 	

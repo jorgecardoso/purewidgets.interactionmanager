@@ -127,14 +127,7 @@ public abstract class GenericResource extends ServerResource {
 		 * release it at the end (see doRelease())
 		 */
 		pm = PMF.get().getPersistenceManager();
-		tx= pm.currentTransaction();
-		try
-		{
-			Log.get().debug("Beginning JDO transaction");
-		    tx.begin();
-		} catch (JDOUserException e) {
-			Log.get().error("Error beginnig JDO transaction: " + e.getMessage());
-		}
+		
 	
 		/*
 		 * Extract the parameters from the URL (including the ones from
@@ -147,20 +140,23 @@ public abstract class GenericResource extends ServerResource {
 			 * We need an appid...
 			 */
 			String errorMessage =  "Sorry, you have to specify a valid application id using 'appid' query parameter.";
-			
-			Log.get().error(errorMessage);
-	
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+			this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage));
 		}
 		
 		/*
 		 * Update the requesting app's last request timestamp
 		 */
+		this.beginTransaction();
 		this.requestingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
 		//this.pm.detachCopy(arg0)
 		if ( null != this.requestingApplicationDSO ) {
 			this.requestingApplicationDSO.setLastRequestTimestamp(System.currentTimeMillis());
 		}
+		if ( !this.commitTransaction() ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
+		}
+			
+		
 		
 		/*
 		 * Check if the user specified content-type (if any) matches any of the 
@@ -181,7 +177,21 @@ public abstract class GenericResource extends ServerResource {
 		
 		Log.get().error(errorMessage);
 		
-		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
+		this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage));
+	}
+
+	/**
+	 * 
+	 */
+	protected void beginTransaction() {
+		tx = pm.currentTransaction();
+		try
+		{
+			Log.get().debug("Beginning JDO transaction");
+		    tx.begin();
+		} catch (JDOUserException e) {
+			Log.get().error("Error beginnig JDO transaction: " + e.getMessage());
+		}
 	}
 
 	/**
@@ -219,6 +229,16 @@ public abstract class GenericResource extends ServerResource {
 	
 	@Override
 	public void doRelease() {
+		
+		pm.close();
+		Log.get().debug("Returning status" +  this.getResponse().getStatus().toString());	
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected boolean commitTransaction() {
 		Log.get().debug("Commiting transaction");
 		try {
 			tx.commit();
@@ -229,12 +249,25 @@ public abstract class GenericResource extends ServerResource {
 			{
 				Log.get().error("Could not finish transaction. Rolling back.");
 				tx.rollback();
+				
+				return false;
 			}
 			Log.get().debug("Closing Persistance Manager.");
-			pm.close();
-		}	
-		Log.get().debug("Returning status" +  this.getResponse().getStatus().toString());	
-		
+			
+		}
+		return true;
+	}
+	
+	protected void rollbackAndThrowException(ResourceException re) {
+		Log.get().error(re.getMessage());
+		if ( this.tx.isActive() ) {
+			this.tx.rollback();
+		}
+		throw re;
+	}
+	
+	protected void rollbackTransaction() {
+		this.tx.rollback();
 	}
 	
 	protected abstract Object doPost(Object incoming);
