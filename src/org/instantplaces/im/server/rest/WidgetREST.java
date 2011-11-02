@@ -22,7 +22,6 @@ public class WidgetREST implements Widget {
 	@XmlAttribute
 	private	String placeId;
 	
-	
 	@XmlAttribute
 	private String applicationId;
 	
@@ -129,7 +128,6 @@ public class WidgetREST implements Widget {
 	 * @return
 	 */
 	public static WidgetREST fromDSO(WidgetDSO widgetDSO) {
-		Log.get().debug("Converting to REST " + widgetDSO.toString());
 		WidgetREST  w = new WidgetREST();
 	
 		if (widgetDSO.getApplication() != null) {
@@ -143,14 +141,13 @@ public class WidgetREST implements Widget {
 			w.addWidgetOption( WidgetOptionREST.fromDSO(option) );
 		}
 		
+		w.setPlaceId(widgetDSO.getPlaceId());
+		w.setApplicationId(widgetDSO.getApplicationId());
 		w.setWidgetId(widgetDSO.getWidgetId());
 		w.setControlType(widgetDSO.getControlType());
 		w.setVolatileWidget(widgetDSO.isVolatileWidget());
 		w.setShortDescription(widgetDSO.getShortDescription());
 		w.setLongDescription(widgetDSO.getLongDescription());
-		
-		
-		Log.get().debug("Converted: " + w.toString());
 		return w; 
 	}
 	
