@@ -12,9 +12,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 
@@ -83,31 +81,6 @@ public class ApplicationREST {
 	public ArrayList<WidgetREST> getWidgets() {
 		return this.widgets;
 	}
-
-	/**
-	 * Converts a ApplicationDSO object to a ApplicationREST object.
-	 * 
-	 * @param widgetDSO
-	 * @return
-	 */
-	public static ApplicationREST fromDSO(ApplicationDSO applicationDSO) {
-		Log.get().debug("Converting to REST " + applicationDSO.toString());
-		ApplicationREST  a = new ApplicationREST();
-	
-		a.setPlaceId( applicationDSO.getPlaceId() );
-		a.setApplicationId( applicationDSO.getApplicationId() );
-		
-		
-		for ( WidgetDSO widget : applicationDSO.getWidgets() ) {
-			a.addWidget( WidgetREST.fromDSO( widget ));
-		}
-		
-		a.setLastRequestTimestamp(applicationDSO.getLastRequestTimestamp());
-		
-		Log.get().debug("Converted: " + a.toString());
-		return a; 
-	}
-
 
 	/**
 	 * @return the lastRequestTimestamp

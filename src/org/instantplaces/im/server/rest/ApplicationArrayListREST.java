@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.instantplaces.im.server.dso.ApplicationDSO;
 
 
 /**
@@ -32,18 +31,5 @@ public class ApplicationArrayListREST {
 			sb.append(a.toString());
 		}
 		return sb.toString();
-	}
-	
-	public static ApplicationArrayListREST fromDSO(ArrayList<ApplicationDSO> applicationDSOList) {
-		
-		ArrayList<ApplicationREST> applicationListREST = new ArrayList<ApplicationREST>();
-		for ( ApplicationDSO aDSO : applicationDSOList ) {
-			ApplicationREST aREST = ApplicationREST.fromDSO(aDSO);
-			applicationListREST.add(aREST);
-		}
-		
-		ApplicationArrayListREST applicationArrayList= new ApplicationArrayListREST();
-		applicationArrayList.applications = applicationListREST;
-		return applicationArrayList;
 	}
 }

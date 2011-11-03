@@ -1,14 +1,22 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 
+import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
+import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetArrayListREST;
 import org.instantplaces.im.server.rest.WidgetREST;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.DsoConverter;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
+import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -25,122 +33,171 @@ public class WidgetResource extends GenericResource {
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
 	}
 
+	
+	
 	@Override
 	protected Object doPost(Object in) {
+		long start = System.currentTimeMillis();
 		Log.get().debug("Responding to Post request.");
 		
 		PlaceDSO existingPlaceDSO = null;
 		ApplicationDSO existingApplicationDSO = null;
+		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST)in;
+		HashSet<String> receivedWidgetsSet = new HashSet<String>();
+		for ( WidgetREST w : receivedWidgetListREST.widgets ) {
+			receivedWidgetsSet.add(w.getWidgetId());
+		}
 		
-		this.beginTransaction();
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
 		 */
-	    existingPlaceDSO = PlaceDSO.getPlaceDSO(this.pm, this.placeId);
+		this.beginTransaction();
+	    existingPlaceDSO = DsoFetcher.getPlaceFromDSO(this.pm, this.placeId);
 	    if (null == existingPlaceDSO) {
-	    	Log.get().debug("The specified place was not found. Creating new...");
+	    	Log.get().info("The specified place " + this.placeId + " was not found. Creating new...");
 	        existingPlaceDSO = new PlaceDSO(this.placeId, null);
 	    } 
-		
+	    this.pm.makePersistent(existingPlaceDSO);
+	       
 	    /*
 	     * Get the Application from the store. Create one if it does not exist yet.
 	     */
-	    existingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
+
+	    existingApplicationDSO = DsoFetcher.getApplicationDSO(this.pm, this.placeId, this.appId);
 	    if (null == existingApplicationDSO) {
-	    	Log.get().debug("The specified application was not found. Creating new...");
-	        existingApplicationDSO = new ApplicationDSO(this.appId, existingPlaceDSO, null);
+	    	Log.get().info("The specified application " + this.appId + "was not found. Creating new...");
+	        existingApplicationDSO = new ApplicationDSO(existingPlaceDSO, this.appId);
+	        //existingApplicationDSO.setPlaceId(existingPlaceDSO.getPlaceId());
+	        //existingApplicationDSO.setKey(KeyFactory.createKey(existingPlaceDSO.getKey(), ApplicationDSO.class.getSimpleName(),  this.appId));
+	    }
+	    this.pm.makePersistent(existingApplicationDSO);
+
+	    
+	    ReferenceCodeGenerator rcg = existingPlaceDSO.getCodeGenerator();
+	    ArrayList<WidgetDSO> widgetsFromApplication = DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+	    ArrayList<WidgetOptionDSO> widgetOptionsFromApplication = DsoFetcher.getWidgetOptionFromDSO(this.pm, this.placeId, this.appId);
+	    
+
+	    /*
+	     * Throw away the widgets and options from the store that do not match the new ones
+	     */
+	    Iterator<WidgetDSO> wIt = widgetsFromApplication.iterator();
+	    while ( wIt.hasNext() ) {
+	    	WidgetDSO next = wIt.next();
+	    	if ( !receivedWidgetsSet.contains(next.getWidgetId()) ) {
+	    		wIt.remove();
+	    	}
 	    }
 	    
+	    Iterator<WidgetOptionDSO> woIt = widgetOptionsFromApplication.iterator();
+	    while ( woIt.hasNext() ) {
+	    	WidgetOptionDSO next = woIt.next();
+	    	if ( !receivedWidgetsSet.contains(next.getWidgetId()) ) {
+	    		woIt.remove();
+	    	}
+	    }
+	    
+	    
 	    /*
-	     * Set the place for the application and add the application to the place. Set the application
-	     * for the widget and add the widget to the application.
-	     * These are (should be) idempotent operations.
-	     */
-	    existingApplicationDSO.setPlace(existingPlaceDSO);
-	    existingPlaceDSO.addApplication(existingApplicationDSO);
-	   
+	     * Now add the new widgets, or merge if they already exist.
+	     * The result will be a set of widgets to add/modify, a set of widgetoptions to add/modify
+	     * and, possibly, a set of widgetOptions to delete. 
+	     * 
+	     */   
+	    // rebuild the widget->widgetOption tree
+	    HashMap<String, WidgetDSO> widgetMap = new HashMap<String, WidgetDSO>();
+	    for ( WidgetDSO w : widgetsFromApplication ) {
+	    	widgetMap.put(w.getWidgetId(), w);
+	    }
 	    
-	    ArrayList<WidgetDSO> widgetsFromApplication = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+	    for ( WidgetOptionDSO wo : widgetOptionsFromApplication ) {
+	    	if ( widgetMap.containsKey(wo.getWidgetId()) ) {
+	    		widgetMap.get(wo.getWidgetId()).addWidgetOption(wo);
+	    	}
+	    }
 	    
-		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST)in;
+	    
 		
-		ArrayList<WidgetDSO> receivedWidgetListDSO = WidgetDSO.fromREST(receivedWidgetListREST);
 		
-		/*
-		 * The list of widgets, with ref codes, that will be sent back to the client
-		 */
-		ArrayList<WidgetDSO> storedWidgetListDSO = new ArrayList<WidgetDSO>();
+		ArrayList<WidgetOptionDSO> toDelete = new ArrayList<WidgetOptionDSO>();
+		ArrayList<WidgetOptionDSO> toAdd = new ArrayList<WidgetOptionDSO>();
 		
-		for ( WidgetDSO receivedWidgetDSO : receivedWidgetListDSO ) {
-			/*
-			 * Try to fetch the widget from the data store (it should not exist)
-			 */
-			WidgetDSO storedWidgetDSO = this.containsWidgetDSO(receivedWidgetDSO, widgetsFromApplication); //WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, receivedWidgetDSO.getWidgetId());
+		for ( WidgetREST receivedWidget : receivedWidgetListREST.widgets ) {
 			
-			if ( null != storedWidgetDSO ) { 
+			/*
+			 * See if this widget already exists
+			 */
+			WidgetDSO storedWidget = widgetMap.get( receivedWidget.getWidgetId() );
+			
+			if ( null != storedWidget ) { 
 				/* 
 				 * Widget exists in data store so merge
 				 */
-				storedWidgetDSO.mergeWith(receivedWidgetDSO);
+				WidgetDSO wDSO = DsoConverter.widgetDSOfromRest(existingApplicationDSO, receivedWidget);
 				
-				
-			} else {
-				/*
-				 * Widget does not exist so create and store 
-				 */
-			
-				storedWidgetDSO = receivedWidgetDSO;
-				
-				storedWidgetDSO.setApplication(existingApplicationDSO);
-				 // Assign the reference codes to the widget.
-			    storedWidgetDSO.assignReferenceCodes();
-			    
-			    existingApplicationDSO.addWidget(storedWidgetDSO);
-			    
+				toDelete.addAll( storedWidget.mergeOptionsToDelete(wDSO) );
+				toAdd.addAll( storedWidget.mergeOptionsToAdd(wDSO) );
 
+			} else {
+				
+				storedWidget = DsoConverter.widgetDSOfromRest(existingApplicationDSO, receivedWidget);
+		
+				toAdd.addAll( storedWidget.getWidgetOptions() );
+				
+				widgetsFromApplication.add(storedWidget);
 			}
-			storedWidgetListDSO.add(storedWidgetDSO);
+			
+			storedWidget.assignReferenceCodes(rcg); 
 		}
+		
+		/*
+		 * We are going to return this
+		 */
+		WidgetArrayListREST walr = RestConverter.widgetArrayListFromDso(widgetsFromApplication);
 		
 		
 		
 		/*
-	     * Make the objects persistent. This is only necessary in case the place does not yet exist
-	     * but it does harm to call it everytime...
+	     * Recycle the codes and delete the input from the options that the widget is no longer using
 	     */
+		for ( WidgetOptionDSO woDso : toDelete ) {
+			rcg.recycleCode(woDso.getReferenceCode());
+			DsoFetcher.deleteWidgetInputDSO(this.pm, this.placeId, this.appId, woDso.getWidgetId(), woDso.getWidgetOptionId());
+		}
+		
+		/*
+		 * Make everything persistent
+		 */
+		Log.get().debug(widgetsFromApplication.size());
+		Log.get().debug(widgetOptionsFromApplication.size());
+		Log.get().debug(toAdd.size());
+		Log.get().debug(toDelete.size());
 		try {
-			existingPlaceDSO = pm.makePersistent(existingPlaceDSO);
+			
+			this.pm.makePersistentAll(widgetsFromApplication);
+			this.pm.makePersistentAll(widgetOptionsFromApplication);
+			this.pm.makePersistentAll(toAdd);
+			this.pm.makePersistent(rcg);
+			this.pm.deletePersistentAll(toDelete);
 		} catch (Exception e) {
-			String errorMessage = "Sorry, could not make the new place persistent.";
+			String errorMessage = "Sorry, could not make persist objects: " + e.getMessage();
 			
 			this.rollbackAndThrowException(new ResourceException(Status.SERVER_ERROR_INTERNAL, errorMessage));
 		}
 		
-		/*
-		 * Send back the list of added widgets
-		 */
-		WidgetArrayListREST walr = WidgetArrayListREST.fromDSO(storedWidgetListDSO);
 		
-		if ( !this.commitTransaction() ) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
-		}
+		this.commitTransaction();
 		
+		long end = System.currentTimeMillis();
+		Log.get().debug("Time: " + (end-start));
 		return walr;
 	}
 
-	private WidgetDSO containsWidgetDSO(WidgetDSO widgetDSO, ArrayList<WidgetDSO> widgetList) {
-		for (WidgetDSO widget : widgetList) {
-			if ( widgetDSO.getWidgetId().equals(widget.getWidgetId()) ) {
-				return widget;
-			}
-		}
-		return null;
-	}
 	
 	@Override
 	protected Object doGet() {
-				
 		Log.get().debug("Responding to GET request.");
+		
 		Object toReturn = null;
 		this.beginTransaction();
 		
@@ -149,28 +206,30 @@ public class WidgetResource extends GenericResource {
 			/* 
 			 * Return the specified widget
 			 */
-			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
+			WidgetDSO widget = DsoFetcher.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
+			this.commitTransaction();
 			
 			if (widget == null) {
 				String errorMessage =  "The specified widget was not found.";
 				this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
-				toReturn =  WidgetREST.fromDSO(widget);
+				toReturn =  RestConverter.widgetRestFromDso(widget);
 			}
 			
 		} else {
 			/*
 			 * Return the list of widgets
 			 */
-			ArrayList<WidgetDSO> widgets = WidgetDSO.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			ArrayList<WidgetDSO> widgets = DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			this.commitTransaction();
 			
 			if ( widgets != null ) {
 				
 				/*
 				 * Convert all to WidgetREST
 				 */
-				toReturn =  WidgetArrayListREST.fromDSO(widgets);
+				toReturn =  RestConverter.widgetArrayListFromDso(widgets);
 				
 			} else {
 				Log.get().debug("Could not find any widget for the specified application");
@@ -179,156 +238,94 @@ public class WidgetResource extends GenericResource {
 			
 		}
 		
-		if ( !this.commitTransaction() ) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
-		}
+		
 		return toReturn;
 		
 	}
 	
-	@Override
-	protected Object doDelete() {
-		Log.get().debug("Responding to DELETE request.");
-		
+	private WidgetArrayListREST deleteSpecifiedWidgets(String [] widgetsToDelete) {
 		/*
 		 * To be returned
 		 */
 		WidgetArrayListREST walr = new WidgetArrayListREST();
 		walr.widgets = new ArrayList<WidgetREST>();
-		
-		this.beginTransaction();
-		/*
-		 * Fetch the app from the store 
-		 */
-		ApplicationDSO app = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.appId);
-		
-		if (this.widgetId != null) { // Delete the specified widget
-			
-			/*
-			 * Fetch the widget from the data store 
-			 */
-			WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, this.widgetId);
-			
-
-			if (widget == null) {
-				/*String errorMessage =  "The specified widget was not found.";
-				Log.get().warn(errorMessage);
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);*/
+		if ( null != widgetsToDelete && widgetsToDelete.length > 0 ) {
+			this.beginTransaction();
+			for ( String widgetId : widgetsToDelete ) {  
+				/*
+				 * Fetch the widget from the data store 
+				 */
+				DsoFetcher.deleteWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
+				
 				WidgetREST toReturn = new WidgetREST();
 				toReturn.setPlaceId(this.placeId);
 				toReturn.setApplicationId(this.appId);
-				toReturn.setWidgetId(this.widgetId);
+				toReturn.setWidgetId(widgetId);
 				
 				
 				walr.widgets.add(toReturn);
-				
-				
-			} else {
-				Log.get().debug("Widget found: " + widget.toString());
-				
-				WidgetREST toReturn = WidgetREST.fromDSO(widget);
-				
-				/*
-				 * Delete the widget from the application
-				 */
-				app.removeWidget(widget);
-				
-				
-				walr.widgets.add(toReturn);
-				return walr;
 			}
+			this.commitTransaction();
+		}
+		return walr;
+	}
+	
+	
+	private WidgetArrayListREST deleteAllWidgets(boolean volatileOnly) {
+		Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + this.appId );
+		
+		WidgetArrayListREST walr = new WidgetArrayListREST();
+		this.beginTransaction();
+		if ( volatileOnly ) {
+			ArrayList<WidgetDSO> widgetsToDelete = DsoFetcher.getVolatileWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			walr = RestConverter.widgetArrayListFromDso(widgetsToDelete);
 			
-			
+			for ( WidgetDSO widget : widgetsToDelete ) {
+				DsoFetcher.deleteWidgetFromDSO(this.pm, this.placeId, this.appId, widget.getWidgetId());
+			}
 		} else {
-			String widgetsToDelete =  this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("widgets", "");
+			ArrayList<WidgetDSO> widgetsToDelete = DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			walr = RestConverter.widgetArrayListFromDso(widgetsToDelete);
+			DsoFetcher.deleteWidgetFromDSO(this.pm, this.placeId, this.appId);
+		}
 			
-			if ( widgetsToDelete.length() > 0 ) {
-				String widgetIds[] = widgetsToDelete.split(",");
-				
-				
-				
-				//ArrayList<WidgetDSO> toDelete = new ArrayList<WidgetDSO>();
-				
-				for (String widgetId : widgetIds) {
-					/*
-					 * Fetch the widget from the data store 
-					 */
-					//WidgetDSO widget = WidgetDSO.getWidgetFromDSO(this.pm, this.placeId, this.appId, widgetId);
-					WidgetDSO widget = app.getWidget( widgetId );
+		this.commitTransaction();
+			
+		return walr;
+			
+		
+	}
+
 	
-					if (widget != null) {
-						Log.get().debug("Widget found: " + widgetId);
 	
-						/*
-						 * Delete the widget from the application
-						 */
-						app.removeWidget(widget);
-						//toDelete.add(widget);
-					}	
-					
-					WidgetREST toReturn = new WidgetREST();
-					toReturn.setPlaceId(this.placeId);
-					toReturn.setApplicationId(this.appId);
-					toReturn.setWidgetId(widgetId);
-					walr.widgets.add(toReturn);
-				}
-				//app.removeWidgets(toDelete);
+	@Override
+	protected Object doDelete() {
+		
+		Log.get().debug("Responding to DELETE request.");
+		
+		
+		
+		
+		
+		if (this.widgetId != null) { // Delete the specified widget
+			
+			return this.deleteSpecifiedWidgets(new String[] {this.widgetId});
+		} else { // delete the widgets passed in the url param
+		
+			String widgetsToDeleteParam =  this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("widgets", "");
+	
+			if ( widgetsToDeleteParam.length() > 0 ) {
+				return this.deleteSpecifiedWidgets(widgetsToDeleteParam.split(","));
 				
-				
-				
-			} else {  //Delete all widgets from this app!
-				
+			} else { // delete all widgets from the app
 				boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
 				
+				return this.deleteAllWidgets(volatileOnly);
 				
-				
-				if ( null == app ) { // app doesn't exist, throw error
-					String errorMessage =  "The specified application was not found.";
-					
-					this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage));
-					
-				} else {
-					Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + app.toString());
-					
-					
-					/*
-					 * Convert all app widgets to WidgetREST, so that we can return them
-					 */
-					ArrayList<WidgetREST> widgetsREST = new ArrayList<WidgetREST>();
-					for ( WidgetDSO widgetDSO : app.getWidgets() ) {
-						if ( volatileOnly ){
-							if ( widgetDSO.isVolatileWidget() ) {
-								widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
-							}
-						} else {
-							widgetsREST.add(WidgetREST.fromDSO(widgetDSO));
-						}
-					}
-					
-					
-					walr.widgets = widgetsREST;
-					
-					
-					/*
-					 * Delete everything!
-					 */
-					if ( volatileOnly ) {
-						app.removeVolatileWidgets();
-					} else {
-						app.removeAllWidgets();
-					}
-					
-					
-				}
 			}
 		}
 		
-		if ( !this.commitTransaction() ) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
-		}
-		
-		return walr;
-		
+	
 	}
 	
 

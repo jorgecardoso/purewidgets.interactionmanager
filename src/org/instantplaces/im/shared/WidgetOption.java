@@ -10,5 +10,6 @@ public interface WidgetOption {
 	
 	public void setReferenceCode(String refCode);
 	public String getReferenceCode();
+
 	
 }

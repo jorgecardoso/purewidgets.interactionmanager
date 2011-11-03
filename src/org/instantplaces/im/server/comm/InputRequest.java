@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetInputDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
@@ -172,8 +173,7 @@ public class InputRequest {
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		WidgetOptionDSO widgetOption = WidgetOptionDSO
-				.getWidgetOptionDSOByReferenceCode(pm, refCode);
+		WidgetOptionDSO widgetOption = DsoFetcher.getWidgetOptionDSOByReferenceCode(pm, refCode);
 
 		// TODO: save statistics in PlaceDSO here. Save input to existing
 		// widgets and to non-existing widgets
@@ -181,20 +181,15 @@ public class InputRequest {
 			Log.get().debug("No widgets are using this reference code.");
 			return;
 		} else {
-			Log.get().debug("Saving input for " + widgetOption.toString());
+			Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
-			WidgetInputDSO input = new WidgetInputDSO();
-			input.setPersona(name);
-
-			input.setParameters(parameters);
-			input.setWidgetOptionDSO(widgetOption);
-			input.setTimeStamp(System.currentTimeMillis());
-			widgetOption.addWidgetInput(input);
+			WidgetInputDSO input = new WidgetInputDSO(widgetOption, System.currentTimeMillis(), parameters, name );
+			pm.makePersistent(input);
 			try {
 				pm.close();
 			} catch (Exception e) {
 				Log.get().error("Could not save input to datastore");
-				Log.get().equals(e.getMessage());
+				Log.get().error(e.getMessage());
 				e.printStackTrace();
 			} finally {
 

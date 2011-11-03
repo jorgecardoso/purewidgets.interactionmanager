@@ -11,8 +11,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import org.instantplaces.im.shared.Widget;
 import org.instantplaces.im.shared.WidgetOption;
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -121,46 +119,18 @@ public class WidgetREST implements Widget {
 	}
 	
 	
-	/**
-	 * Converts a WidgetDSO object to a WidgetREST object.
-	 * 
-	 * @param widgetDSO
-	 * @return
-	 */
-	public static WidgetREST fromDSO(WidgetDSO widgetDSO) {
-		WidgetREST  w = new WidgetREST();
-	
-		if (widgetDSO.getApplication() != null) {
-			w.setApplicationId(widgetDSO.getApplication().getApplicationId());
-			
-			if (widgetDSO.getApplication().getPlace() != null) {
-				w.setPlaceId(widgetDSO.getApplication().getPlace().getPlaceId());
-			}
-		}
-		for (WidgetOptionDSO option : widgetDSO.getWidgetOptions()) {
-			w.addWidgetOption( WidgetOptionREST.fromDSO(option) );
-		}
-		
-		w.setPlaceId(widgetDSO.getPlaceId());
-		w.setApplicationId(widgetDSO.getApplicationId());
-		w.setWidgetId(widgetDSO.getWidgetId());
-		w.setControlType(widgetDSO.getControlType());
-		w.setVolatileWidget(widgetDSO.isVolatileWidget());
-		w.setShortDescription(widgetDSO.getShortDescription());
-		w.setLongDescription(widgetDSO.getLongDescription());
-		return w; 
-	}
-	
-	
-
-	
 	@Override
 	public String toString() {
+		return "WidgetRest ( " + this.widgetId + " )";
+		
+	}
+	
+	public String toDebugString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Widget(id: ").append(this.widgetId).append("; options: ");
 		if ( this.widgetOptions != null ) {
-			for (WidgetOption wo : this.widgetOptions) {
-				sb.append(wo.toString());
+			for (WidgetOptionREST wo : this.widgetOptions) {
+				sb.append(wo.toDebugString());
 			}
 		}
 		sb.append(")");

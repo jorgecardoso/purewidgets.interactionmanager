@@ -3,21 +3,22 @@ package org.instantplaces.im.server.dso;
 import java.util.Arrays;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.rest.WidgetInputREST;
 
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class WidgetInputDSO {
 
 	@PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    @Persistent//(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 	
 	@Persistent
@@ -32,7 +33,7 @@ public class WidgetInputDSO {
 	@Persistent
 	private String widgetOptionId;
 	
-	@Persistent
+	@NotPersistent
 	private WidgetOptionDSO widgetOption;
 	
 	@Persistent
@@ -44,20 +45,40 @@ public class WidgetInputDSO {
 	@Persistent
 	private String persona;
 	
-	@Persistent
 	/**
 	 * The input mechanism that was used to generate this input
 	 */
+	@Persistent
 	private String inputMechanism;
 	
-	@Persistent
+	
 	/**
 	 * Indicates whether this input has already been delivered to the owner application
 	 */
+	@Persistent
 	private boolean delivered;
 
 	public WidgetInputDSO() {
 		delivered = false;
+	}
+	
+	public WidgetInputDSO(WidgetOptionDSO widgetOptionDso, long timeStamp, String []parameters, String persona) {
+		this.timeStamp = timeStamp;
+		this.parameters = parameters;
+		this.persona = persona;
+		this.setWidgetOptionDSO(widgetOptionDso);
+	}
+	
+	public void setWidgetOptionDSO(WidgetOptionDSO widgetOption) {
+		if ( null != widgetOption ) {
+			this.widgetOption = widgetOption;
+			this.key = KeyFactory.createKey(widgetOption.getKey(), WidgetInputDSO.class.getSimpleName(),  this.timeStamp);
+			
+			this.widgetOptionId = widgetOption.getWidgetOptionId();
+			this.widgetId = widgetOption.getWidgetId();
+			this.applicationId = widgetOption.getApplicationId();
+			this.placeId = widgetOption.getPlaceId();
+		}
 	}
 	
 	public void setKey(Key key) {
@@ -93,40 +114,13 @@ public class WidgetInputDSO {
 		return persona;
 	}
 
-	public void setWidgetOptionDSO(WidgetOptionDSO widgetOption) {
-		this.widgetOption = widgetOption;
-		this.widgetOptionId = widgetOption.getWidgetOptionId();
-		this.widgetId = widgetOption.getWidgetId();
-		this.applicationId = widgetOption.getApplicationId();
-		this.placeId = widgetOption.getPlaceId();
-	}
+	
 
 	public WidgetOptionDSO getWidgetOptionDSO() {
 		return this.widgetOption;
 	}
 	
 
-	public WidgetInputREST toREST() {
-		Log.get().debug("Converting to REST " + this.toString());
-		
-		WidgetInputREST  w = new WidgetInputREST();
-	
-		if (this.widgetOption != null) {
-			w.setWidgetOptionId(this.widgetOption.getWidgetOptionId());
-			w.setWidgetId(this.widgetOption.getWidget().getWidgetId());
-		}
-		w.setParameters(this.parameters);
-		w.setPersona(this.persona);
-		w.setTimeStamp(""+this.timeStamp);
-		w.setInputMechanism(this.inputMechanism);
-		w.setDelivered(this.delivered);
-		
-		Log.get().debug("Converted: " + w.toString());
-		return w; 
-	}
-
-	
-	
 	@Override
 	public boolean equals(Object o) {
 		if (super.equals(o)) {

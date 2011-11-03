@@ -17,6 +17,7 @@ import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.comm.InputRequest;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -127,7 +128,7 @@ public abstract class GenericResource extends ServerResource {
 		 * release it at the end (see doRelease())
 		 */
 		pm = PMF.get().getPersistenceManager();
-		
+		pm.setDetachAllOnCommit(true);
 	
 		/*
 		 * Extract the parameters from the URL (including the ones from
@@ -147,14 +148,12 @@ public abstract class GenericResource extends ServerResource {
 		 * Update the requesting app's last request timestamp
 		 */
 		this.beginTransaction();
-		this.requestingApplicationDSO = ApplicationDSO.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
+		this.requestingApplicationDSO = DsoFetcher.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
 		//this.pm.detachCopy(arg0)
 		if ( null != this.requestingApplicationDSO ) {
 			this.requestingApplicationDSO.setLastRequestTimestamp(System.currentTimeMillis());
 		}
-		if ( !this.commitTransaction() ) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry, could not commit transaction");
-		}
+		this.commitTransaction();
 			
 		
 		
@@ -238,24 +237,27 @@ public abstract class GenericResource extends ServerResource {
 	/**
 	 * 
 	 */
-	protected boolean commitTransaction() {
+	protected void commitTransaction() {
 		Log.get().debug("Commiting transaction");
+		boolean success = false;
 		try {
 			tx.commit();
-		} catch (JDOUserException e) {
-			Log.get().error("Could not commit transaction.");
+			success = true;
+		} catch (Exception e) {
+			Log.get().error("Could not commit transaction: " + e.getMessage());
 		} finally	{
 			if (tx.isActive())
 			{
 				Log.get().error("Could not finish transaction. Rolling back.");
 				tx.rollback();
 				
-				return false;
+			
 			}
-			Log.get().debug("Closing Persistance Manager.");
 			
 		}
-		return true;
+		if ( !success ) {
+			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction.");
+		}
 	}
 	
 	protected void rollbackAndThrowException(ResourceException re) {
@@ -411,6 +413,7 @@ public abstract class GenericResource extends ServerResource {
 		Log.get().info("Returning JSON representation of resource");
 		
 		JacksonRepresentation jr = new JacksonRepresentation(object);
+		
 		return jr;
 	}
 	

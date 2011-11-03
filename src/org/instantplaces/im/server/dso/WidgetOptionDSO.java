@@ -1,26 +1,23 @@
 package org.instantplaces.im.server.dso;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.rest.WidgetOptionREST;
+import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
 
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class WidgetOptionDSO {
 	
 	@PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    @Persistent//(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 
 	@Persistent
@@ -41,13 +38,8 @@ public class WidgetOptionDSO {
 	@Persistent
 	private String referenceCode;
 	
-	@Persistent
+	@NotPersistent
 	private WidgetDSO widget;
-	
-
-	
-	@Persistent(mappedBy = "widgetOption")
-	private ArrayList <WidgetInputDSO> inputs; 
 	
 	@Persistent
 	private String shortDescription;
@@ -60,29 +52,28 @@ public class WidgetOptionDSO {
 	}
 	
 	
-	public WidgetOptionDSO(String id, WidgetDSO widget) {
-		this(id, null, null, widget);
+	public WidgetOptionDSO(WidgetDSO widget, String widgetOptionId) {
+		this(widget, widgetOptionId, null, null);
 	}
 	
 	
-	public WidgetOptionDSO(String id, String suggestedReferenceCode, String referenceCode, WidgetDSO widget) {
-		this.widgetOptionId = id;
+	public WidgetOptionDSO(WidgetDSO widget, String widgetOptionId, String suggestedReferenceCode, String referenceCode) {
+		this.widgetOptionId = widgetOptionId;
 		this.suggestedReferenceCode = suggestedReferenceCode;
 		this.referenceCode = referenceCode;
-		if (null != widget ) {
-			this.widget = widget;
-			this.widgetId = widget.getWidgetId();
-			this.applicationId = widget.getApplicationId();
-			this.placeId = widget.getPlaceId();
-		}
+		
+		this.setWidget(widget);
 	}
 
 	
 	public void setWidget(WidgetDSO w) {
 		this.widget = w;	
-		this.widgetId = w.getWidgetId();
-		this.applicationId = w.getApplicationId();
-		this.placeId = w.getPlaceId();
+		if ( null != w ) {
+			this.key = KeyFactory.createKey(w.getKey(), WidgetOptionDSO.class.getSimpleName(),  this.widgetOptionId);
+			this.widgetId = w.getWidgetId();
+			this.applicationId = w.getApplicationId();
+			this.placeId = w.getPlaceId();
+		}
 	}
 
 
@@ -110,7 +101,6 @@ public class WidgetOptionDSO {
 	}
 
 
-
 	public void setSuggestedReferenceCode(String suggestedReferenceCode) {
 		this.suggestedReferenceCode = suggestedReferenceCode;
 	}
@@ -127,28 +117,12 @@ public class WidgetOptionDSO {
 		return referenceCode;
 	} 	
 	
-	
-	public void addWidgetInput(WidgetInputDSO input) {
-		if (!this.inputs.contains(input)) {
-			this.inputs.add(input);
-		}
-	}
-	public void removeWidgetInput(WidgetInputDSO input) {
-		this.inputs.remove(input);
-	}
-
-
-	public WidgetInputDSO[] getWidgetInputs() {
-		return this.inputs.toArray(new WidgetInputDSO[0]);
-	}
-
-	public ArrayList<WidgetInputDSO> getWidgetInputsAsArrayList() {
-		return this.inputs;
-	}
-	
-	
 	@Override
 	public String toString() {
+		return "WidgetOption ( " + this.widgetOptionId + " )";
+	}
+	
+	public String toDebugString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("WidgetOption(id: ").append(this.widgetOptionId).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
 		sb.append("; referenceCode: ").append(this.referenceCode);
@@ -156,20 +130,6 @@ public class WidgetOptionDSO {
 		return sb.toString();
 	}
 	
-	
-	public static WidgetOptionDSO fromREST(WidgetOptionREST widgetOptionREST) {
-		Log.get().debug("Converting WidgetOptionREST to DSO");
-		
-		WidgetOptionDSO woDSO = new WidgetOptionDSO();
-		
-		woDSO.setWidgetOptionId(widgetOptionREST.getWidgetOptionId());
-		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
-		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
-		woDSO.setLongDescripton(widgetOptionREST.getLongDescription());
-		woDSO.setShortDescription(widgetOptionREST.getShortDescription());
-		
-		return woDSO;
-	}
 	
 	@Override
 	public boolean equals(Object that) {
@@ -185,32 +145,6 @@ public class WidgetOptionDSO {
 		}
 		return this.widgetOptionId.equals(thatId);
 		
-	}
-	
-	public static WidgetOptionDSO getWidgetOptionDSOByReferenceCode(PersistenceManager pm, String referenceCode ) {
-		Log.get().debug("Fetching WidgetOptionDSO with referenceCode(" + referenceCode + ") from Data Store.");
-		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
-	    query.setFilter("referenceCode == idParam");
-	    query.declareParameters("String idParam");
-	    
-	    try {
-	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(referenceCode);
-	        if (!results.isEmpty()) {
-	        	Log.get().debug("Found " + results.size() + " widget options. Returning first.");
-	        	WidgetOptionDSO widgetOption = results.get(0);
-	        	return widgetOption;
-	        } else {
-	        	Log.get().debug("Widget option not found.");
-	        }
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store.");
-	    	Log.get().error(e.getMessage());
-	    	e.printStackTrace();
-	    }  finally {
-	        query.closeAll();
-	    }
-	    return null;
 	}
 
 
@@ -291,5 +225,9 @@ public class WidgetOptionDSO {
 	 */
 	public void setPlaceId(String placeId) {
 		this.placeId = placeId;
-	}	
+	}
+
+	
+
+	
 }

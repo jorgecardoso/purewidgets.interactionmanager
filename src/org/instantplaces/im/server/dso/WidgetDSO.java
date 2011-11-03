@@ -2,13 +2,11 @@ package org.instantplaces.im.server.dso;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -16,25 +14,19 @@ import javax.jdo.annotations.PrimaryKey;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
 import org.instantplaces.im.server.rest.WidgetArrayListREST;
-import org.instantplaces.im.server.rest.WidgetOptionREST;
-import org.instantplaces.im.server.rest.WidgetREST;
-import org.instantplaces.im.shared.WidgetOption;
 
 
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class WidgetDSO {
 	
 	
 	@PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    @Persistent//(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
-	
-	
-	@Persistent
-	private ApplicationDSO application;
 	
 	@Persistent 
 	private String placeId;
@@ -66,47 +58,42 @@ public class WidgetDSO {
 	@Persistent
 	private String longDescription;
 	
+	@NotPersistent
+	private ArrayList<WidgetOptionDSO> widgetOptions;
 	
-	@Persistent(mappedBy = "widget")
-	private ArrayList <WidgetOptionDSO> options; 
-
 	
-	public WidgetDSO() {
-		this(null, null, null);
+	@NotPersistent
+	private ApplicationDSO application;
+	
+	public WidgetDSO(ApplicationDSO application) {
+		this(application, null, null, null, null);
 	}
 
 	
-	public WidgetDSO(String id, ApplicationDSO app, ArrayList<WidgetOptionDSO>options) {
-		this.widgetId = id;
-		this.application = app;
+	public WidgetDSO(ApplicationDSO application, String widgetId, String controlType, String shortDescription, String longDescription) {
+		this.widgetId = widgetId;
+		this.controlType = controlType;
+		this.shortDescription = shortDescription;
+		this.longDescription = longDescription;
+		this.volatileWidget = true;
 		
-		if (options != null) {
-			this.options = options;
-		} else {
-			this.options = new ArrayList<WidgetOptionDSO>();
+		this.setApplication(application);
+	}
+
+	
+	public void setApplication(ApplicationDSO a) {
+		this.application = a;	
+		if ( null != a ) {
+			this.key = KeyFactory.createKey(a.getKey(), WidgetDSO.class.getSimpleName(),  this.widgetId);
+			this.applicationId = a.getApplicationId();
+			this.placeId = a.getPlaceId();
 		}
-			
 	}
 	
-
-	public void setApplication(	ApplicationDSO app) {
-		this.application = app;
-		this.applicationId = app.getApplicationId();
-		this.placeId = app.getPlaceId();
-	}
-
-
-	public 	ApplicationDSO getApplication() {
-		return this.application;
-	}
-
-
-
 	public void setWidgetId(String id) {
 		this.widgetId = id;
 		
 	}
-
 
 
 	public String getWidgetId() {
@@ -114,22 +101,6 @@ public class WidgetDSO {
 	}
 
 
-
-	public void addWidgetOption(WidgetOptionDSO option) {
-		if (!this.options.contains(option)) {
-			this.options.add(option);
-		}
-	}
-
-
-	public ArrayList<WidgetOptionDSO> getWidgetOptions() {
-		return this.options;//.toArray(new WidgetOptionDSO[0]);
-	}
-/*
-	public ArrayList<WidgetOptionDSO> getWidgetOptionsAsArrayList() {
-		return this.options;
-	}
-	*/
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -138,38 +109,12 @@ public class WidgetDSO {
 		return key;
 	}
 
-	
-	/**
-	 * Converts a WidgetREST object to a WidgetDSO object.
-	 * 
-	 * @param widgetREST
-	 * @return
-	 */
-	public static WidgetDSO fromREST(WidgetREST widgetREST) {
-		WidgetDSO wDSO = new WidgetDSO();
-		Log.get().debug("Converting WidgetREST to DSO");
-		wDSO.setWidgetId(widgetREST.getWidgetId());
-		wDSO.setControlType(widgetREST.getControlType());
-		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
-		wDSO.setShortDescription(widgetREST.getShortDescription());
-		wDSO.setLongDescription(widgetREST.getLongDescription());
-		wDSO.setApplicationId(widgetREST.getApplicationId());
-		wDSO.setPlaceId(widgetREST.getPlaceId());
-		
-		for (WidgetOption wo : widgetREST.getWidgetOptions()) {
-			
-			WidgetOptionREST woREST = (WidgetOptionREST)wo;
-			
-			WidgetOptionDSO woDso = WidgetOptionDSO.fromREST(woREST);
-			woDso.setWidgetId(wDSO.getWidgetId());
-			woDso.setApplicationId(wDSO.getApplicationId());
-			woDso.setPlaceId(wDSO.getPlaceId());
-			wDSO.addWidgetOption(woDso);
+	public void addWidgetOption(WidgetOptionDSO widgetOption) {
+		if ( null == this.widgetOptions ) {
+			this.widgetOptions = new ArrayList<WidgetOptionDSO>();
 		}
-		
-		return wDSO;
+		this.widgetOptions.add(widgetOption);
 	}
-
 	
 	@Override
 	public boolean equals(Object app) {
@@ -188,185 +133,115 @@ public class WidgetDSO {
 	}
 
 	
-	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId) {
-		Log.get().debug("Fetching widgets for Place(" + placeId + ") from Data Store.");
-		
-		Query query = pm.newQuery(WidgetDSO.class);
-	    query.setFilter("placeId == placeIdParam ");
-	    query.declareParameters("String placeIdParam");
-	    try {
-	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId);
-	    
-	    	if ( null == result) {
-	    		Log.get().warn("Widgets not found.");
-	    		
-	    	} else {
-	    		Log.get().debug("Found " + result.size() + " widgets");
-	    	}
-	    	
-	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
-	    	toReturn.addAll(result);
-	    	return toReturn;
-	    	
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store." + e.getMessage());
-	    }  finally {
-	        query.closeAll();
-	    }
-	    return null;
-	}
 	
-	public static ArrayList<WidgetOptionDSO> getWidgetOptionsFromDSO( PersistenceManager pm, String placeId) {
-		Log.get().debug("Fetching widgets options for Place(" + placeId + ") from Data Store.");
-		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
-	    query.setFilter("placeId == placeIdParam ");
-	    query.declareParameters("String placeIdParam");
-	    try {
-	    	List<WidgetOptionDSO> result = (List<WidgetOptionDSO>) query.execute(placeId);
-	    
-	    	if ( null == result) {
-	    		Log.get().warn("Widgets not found.");
-	    		
-	    	} else {
-	    		Log.get().debug("Found " + result.size() + " widgets");
-	    	}
-	    	
-	    	ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
-	    	toReturn.addAll(result);
-	    	return toReturn;
-	    	
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store." + e.getMessage());
-	    }  finally {
-	        query.closeAll();
-	    }
-	    return null;
-	}
 	
-	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
-		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
-		
-		Query query = pm.newQuery(WidgetDSO.class);
-	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
-	    query.declareParameters("String placeIdParam, String applicationIdParam");
-	    try {
-	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId, applicationId);
-	    
-	    	if ( null == result) {
-	    		Log.get().warn("Widgets not found.");
-	    		
-	    	} else {
-	    		Log.get().debug("Found " + result.size() + " widgets");
-	    	}
-	    	
-	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
-	    	toReturn.addAll(result);
-	    	return toReturn;
-	    	
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store." + e.getMessage());
-	    }  finally {
-	        query.closeAll();
-	    }
-	    return null;
-	}
 	
-	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
-		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "), Widget(" + widgetId + ") from Data Store.");
 	
-		Query query = pm.newQuery(WidgetDSO.class);
-	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
-	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
-	    query.setUnique(true);
-	    
-	    try {
-	    	WidgetDSO result = (WidgetDSO) query.execute(placeId, applicationId, widgetId);
-	        if ( null != result ) {
-	        	Log.get().debug("Found widgets. Returning first.");
-	        	
-	        	return result;
-	        } else {
-	        	Log.get().debug("Widget not found.");
-	        }
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store." + e.getMessage());
-	    }  finally {
-	        query.closeAll();
-	    }
-	    return null;
-	}
 	
-	public void copySuggestedReferenceCodesToReferenceCodes() {
+	
+	
+	
+/*	public void copySuggestedReferenceCodesToReferenceCodes() {
 		//Log.get().debug(this.toString());
 		for (WidgetOptionDSO option : this.options) {
 			option.setReferenceCode(option.getSuggestedReferenceCode());
 		}
 	//	Log.get().debug(this.toString());
 	}
+	*/
 	
-	/**
-	 * Merges this WidgetDSO with the information from that WidgetDSO.
-	 * 
-	 * @param that
-	 */
-	public void mergeWith(WidgetDSO that) {
-		Log.get().debug("Merging " + this.toString() + " with " + that.toString());
-		//right now only merging options. the widget itself has no other
-		// information that can be merged
-		
-		// TODO: if client changed the suggested ref code for an option should we 
-		// update it and try to generate a new ref code?
-		
+	public ArrayList<WidgetOptionDSO> mergeOptionsToDelete(WidgetDSO that) {
+		ArrayList<WidgetOptionDSO> toDelete = new ArrayList<WidgetOptionDSO>();
 		/*
 		 * Check options that have been deleted in that and... delete them in this 
 		 */
-		Iterator<WidgetOptionDSO> it = this.options.iterator();
-		while (it.hasNext()) {
-			WidgetOptionDSO next = it.next();
-			if (!that.getWidgetOptions().contains(next)) {
-				Log.get().debug("Deleting unused option " + it.toString());
-				it.remove();	
-			} 
+		if ( null != this.widgetOptions ) {
+			Iterator<WidgetOptionDSO> it = this.widgetOptions.iterator();
+			while (it.hasNext()) {
+				WidgetOptionDSO next = it.next();
+				if (!that.getWidgetOptions().contains(next)) {
+					Log.get().debug("Deleting unused option " + it.toString());
+					it.remove();	
+					toDelete.add(next);
+				} 
+			}
+		}
+		return toDelete;
+	}
+	
+	public ArrayList<WidgetOptionDSO> mergeOptionsToAdd(WidgetDSO that) {
+		ArrayList<WidgetOptionDSO> toAdd = new ArrayList<WidgetOptionDSO>();
+		if ( null == this.widgetOptions ) {
+			this.widgetOptions = new ArrayList<WidgetOptionDSO>();
+			this.widgetOptions.addAll(that.getWidgetOptions());
+			toAdd.addAll(that.getWidgetOptions());
+		} else {
+			Iterator<WidgetOptionDSO> it = that.getWidgetOptions().iterator();
+			while (it.hasNext()) {
+				WidgetOptionDSO next = it.next();
+				if (!this.widgetOptions.contains(next)) {
+					Log.get().debug("Adding to new option " + next.toString());
+					this.widgetOptions.add(next);	
+					toAdd.add(next);
+				} 
+			}
 		}
 		
-		/*
-		 * Add new options to this
-		 */
-		it = that.getWidgetOptions().iterator();
-		while (it.hasNext()) {
-			WidgetOptionDSO next = it.next();
-			if (!this.options.contains(next)) {
-				Log.get().debug("Adding to new option " + next.toString());
-				this.addWidgetOption(next);	
-			} 
-		}
+		return toAdd;
+	}
+	
+	
+//	/**
+//	 * Merges this WidgetDSO with the information from that WidgetDSO.
+//	 * 
+//	 * @param that
+//	 */
+//	public void mergeWith(WidgetDSO that) {
+//		Log.get().debug("Merging " + this.toString() + " with " + that.toString());
+//		//right now only merging options. the widget itself has no other
+//		// information that can be merged
+//		
+//		// TODO: if client changed the suggested ref code for an option should we 
+//		// update it and try to generate a new ref code?
+//		
+//		/*
+//		 * Check options that have been deleted in that and... delete them in this 
+//		 */
+//		Iterator<WidgetOptionDSO> it = this.widgetOptions.iterator();
+//		while (it.hasNext()) {
+//			WidgetOptionDSO next = it.next();
+//			if (!that.getWidgetOptions().contains(next)) {
+//				Log.get().debug("Deleting unused option " + it.toString());
+//				it.remove();	
+//			} 
+//		}
+//		
+//		/*
+//		 * Add new options to this
+//		 */
+//		it = that.getWidgetOptions().iterator();
+//		while (it.hasNext()) {
+//			WidgetOptionDSO next = it.next();
+//			if (!this.options.contains(next)) {
+//				Log.get().debug("Adding to new option " + next.toString());
+//				this.addWidgetOption(next);	
+//			} 
+//		}
+//		
+//	}
+//
+
+
+	public void assignReferenceCodes(ReferenceCodeGenerator rcg) {
 		
-	}
-
-	public void recycleReferenceCodes() {
-		//ReferenceCodeGenerator rcg = ReferenceCodeGenerator.getFromDSO(pm);
-		for (WidgetOptionDSO option : this.options) {
-			this.application.getPlace().getCodeGenerator().recycleCode(option.getReferenceCode());
-		}
-	}
-
-	public void assignReferenceCodes() {
-		//RCGF r = new RCGF();
-		//ReferenceCodeGenerator g = r.get();~
-		ReferenceCodeGenerator g = this.application.getPlace().getCodeGenerator();//ReferenceCodeGenerator.getFromDSO(pm);
-		//Log.get().debug(this.toString());
 		String code;
-		for (WidgetOptionDSO option : this.options) {
+		for (WidgetOptionDSO option : this.widgetOptions) {
 			if ( null == option.getReferenceCode() ) {
-				code = g.getNextCodeAsString();
+				code = rcg.getNextCodeAsString();
 				Log.get().debug("Assigning reference code: " + code +" to " + this.toString());
 				option.setReferenceCode(code);
 			}
 		}
-		
-		//Log.get().debug("Generator code: " + g.getNextCode());
-		
 	}
 
 
@@ -386,32 +261,20 @@ public class WidgetDSO {
 	 * @param widgetArrayListREST
 	 * @return
 	 */
-	public static ArrayList<WidgetDSO> fromREST(WidgetArrayListREST widgetArrayListREST) {
-		
-		ArrayList<WidgetDSO> widgetListDSO = new ArrayList<WidgetDSO>();
-		
-		Log.get().debug("Converting WidgetArrayListREST to ArrayList of WidgetDSO");
-		
-		for ( WidgetREST wREST : widgetArrayListREST.widgets ) {
-			
-//			Log.get().debug("Converting WidgetREST to DSO");
-//			
-//			WidgetDSO wDSO = new WidgetDSO();
-//			wDSO.setWidgetId(wREST.getWidgetId());
-//			wDSO.setVolatileWidget(wREST.isVolatileWidget());
-//			for (WidgetOption wo : wREST.getWidgetOptions()) {
-//				
-//				WidgetOptionREST woREST = (WidgetOptionREST)wo;
-//				
-//				wDSO.addWidgetOption(WidgetOptionDSO.fromREST(woREST));
-//			}
-			
-			widgetListDSO.add(WidgetDSO.fromREST(wREST));
-		}
-		
-		
-		return widgetListDSO;
-	}
+//	public static ArrayList<WidgetDSO> fromREST(WidgetArrayListREST widgetArrayListREST) {
+//		
+//		ArrayList<WidgetDSO> widgetListDSO = new ArrayList<WidgetDSO>();
+//		
+//		Log.get().debug("Converting WidgetArrayListREST to ArrayList of WidgetDSO");
+//		
+//		for ( WidgetREST wREST : widgetArrayListREST.widgets ) {
+//		
+//			widgetListDSO.add(WidgetDSO.fromREST(wREST));
+//		}
+//		
+//		
+//		return widgetListDSO;
+//	}
 
 
 	/**
@@ -491,5 +354,21 @@ public class WidgetDSO {
 	 */
 	public void setPlaceId(String placeId) {
 		this.placeId = placeId;
+	}
+
+
+	/**
+	 * @return the widgetOptions
+	 */
+	public ArrayList<WidgetOptionDSO> getWidgetOptions() {
+		return widgetOptions;
+	}
+
+
+	/**
+	 * @param widgetOptions the widgetOptions to set
+	 */
+	public void setWidgetOptions(ArrayList<WidgetOptionDSO> widgetOptions) {
+		this.widgetOptions = widgetOptions;
 	}
 }

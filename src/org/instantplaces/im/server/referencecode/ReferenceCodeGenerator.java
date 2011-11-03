@@ -15,7 +15,7 @@ import org.instantplaces.im.server.Log;
 import com.google.appengine.api.datastore.Key;
 
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class ReferenceCodeGenerator {
 	
 	

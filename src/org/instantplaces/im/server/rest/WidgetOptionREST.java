@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.instantplaces.im.shared.WidgetOption;
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -70,34 +69,10 @@ public class WidgetOptionREST implements WidgetOption {
 		return this.referenceCode;
 	}
 	
-	/**
-	 * Converts a WidgetOptionDSO object to a WidgetOptionREST object
-	 * 
-	 * @param widgetOptionDSO
-	 * @return
-	 */
-	public static WidgetOptionREST fromDSO(WidgetOptionDSO widgetOptionDSO) {
-		Log.get().debug("Converting to REST " + widgetOptionDSO.toString());
-		
-		WidgetOptionREST woREST = new WidgetOptionREST();
-		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
-		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
-		woREST.setSuggestedReferenceCode(widgetOptionDSO.getSuggestedReferenceCode());
-		woREST.setLongDescription(widgetOptionDSO.getLongDescripton());
-		woREST.setShortDescription(widgetOptionDSO.getShortDescription());
-		
-		Log.get().debug("Converted: " + woREST.toString());
-		return woREST;
-	}
-	
-	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("WidgetOption(id: ").append(this.widgetOptionId).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
-		sb.append("; referenceCode: ").append(this.referenceCode);
-		sb.append(")");
-		return sb.toString();
+		return "WidgetOption ( " + this.widgetOptionId + " )";
+	
 	}
 
 
@@ -130,6 +105,16 @@ public class WidgetOptionREST implements WidgetOption {
 	 */
 	public void setLongDescription(String longDescription) {
 		this.longDescription = longDescription;
+	}
+
+
+	public String toDebugString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("WidgetOption(id: ").append(this.widgetOptionId).append("; suggestedReferenceCode: ").append(this.suggestedReferenceCode);
+		sb.append("; referenceCode: ").append(this.referenceCode);
+		sb.append(")");
+		return sb.toString();
+		
 	}
 
 

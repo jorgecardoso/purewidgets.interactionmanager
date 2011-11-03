@@ -62,41 +62,41 @@ public class CronDeleteOldAppsResource extends ServerResource {
 	}
 	
 	private void deleteOldApps(PersistenceManager pm) {
-		
-		try {
-			
-			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
-		
-			Iterator<PlaceDSO> it =  extent.iterator();
-		
-			long current = System.currentTimeMillis();
-			while (it.hasNext()) {
-				PlaceDSO place = it.next();
-			
-				ArrayList<ApplicationDSO> toDelete = new ArrayList<ApplicationDSO>();
-				
-				for ( ApplicationDSO app : place.getApplications() ) {
-					if ( current-app.getLastRequestTimestamp() > OLD ) {			
-						toDelete.add(app);
-					}
-				}
-				
-				for ( ApplicationDSO app : toDelete ) {
-					String id = app.getApplicationId();
-					Log.get().info("Cron: deleting application " + id);
-					
-					if ( place.deleteApplication(app) ) {
-						Log.get().info("Cron: deleted application " + id);
-					}
-					
-				}
-				
-			}
-	    } catch (Exception e) {
-	    	Log.get().error("Error deleting old apps " + e.getMessage());
-	    	for ( StackTraceElement ste : e.getStackTrace() ) {
-	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
-	    	}
-	    } 
+//		
+//		try {
+//			
+//			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
+//		
+//			Iterator<PlaceDSO> it =  extent.iterator();
+//		
+//			long current = System.currentTimeMillis();
+//			while (it.hasNext()) {
+//				PlaceDSO place = it.next();
+//			
+//				ArrayList<ApplicationDSO> toDelete = new ArrayList<ApplicationDSO>();
+//				
+//				for ( ApplicationDSO app : place.getApplications() ) {
+//					if ( current-app.getLastRequestTimestamp() > OLD ) {			
+//						toDelete.add(app);
+//					}
+//				}
+//				
+//				for ( ApplicationDSO app : toDelete ) {
+//					String id = app.getApplicationId();
+//					Log.get().info("Cron: deleting application " + id);
+//					
+//					if ( place.deleteApplication(app) ) {
+//						Log.get().info("Cron: deleted application " + id);
+//					}
+//					
+//				}
+//				
+//			}
+//	    } catch (Exception e) {
+//	    	Log.get().error("Error deleting old apps " + e.getMessage());
+//	    	for ( StackTraceElement ste : e.getStackTrace() ) {
+//	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
+//	    	}
+//	    } 
 	}
 }

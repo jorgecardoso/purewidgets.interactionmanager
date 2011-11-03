@@ -62,41 +62,41 @@ public class CronRebuildCodesResource extends ServerResource {
 	
 	private void deleteOldWidgets(PersistenceManager pm) {
 		
-		try {
-			
-			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
-		
-			Iterator<PlaceDSO> it =  extent.iterator();
-		
-			while (it.hasNext()) {
-				PlaceDSO place = it.next();
-				
-				
-				/*
-				 * sometimes codes are not recycled correctly, so rebuild the code generator from the currently used codes.
-				 */
-				
-				ReferenceCodeGenerator rcg = place.getCodeGenerator();
-				rcg.rebuild();
-				for (ApplicationDSO app : place.getApplications()) {
-					if ( null != app ) {
-						for ( WidgetDSO widget : app.getWidgets() ) {
-							
-							for ( WidgetOptionDSO option : widget.getWidgetOptions() ) {
-								rcg.remove(option.getReferenceCode());
-								Log.get().debug("Removing used code: " + option.getReferenceCode());
-							}
-						}
-					}
-				}
-				
-				
-			}
-	    } catch (Exception e) {
-	    	Log.get().error("Error rebuilding reference codes: " + e.getMessage());
-	    	for ( StackTraceElement ste : e.getStackTrace() ) {
-	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
-	    	}
-	    } 
+//		try {
+//			
+//			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
+//		
+//			Iterator<PlaceDSO> it =  extent.iterator();
+//		
+//			while (it.hasNext()) {
+//				PlaceDSO place = it.next();
+//				
+//				
+//				/*
+//				 * sometimes codes are not recycled correctly, so rebuild the code generator from the currently used codes.
+//				 */
+//				
+//				ReferenceCodeGenerator rcg = place.getCodeGenerator();
+//				rcg.rebuild();
+//				for (ApplicationDSO app : place.getApplications()) {
+//					if ( null != app ) {
+//						for ( WidgetDSO widget : app.getWidgets() ) {
+//							
+//							for ( WidgetOptionDSO option : widget.getWidgetOptions() ) {
+//								rcg.remove(option.getReferenceCode());
+//								Log.get().debug("Removing used code: " + option.getReferenceCode());
+//							}
+//						}
+//					}
+//				}
+//				
+//				
+//			}
+//	    } catch (Exception e) {
+//	    	Log.get().error("Error rebuilding reference codes: " + e.getMessage());
+//	    	for ( StackTraceElement ste : e.getStackTrace() ) {
+//	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
+//	    	}
+//	    } 
 	}
 }
