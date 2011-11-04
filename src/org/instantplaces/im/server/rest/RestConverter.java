@@ -87,9 +87,9 @@ public class RestConverter {
 		a.setApplicationId( applicationDSO.getApplicationId() );
 		
 		
-		for ( WidgetDSO widget : applicationDSO.getWidgets() ) {
+		/*for ( WidgetDSO widget : applicationDSO.getWidgets() ) {
 			a.addWidget( widgetRestFromDso( widget ));
-		}
+		}*/
 		
 		a.setLastRequestTimestamp(applicationDSO.getLastRequestTimestamp());
 		

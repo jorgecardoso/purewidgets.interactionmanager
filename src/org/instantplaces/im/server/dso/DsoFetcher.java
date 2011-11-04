@@ -114,7 +114,41 @@ public class DsoFetcher {
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam, String widgetOptionIdParam");
 	    query.deletePersistentAll(placeId, applicationId, widgetId, widgetOptionId);
 	}
-
+	
+	public static void deleteApplicationDSO(PersistenceManager pm, String placeId, String applicationId) {
+		Query query = pm.newQuery(ApplicationDSO.class);
+	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
+	    query.declareParameters("String placeIdParam, String applicationIdParam");
+	    query.deletePersistentAll(placeId, applicationId);
+	}
+	
+	public static void deleteApplicationsDSO(PersistenceManager pm,  long earlierThan) {
+		Query query = pm.newQuery(ApplicationDSO.class);
+	    query.setFilter("lastRequestTimestamp < earlierThanParam");
+	    query.declareParameters("long earlierThanParam");
+	    
+	    
+	    try {
+	    	List<ApplicationDSO> result = (List<ApplicationDSO>)  query.execute(earlierThan);
+	        if ( null != result ) {
+	        	Log.get().warn("Found " + result.size() + " applications. Deleting...");
+	        	for ( ApplicationDSO app : result ) {
+	        		Log.get().warn("Deleting application: " + app.getApplicationId());
+	        		DsoFetcher.deleteWidgetInputDSO(pm, app.getPlaceId(), app.getApplicationId());
+	        		DsoFetcher.deleteWidgetOptionFromDSO(pm, app.getPlaceId(), app.getApplicationId());
+	        		DsoFetcher.deleteWidgetFromDSO(pm, app.getPlaceId(), app.getApplicationId());
+	        		DsoFetcher.deleteApplicationDSO(pm, app.getPlaceId(), app.getApplicationId());
+	        	}
+	        } else {
+	        	Log.get().debug("No applications found.");
+	        }
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	  
+	}
 	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
 	Log.get().debug("Fetching application Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 	
@@ -171,6 +205,64 @@ public class DsoFetcher {
 	    return null;
 	}
 
+	public static ArrayList<ApplicationDSO> getApplicationsDSO( PersistenceManager pm, long lastActivityTimeLessThan ) {
+		Log.get().debug("Fetching applications from Data Store.");
+		
+		Query query = pm.newQuery(ApplicationDSO.class);
+	    query.setFilter("lastRequestTimestamp < timeParam");
+	    query.declareParameters("long timeParam");
+	    
+	    
+	    try {
+	    	List<ApplicationDSO> result = (List<ApplicationDSO>) query.execute(lastActivityTimeLessThan);
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Applications not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + result.size() + " applications");
+	    	}
+	    	
+	    	ArrayList<ApplicationDSO> toReturn = new ArrayList<ApplicationDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
+	
+	public static ArrayList<PlaceDSO> getPlacesFromDSO( PersistenceManager pm ) {
+		Log.get().debug("Fetching places from Data Store.");
+		
+		Query query = pm.newQuery(PlaceDSO.class);
+	   
+	    
+	    try {
+	    	List<PlaceDSO> result = (List<PlaceDSO>) query.execute();
+	    
+	    	if ( null == result) {
+	    		Log.get().warn("Places not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + result.size() + " places");
+	    	}
+	    	
+	    	ArrayList<PlaceDSO> toReturn = new ArrayList<PlaceDSO>();
+	    	toReturn.addAll(result);
+	    	return toReturn;
+	    	
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store." + e.getMessage());
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
+	
 	public static WidgetInputDSO getLastWidgetInputFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
 		Log.get().debug("Fetching input Place(" + placeId + "), Application("+ applicationId + "),  from Data Store.");
 	
@@ -275,6 +367,38 @@ public class DsoFetcher {
 	    return null;
 	}
 
+	public static ArrayList<WidgetOptionDSO> getWidgetOptionFromDSO(
+			PersistenceManager pm, String placeId) {
+		Log.get().debug("Fetching WidgetOptionDSO from Data Store.");
+		
+		Query query = pm.newQuery(WidgetOptionDSO.class);
+	    query.setFilter("placeId == placeIdParam ");
+	    query.declareParameters("String placeIdParam");
+	    
+	    try {
+	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(placeId);
+	        ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
+	        
+	        if ( null == results) {
+	    		Log.get().warn("Widget options not found.");
+	    		
+	    	} else {
+	    		Log.get().debug("Found " + results.size() + " widget options");
+	    	}
+	    	
+	    	
+	    	toReturn.addAll(results);
+	    	return toReturn;
+	    } catch (Exception e) {
+	    	Log.get().error("Could not access data store.");
+	    	Log.get().error(e.getMessage());
+	    	e.printStackTrace();
+	    }  finally {
+	        query.closeAll();
+	    }
+	    return null;
+	}
+	
 	public static ArrayList<WidgetOptionDSO> getWidgetOptionFromDSO(
 			PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching WidgetOptionDSO from Data Store.");

@@ -13,6 +13,7 @@ import javax.jdo.Transaction;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -26,7 +27,7 @@ public class CronDeleteOldAppsResource extends ServerResource {
 	/*
 	 * Applications that don't communicate over OLD milliseconds will be deleted
 	 */
-	private static final long OLD = 1*24*60*60*1000; // milliseconds
+	private static final long OLD = 1*24*60*60*1000; // milliseconds, 1 day
 	
 	@Override
 	public void doInit() {
@@ -42,7 +43,7 @@ public class CronDeleteOldAppsResource extends ServerResource {
 		{
 		    tx.begin();
 		    
-		    deleteOldApps(pm);
+		    DsoFetcher.deleteApplicationsDSO(pm, System.currentTimeMillis()-OLD);
 		    
 		    tx.commit();
 		}
@@ -61,42 +62,5 @@ public class CronDeleteOldAppsResource extends ServerResource {
 		return null;
 	}
 	
-	private void deleteOldApps(PersistenceManager pm) {
-//		
-//		try {
-//			
-//			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
-//		
-//			Iterator<PlaceDSO> it =  extent.iterator();
-//		
-//			long current = System.currentTimeMillis();
-//			while (it.hasNext()) {
-//				PlaceDSO place = it.next();
-//			
-//				ArrayList<ApplicationDSO> toDelete = new ArrayList<ApplicationDSO>();
-//				
-//				for ( ApplicationDSO app : place.getApplications() ) {
-//					if ( current-app.getLastRequestTimestamp() > OLD ) {			
-//						toDelete.add(app);
-//					}
-//				}
-//				
-//				for ( ApplicationDSO app : toDelete ) {
-//					String id = app.getApplicationId();
-//					Log.get().info("Cron: deleting application " + id);
-//					
-//					if ( place.deleteApplication(app) ) {
-//						Log.get().info("Cron: deleted application " + id);
-//					}
-//					
-//				}
-//				
-//			}
-//	    } catch (Exception e) {
-//	    	Log.get().error("Error deleting old apps " + e.getMessage());
-//	    	for ( StackTraceElement ste : e.getStackTrace() ) {
-//	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
-//	    	}
-//	    } 
-	}
+	
 }

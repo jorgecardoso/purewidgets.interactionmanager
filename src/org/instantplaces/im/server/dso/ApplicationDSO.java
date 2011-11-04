@@ -16,12 +16,15 @@ public class ApplicationDSO  {
 	
 	public static final int MAXIMUM_ACTIVITY_INTERVAL = 30*1000; // milliseconds
 	
-	@Persistent
-	private String applicationId;
-	
 	@PrimaryKey
     @Persistent //(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
+	
+	@Persistent 
+	private String placeId;
+	
+	@Persistent
+	private String applicationId;
 	
 	/**
 	 * The timestamp of the last request made by this app.
@@ -32,9 +35,6 @@ public class ApplicationDSO  {
 	
 	@NotPersistent
 	private PlaceDSO place;
-	
-	@Persistent 
-	private String placeId;
 	
 	@NotPersistent
 	private ArrayList<WidgetDSO> widgets;
@@ -113,8 +113,7 @@ public class ApplicationDSO  {
 		if ( null != place ) {
 			this.place = place;
 			this.placeId = place.getPlaceId();
-			this.key = KeyFactory.createKey(place.getKey(), ApplicationDSO.class.getSimpleName(),  this.applicationId);
-			
+			this.key = KeyFactory.createKey(place.getKey(), ApplicationDSO.class.getSimpleName(),  this.applicationId);	
 		}
 	}
 

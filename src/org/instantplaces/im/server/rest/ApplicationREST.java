@@ -12,6 +12,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.instantplaces.im.server.dso.ApplicationDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
 
@@ -23,6 +27,8 @@ import org.instantplaces.im.server.dso.WidgetOptionDSO;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="application")
+@JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
+@JsonIgnoreProperties({ "widgets" }) // @JsonIgnore seems to not work correctly, so we duplicate
 public class ApplicationREST {
 	
 	@XmlAttribute
@@ -31,15 +37,17 @@ public class ApplicationREST {
 	@XmlAttribute
 	private String applicationId;
 	
-	@XmlElement
-	private ArrayList<WidgetREST> widgets;
-
 	/**
 	 * The timestamp of the last request made by this app.
 	 * This is used to determine if an application is still active or not.
 	 */
 	@XmlElement
 	private long lastRequestTimestamp;
+	
+	@XmlElement
+	@JsonIgnore
+	private ArrayList<WidgetREST> widgets;
+
 	
 	public ApplicationREST() {
 		this.widgets = new ArrayList<WidgetREST>();

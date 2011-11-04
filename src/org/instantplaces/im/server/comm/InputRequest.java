@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 import javax.jdo.PersistenceManager;
 
@@ -44,10 +48,7 @@ public class InputRequest {
 
 	private static final String IDENTITY_URL = "http://api2.instantplaces.org/InstantPlacesService/InstantPlacesService.svc/domain/dsi/place/jorge/identities/";
 
-	private static ArrayList<String> lastCommands = new ArrayList<String>();
-	private static ArrayList<String> currentCommands;
 
-	private static long lastRun = 0;
 	private static long minInterval = 15 * 1000; // 15 seconds
 
 	/**
@@ -56,16 +57,32 @@ public class InputRequest {
 	private static HashMap<String, String> identityMap = new HashMap<String, String>();
 
 	public static void getPresences() {
-		long currentTime = System.currentTimeMillis();
-		if ((currentTime - lastRun) < minInterval) {
-			// Log.get().debug();
-			return;
+		
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		Long lastRun = (Long) syncCache.get("lastrun");
+		
+		Long current = new Long(System.currentTimeMillis());
+		if ( null != lastRun ) {
+			Log.get().warn("Could not retrieve 'lastRun' from memcache.");
+			if ( (current.longValue() - lastRun.longValue()) < minInterval ) {
+				return;
+			}
 		}
-		Log.get().debug("Updating input from main Instant Places server.");
-		lastRun = currentTime;
-
+		
+		
+		
+		ArrayList<String> lastCommands = (ArrayList<String>) syncCache.get("lastcommands");
+		if ( null == lastCommands ) {
+			Log.get().warn("Could not retrieve 'lastcommands' from memcache.");
+			lastCommands = new ArrayList<String>();
+		}
+		ArrayList<String> currentCommands;
+		
+		
+	
 		SAXBuilder builder = new SAXBuilder();
 		builder.setValidation(false);
+		
 		// builder.setIgnoringElementContentWhitespace(true);
 		try {
 			InputStream is = getNoCache(url);
@@ -156,6 +173,7 @@ public class InputRequest {
 				lastCommands.add(s);
 			}
 
+			syncCache.put("lastcommands", lastCommands);
 		} catch (JDOMException e) {
 			e.printStackTrace();
 			Log.get().error(e.getMessage());

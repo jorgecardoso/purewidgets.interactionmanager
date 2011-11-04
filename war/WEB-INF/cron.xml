@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/cron-delete-volatile</url>
+    <url>/cron/check-tasks</url>
+    <description>Creates four tasks to fetch input during the next minute</description>
+    <schedule>every 1 minutes</schedule>
+  </cron>
+  
+  <cron>
+    <url>/cron/delete-volatile</url>
     <description>Cron delete volatile widgets from inactive apps</description>
     <schedule>every 1 minutes</schedule>
   </cron>
   
     <cron>
-    <url>/cron-rebuild-codes</url>
+    <url>/cron/rebuild-codes</url>
     <description>Cron rebuild reference codes</description>
     <schedule>every 10 minutes</schedule>
   </cron>
   
       <cron>
-    <url>/cron-delete-old-apps</url>
+    <url>/cron/delete-old-apps</url>
     <description>Cron delete old apps that dont communicate for 1 day</description>
     <schedule>every day 01:00</schedule>
   </cron>

@@ -1,0 +1,5 @@
+curl http://localhost:8080/cron-delete-old-apps
+sleep 5
+curl http://localhost:8080/cron-delete-volatile
+sleep 5
+curl http://localhost:8080/cron-rebuild-codes

@@ -3,6 +3,7 @@
  */
 package org.instantplaces.im.server.resource;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.jdo.Extent;
@@ -12,6 +13,7 @@ import javax.jdo.Transaction;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
@@ -41,8 +43,17 @@ public class CronRebuildCodesResource extends ServerResource {
 		{
 		    tx.begin();
 		    
-		    deleteOldWidgets(pm);
-		    
+		    ArrayList<PlaceDSO> places = DsoFetcher.getPlacesFromDSO(pm);
+		    for ( PlaceDSO place : places ) {
+		    	ReferenceCodeGenerator rcg = place.getCodeGenerator();
+		    	rcg.rebuild();
+		    	ArrayList<WidgetOptionDSO> options = DsoFetcher.getWidgetOptionFromDSO(pm, place.getPlaceId());
+		    	for ( WidgetOptionDSO option : options ) {
+		    		rcg.remove(option.getReferenceCode());
+					Log.get().debug("Removing used code: " + option.getReferenceCode());
+		    	}
+		    }
+		   
 		    tx.commit();
 		}
 		finally
@@ -60,43 +71,4 @@ public class CronRebuildCodesResource extends ServerResource {
 		return null;
 	}
 	
-	private void deleteOldWidgets(PersistenceManager pm) {
-		
-//		try {
-//			
-//			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
-//		
-//			Iterator<PlaceDSO> it =  extent.iterator();
-//		
-//			while (it.hasNext()) {
-//				PlaceDSO place = it.next();
-//				
-//				
-//				/*
-//				 * sometimes codes are not recycled correctly, so rebuild the code generator from the currently used codes.
-//				 */
-//				
-//				ReferenceCodeGenerator rcg = place.getCodeGenerator();
-//				rcg.rebuild();
-//				for (ApplicationDSO app : place.getApplications()) {
-//					if ( null != app ) {
-//						for ( WidgetDSO widget : app.getWidgets() ) {
-//							
-//							for ( WidgetOptionDSO option : widget.getWidgetOptions() ) {
-//								rcg.remove(option.getReferenceCode());
-//								Log.get().debug("Removing used code: " + option.getReferenceCode());
-//							}
-//						}
-//					}
-//				}
-//				
-//				
-//			}
-//	    } catch (Exception e) {
-//	    	Log.get().error("Error rebuilding reference codes: " + e.getMessage());
-//	    	for ( StackTraceElement ste : e.getStackTrace() ) {
-//	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
-//	    	}
-//	    } 
-	}
 }

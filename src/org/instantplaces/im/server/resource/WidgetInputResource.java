@@ -50,7 +50,7 @@ public class WidgetInputResource extends GenericResource {
 	
 	private WidgetInputArrayListREST getInputForAllWidgets(long from) {
 		/*
-		 * Return input for all widgets for the specified application
+		 * Return input newer than from
 		 */
 		if ( from >= 0 ) {
 			
@@ -62,6 +62,9 @@ public class WidgetInputResource extends GenericResource {
 			this.commitTransaction();
 			
 			return RestConverter.widgetInputArrayListFromDso(widgetInputs);
+		/*
+		 * Return the last input to every widget
+		 */
 		} else {
 			this.beginTransaction();
 			ArrayList<WidgetDSO> widgets = DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
@@ -83,7 +86,7 @@ public class WidgetInputResource extends GenericResource {
 		WidgetInputArrayListREST toReturn = new WidgetInputArrayListREST();
 		
 		
-		InputRequest.getPresences();
+		//InputRequest.getPresences();
 		
 		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
 		long from = -1;

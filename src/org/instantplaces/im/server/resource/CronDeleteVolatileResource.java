@@ -1,5 +1,6 @@
 package org.instantplaces.im.server.resource;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
@@ -8,6 +9,7 @@ import javax.jdo.Transaction;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.dso.ApplicationDSO;
+import org.instantplaces.im.server.dso.DsoFetcher;
 import org.instantplaces.im.server.dso.PlaceDSO;
 import org.instantplaces.im.server.dso.WidgetDSO;
 import org.instantplaces.im.server.dso.WidgetOptionDSO;
@@ -21,7 +23,7 @@ public class CronDeleteVolatileResource extends ServerResource {
 	 * Applications that don't communicate over OLD minutes
 	 * will have all their volatile widgets deleted.
 	 */
-	private static final long OLD = 5; // minutes
+	private static final long INACTIVE = 5*60*1000; // milliseconds, 5 minutes
 	
 	@Override
 	public void doInit() {
@@ -37,8 +39,16 @@ public class CronDeleteVolatileResource extends ServerResource {
 		{
 		    tx.begin();
 		    
-		    deleteOldWidgets(pm);
+		    ArrayList<ApplicationDSO> applications = DsoFetcher.getApplicationsDSO(pm, System.currentTimeMillis()-INACTIVE);
 		    
+		    for ( ApplicationDSO app : applications ) {
+		    	Log.get().debug("Deleting widgets from application: " + app.getApplicationId());
+		    	ArrayList<WidgetDSO> widgets = DsoFetcher.getVolatileWidgetsFromDSO(pm, app.getPlaceId(), app.getApplicationId());
+		    	for ( WidgetDSO widget : widgets ) {
+		    		Log.get().debug("Deleting widget: " + widget.getWidgetId());
+		    		DsoFetcher.deleteWidgetFromDSO(pm, widget.getPlaceId(), widget.getApplicationId(), widget.getWidgetId());
+		    	}
+		    }
 		    tx.commit();
 		}
 		finally
@@ -51,38 +61,8 @@ public class CronDeleteVolatileResource extends ServerResource {
 		}
 		pm.close();
 		
-		
-		
 		return null;
 	}
 	
-	private void deleteOldWidgets(PersistenceManager pm) {
-		
-//		try {
-//			
-//			Extent<PlaceDSO> extent = pm.getExtent(PlaceDSO.class);
-//		
-//			Iterator<PlaceDSO> it =  extent.iterator();
-//		
-//			long current = System.currentTimeMillis();
-//			while (it.hasNext()) {
-//				PlaceDSO place = it.next();
-//				
-//				for (ApplicationDSO app : place.getApplications()) {
-//					if ( current-app.getLastRequestTimestamp() > OLD*60*1000 ) {
-//						
-//						if (  app.removeVolatileWidgets() ) {
-//							Log.get().info("Cron: deleted volatile widgets from application " + app.getApplicationId());
-//						
-//						}
-//					}
-//				}
-//			}
-//	    } catch (Exception e) {
-//	    	Log.get().error("Error deleting widgets: " + e.getMessage());
-//	    	for ( StackTraceElement ste : e.getStackTrace() ) {
-//	    		Log.get().error(ste.getClassName() + " "+ ste.getMethodName() + " " + ste.getLineNumber());
-//	    	}
-//	    } 
-	}
+	
 }

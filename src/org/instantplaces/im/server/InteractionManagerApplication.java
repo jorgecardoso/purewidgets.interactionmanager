@@ -1,9 +1,11 @@
 package org.instantplaces.im.server;
 
 import org.instantplaces.im.server.resource.ApplicationResource;
+import org.instantplaces.im.server.resource.CronCheckTasksResource;
 import org.instantplaces.im.server.resource.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.resource.CronDeleteVolatileResource;
 import org.instantplaces.im.server.resource.CronRebuildCodesResource;
+import org.instantplaces.im.server.resource.TaskFetchInputResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
 import org.restlet.Application;
@@ -55,9 +57,15 @@ public class InteractionManagerApplication extends Application {
         /*
          * Cron
          */
-        router.attach("/cron-delete-volatile", CronDeleteVolatileResource.class);
-        router.attach("/cron-rebuild-codes", CronRebuildCodesResource.class);
-        router.attach("/cron-delete-old-apps", CronDeleteOldAppsResource.class);
+        router.attach("/cron/delete-volatile", CronDeleteVolatileResource.class);
+        router.attach("/cron/rebuild-codes", CronRebuildCodesResource.class);
+        router.attach("/cron/delete-old-apps", CronDeleteOldAppsResource.class);
+        router.attach("/cron/check-tasks", CronCheckTasksResource.class);
+        
+        /*
+         * Tasks
+         */
+        router.attach("/task/fetch-input", TaskFetchInputResource.class);
         return router;
 	}    
 }
