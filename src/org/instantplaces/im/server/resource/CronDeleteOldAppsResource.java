@@ -12,9 +12,9 @@ import javax.jdo.Transaction;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.DsoFetcher;
-import org.instantplaces.im.server.dso.PlaceDSO;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
+import org.instantplaces.im.server.dao.PlaceDAO;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -43,7 +43,7 @@ public class CronDeleteOldAppsResource extends ServerResource {
 		{
 		    tx.begin();
 		    
-		    DsoFetcher.deleteApplicationsDSO(pm, System.currentTimeMillis()-OLD);
+//		    DsoFetcher.deleteApplicationsDSO(pm, System.currentTimeMillis()-OLD);
 		    
 		    tx.commit();
 		}

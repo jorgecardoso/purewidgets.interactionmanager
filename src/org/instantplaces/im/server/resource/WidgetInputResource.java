@@ -5,10 +5,11 @@ import java.util.Arrays;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.comm.InputRequest;
-import org.instantplaces.im.server.dso.DsoFetcher;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetInputDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.instantplaces.im.server.dao.DAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
+import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetInputDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDAO;
 import org.instantplaces.im.server.resource.GenericResource.ContentType;
 import org.instantplaces.im.server.rest.ErrorREST;
 import org.instantplaces.im.server.rest.RestConverter;
@@ -57,26 +58,29 @@ public class WidgetInputResource extends GenericResource {
 			/*
 			 * Fetch the widgets from the data store.
 			 */
-			this.beginTransaction();
-			ArrayList<WidgetInputDSO> widgetInputs = DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
-			this.commitTransaction();
+			DAO.beginTransaction();
+			ArrayList<WidgetInputDAO> widgetInputs = DAO.getWidgetInput(this.placeId, this.appId, from); 
+					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
+			DAO.commitOrRollbackTransaction();
 			
 			return RestConverter.widgetInputArrayListFromDso(widgetInputs);
 		/*
 		 * Return the last input to every widget
 		 */
 		} else {
-			this.beginTransaction();
-			ArrayList<WidgetDSO> widgets = DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
-			ArrayList<WidgetInputDSO> inputs = new ArrayList<WidgetInputDSO>();
+			DAO.beginTransaction();
+			ArrayList<WidgetDAO> widgets = DAO.getWidgets(this.placeId, this.appId);
+					//DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
+			ArrayList<WidgetInputDAO> inputs = new ArrayList<WidgetInputDAO>();
 			
-			for ( WidgetDSO w : widgets ) {
-				WidgetInputDSO input = DsoFetcher.getLastWidgetInputFromDSO(this.pm, this.placeId, this.appId, w.getWidgetId());
+			for ( WidgetDAO w : widgets ) {
+				WidgetInputDAO input = DAO.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
+						//DsoFetcher.getLastWidgetInputFromDSO(this.pm, this.placeId, this.appId, w.getWidgetId());
 				if ( null != input ) {
 					inputs.add(input);
 				}
 			}
-			this.commitTransaction();
+			DAO.commitOrRollbackTransaction();
 			return RestConverter.widgetInputArrayListFromDso(inputs);
 		}
 	}
@@ -111,5 +115,5 @@ public class WidgetInputResource extends GenericResource {
 		return WidgetInputREST.class;
 	}
 
-	
+
 }

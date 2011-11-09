@@ -1,40 +1,47 @@
-package org.instantplaces.im.server.referencecode;
+package org.instantplaces.im.server.dao;
 
 import java.util.ArrayList;
 
+import javax.persistence.Id;
 
-import javax.jdo.annotations.Element;
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+
 
 import org.instantplaces.im.server.Log;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.NotSaved;
+import com.googlecode.objectify.annotation.Parent;
+import com.googlecode.objectify.annotation.Unindexed;
 
-import com.google.appengine.api.datastore.Key;
 
 
-@PersistenceCapable(detachable="true")
-public class ReferenceCodeGenerator {
+
+public class ReferenceCodeGeneratorDAO {
 	
+	@Parent
+	private Key<PlaceDAO> placeKey;
 	
+	@Id
+	private Long referenceCodeGeneratorId;
 	
-	@PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-	
-	@Persistent
+	@Unindexed
 	private ArrayList<Integer> codes;
 	
-	private static final int MAX_CODE = 500;
+	@NotSaved
+	private static final int MAX_CODE = 50;
+	
+	@NotSaved
+	private PlaceDAO place;
 	
 
+	private ReferenceCodeGeneratorDAO() {
+	}
 	
-	public ReferenceCodeGenerator() {
+	public ReferenceCodeGeneratorDAO(PlaceDAO place) {
     	codes = new ArrayList<Integer>(1000);
     	this.rebuild();
     	//Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
+    	this.setPlace(place);
 	}
 	
     public synchronized String getNextCodeAsString() {
@@ -144,14 +151,7 @@ public class ReferenceCodeGenerator {
 	    }
 	}
 	*/
-    
-	public void setKey(Key key) {
-		this.key = key;
-	}
-
-	public Key getKey() {
-		return key;
-	}
+   
 	
 	public void setCodes(ArrayList<Integer> codes) {
 		this.codes = codes;
@@ -160,5 +160,22 @@ public class ReferenceCodeGenerator {
 	
 	public ArrayList<Integer> getCodes() {
 		return this.codes;
+	}
+
+	/**
+	 * @return the place
+	 */
+	public PlaceDAO getPlace() {
+		return place;
+	}
+
+	/**
+	 * @param place the place to set
+	 */
+	public void setPlace(PlaceDAO place) {
+		this.place = place;
+		if ( null != place ) {
+			this.placeKey = new Key<PlaceDAO>(PlaceDAO.class, place.getPlaceId());
+		}
 	}
 }

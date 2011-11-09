@@ -1,76 +1,64 @@
-package org.instantplaces.im.server.dso;
+package org.instantplaces.im.server.dao;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.jdo.annotations.Element;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.NotPersistent;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+import javax.persistence.Id;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
-import org.instantplaces.im.server.rest.WidgetArrayListREST;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.NotSaved;
+import com.googlecode.objectify.annotation.Parent;
+import com.googlecode.objectify.annotation.Unindexed;
 
+public class WidgetDAO {
 
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-
-@PersistenceCapable(detachable="true")
-public class WidgetDSO {
+	@Parent
+	private Key<ApplicationDAO> applicationKey;
 	
-	
-	@PrimaryKey
-    @Persistent//(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-	
-	@Persistent 
-	private String placeId;
-	
-	@Persistent
-	private String applicationId;
-	
-	@Persistent
+	@Id
 	private String widgetId;
 	
-	@Persistent
+	@Unindexed
 	private String controlType;
 	
-	@Persistent
+	@Unindexed
 	private boolean volatileWidget;
+	
 	
 	/**
 	 * A short description (label) for the widget. The descriptions
 	 * can be used to generate a more informative GUI by other system applications.
 	 *
 	 */
-	@Persistent
+	@Unindexed
 	private String shortDescription;
 	
 	/**
 	 * A long description for the widget. The descriptions
 	 * can be used to generate a more informative GUI by other system applications.
 	 */
-	@Persistent
+	@Unindexed
 	private String longDescription;
 	
-	@NotPersistent
-	private ArrayList<WidgetOptionDSO> widgetOptions;
+	
+	@NotSaved
+	private ArrayList<WidgetOptionDAO> widgetOptions;
 	
 	
-	@NotPersistent
-	private ApplicationDSO application;
+	@NotSaved
+	private ApplicationDAO application;
 	
-	public WidgetDSO(ApplicationDSO application) {
+	private WidgetDAO() {
+		this(null, null, null, null, null);
+	}
+	
+	public WidgetDAO(ApplicationDAO application) {
 		this(application, null, null, null, null);
 	}
 
 	
-	public WidgetDSO(ApplicationDSO application, String widgetId, String controlType, String shortDescription, String longDescription) {
+	public WidgetDAO(ApplicationDAO application, String widgetId, String controlType, String shortDescription, String longDescription) {
 		this.widgetId = widgetId;
 		this.controlType = controlType;
 		this.shortDescription = shortDescription;
@@ -81,14 +69,16 @@ public class WidgetDSO {
 	}
 
 	
-	public void setApplication(ApplicationDSO a) {
+	public void setApplication(ApplicationDAO a) {
 		this.application = a;	
 		if ( null != a ) {
-			this.key = KeyFactory.createKey(a.getKey(), WidgetDSO.class.getSimpleName(),  this.widgetId);
-			this.applicationId = a.getApplicationId();
-			this.placeId = a.getPlaceId();
+			this.application = a;
+			
+			this.applicationKey = new Key<ApplicationDAO>(a.getPlaceKey(), ApplicationDAO.class, a.getApplicationId());		
 		}
 	}
+	
+
 	
 	public void setWidgetId(String id) {
 		this.widgetId = id;
@@ -101,30 +91,24 @@ public class WidgetDSO {
 	}
 
 
-	public void setKey(Key key) {
-		this.key = key;
-	}
 
-	public Key getKey() {
-		return key;
-	}
-
-	public void addWidgetOption(WidgetOptionDSO widgetOption) {
+	public void addWidgetOption(WidgetOptionDAO widgetOption) {
 		if ( null == this.widgetOptions ) {
-			this.widgetOptions = new ArrayList<WidgetOptionDSO>();
+			this.widgetOptions = new ArrayList<WidgetOptionDAO>();
 		}
 		this.widgetOptions.add(widgetOption);
 	}
 	
-	@Override
-	public boolean equals(Object app) {
-		if ( !(app instanceof WidgetDSO) ) {
-			return false;
-		}
-		return ((WidgetDSO) app).getKey().equals(this.key);
-	} 	
-	
+//	@Override
+//	public boolean equals(Object app) {
+//		if ( !(app instanceof WidgetDSO) ) {
+//			return false;
+//		}
+//		return ((WidgetDSO) app).getKey().equals(this.key);
+//	} 	
+//	
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Widget(id: ").append(this.widgetId).append("; ");
@@ -150,15 +134,15 @@ public class WidgetDSO {
 	}
 	*/
 	
-	public ArrayList<WidgetOptionDSO> mergeOptionsToDelete(WidgetDSO that) {
-		ArrayList<WidgetOptionDSO> toDelete = new ArrayList<WidgetOptionDSO>();
+	public ArrayList<WidgetOptionDAO> mergeOptionsToDelete(WidgetDAO that) {
+		ArrayList<WidgetOptionDAO> toDelete = new ArrayList<WidgetOptionDAO>();
 		/*
 		 * Check options that have been deleted in that and... delete them in this 
 		 */
 		if ( null != this.widgetOptions ) {
-			Iterator<WidgetOptionDSO> it = this.widgetOptions.iterator();
+			Iterator<WidgetOptionDAO> it = this.widgetOptions.iterator();
 			while (it.hasNext()) {
-				WidgetOptionDSO next = it.next();
+				WidgetOptionDAO next = it.next();
 				if (!that.getWidgetOptions().contains(next)) {
 					Log.get().debug("Deleting unused option " + it.toString());
 					it.remove();	
@@ -169,16 +153,16 @@ public class WidgetDSO {
 		return toDelete;
 	}
 	
-	public ArrayList<WidgetOptionDSO> mergeOptionsToAdd(WidgetDSO that) {
-		ArrayList<WidgetOptionDSO> toAdd = new ArrayList<WidgetOptionDSO>();
+	public ArrayList<WidgetOptionDAO> mergeOptionsToAdd(WidgetDAO that) {
+		ArrayList<WidgetOptionDAO> toAdd = new ArrayList<WidgetOptionDAO>();
 		if ( null == this.widgetOptions ) {
-			this.widgetOptions = new ArrayList<WidgetOptionDSO>();
+			this.widgetOptions = new ArrayList<WidgetOptionDAO>();
 			this.widgetOptions.addAll(that.getWidgetOptions());
 			toAdd.addAll(that.getWidgetOptions());
 		} else {
-			Iterator<WidgetOptionDSO> it = that.getWidgetOptions().iterator();
+			Iterator<WidgetOptionDAO> it = that.getWidgetOptions().iterator();
 			while (it.hasNext()) {
-				WidgetOptionDSO next = it.next();
+				WidgetOptionDAO next = it.next();
 				if (!this.widgetOptions.contains(next)) {
 					Log.get().debug("Adding to new option " + next.toString());
 					this.widgetOptions.add(next);	
@@ -232,10 +216,10 @@ public class WidgetDSO {
 //
 
 
-	public void assignReferenceCodes(ReferenceCodeGenerator rcg) {
+	public void assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
 		
 		String code;
-		for (WidgetOptionDSO option : this.widgetOptions) {
+		for (WidgetOptionDAO option : this.widgetOptions) {
 			if ( null == option.getReferenceCode() ) {
 				code = rcg.getNextCodeAsString();
 				Log.get().debug("Assigning reference code: " + code +" to " + this.toString());
@@ -325,42 +309,13 @@ public class WidgetDSO {
 	}
 
 
-	/**
-	 * @return the applicationId
-	 */
-	public String getApplicationId() {
-		return applicationId;
-	}
-
-
-	/**
-	 * @param applicationId the applicationId to set
-	 */
-	public void setApplicationId(String applicationId) {
-		this.applicationId = applicationId;
-	}
-
-
-	/**
-	 * @return the placeId
-	 */
-	public String getPlaceId() {
-		return placeId;
-	}
-
-
-	/**
-	 * @param placeId the placeId to set
-	 */
-	public void setPlaceId(String placeId) {
-		this.placeId = placeId;
-	}
+	
 
 
 	/**
 	 * @return the widgetOptions
 	 */
-	public ArrayList<WidgetOptionDSO> getWidgetOptions() {
+	public ArrayList<WidgetOptionDAO> getWidgetOptions() {
 		return widgetOptions;
 	}
 
@@ -368,7 +323,23 @@ public class WidgetDSO {
 	/**
 	 * @param widgetOptions the widgetOptions to set
 	 */
-	public void setWidgetOptions(ArrayList<WidgetOptionDSO> widgetOptions) {
+	public void setWidgetOptions(ArrayList<WidgetOptionDAO> widgetOptions) {
 		this.widgetOptions = widgetOptions;
+	}
+
+
+	/**
+	 * @return the applicationKey
+	 */
+	public Key<ApplicationDAO> getApplicationKey() {
+		return applicationKey;
+	}
+
+
+	/**
+	 * @param applicationKey the applicationKey to set
+	 */
+	public void setApplicationKey(Key<ApplicationDAO> applicationKey) {
+		this.applicationKey = applicationKey;
 	}
 }

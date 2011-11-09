@@ -4,20 +4,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import javax.jdo.JDOUserException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
-
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.comm.InputRequest;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.DsoFetcher;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.DAO;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -95,18 +89,10 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	protected String requestingAppId;
 	
-	protected ApplicationDSO applicationDSO;
+	protected ApplicationDAO applicationDAO;
 	
-	protected ApplicationDSO requestingApplicationDSO;
+	protected ApplicationDAO requestingApplicationDAO;
 	
-	/**
-	 * The PersistanceManager used to retrieve objects from the data store.
-	 * This is created at the beginning of the request (doInit) and released at
-	 * the end (doRelease).
-	 */
-	protected PersistenceManager pm;
-	
-	private Transaction tx; 
 	
 	public GenericResource() {
 		//pm = null;
@@ -122,14 +108,7 @@ public abstract class GenericResource extends ServerResource {
 	@Override
 	public void doInit() {
 		
-		/*
-		 * JDO Queries only retrieve child objects when they are accessed so
-		 * we keep an instance of PersistanceManager throughout the whole request and
-		 * release it at the end (see doRelease())
-		 */
-		pm = PMF.get().getPersistenceManager();
-		pm.setDetachAllOnCommit(true);
-	
+		
 		/*
 		 * Extract the parameters from the URL (including the ones from
 		 * the query part) and put them on object fields
@@ -141,19 +120,23 @@ public abstract class GenericResource extends ServerResource {
 			 * We need an appid...
 			 */
 			String errorMessage =  "Sorry, you have to specify a valid application id using 'appid' query parameter.";
-			this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage));
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
 		}
 		
 		/*
 		 * Update the requesting app's last request timestamp
 		 */
-		this.beginTransaction();
-		this.requestingApplicationDSO = DsoFetcher.getApplicationDSO(this.pm, this.placeId, this.requestingAppId);
-		//this.pm.detachCopy(arg0)
-		if ( null != this.requestingApplicationDSO ) {
-			this.requestingApplicationDSO.setLastRequestTimestamp(System.currentTimeMillis());
+		DAO.beginTransaction();
+		this.requestingApplicationDAO = DAO.getApplication(this.placeId, this.requestingAppId);
+		
+		if ( null != this.requestingApplicationDAO ) {
+			this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
+			DAO.putApplication(this.requestingApplicationDAO);
+		} 
+		
+		if ( !DAO.commitOrRollbackTransaction() ) {
+			Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
 		}
-		this.commitTransaction();
 			
 		
 		
@@ -176,22 +159,10 @@ public abstract class GenericResource extends ServerResource {
 		
 		Log.get().error(errorMessage);
 		
-		this.rollbackAndThrowException(new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage));
+		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
 	}
 
-	/**
-	 * 
-	 */
-	protected void beginTransaction() {
-		tx = pm.currentTransaction();
-		try
-		{
-			Log.get().debug("Beginning JDO transaction");
-		    tx.begin();
-		} catch (JDOUserException e) {
-			Log.get().error("Error beginnig JDO transaction: " + e.getMessage());
-		}
-	}
+	
 
 	/**
 	 * Extracts the placeId, applicationId and widgetId from the request URL 
@@ -228,49 +199,11 @@ public abstract class GenericResource extends ServerResource {
 	
 	@Override
 	public void doRelease() {
-		
-		pm.close();
 		Log.get().debug("Returning status" +  this.getResponse().getStatus().toString());	
-		
 	}
 
-	/**
-	 * 
-	 */
-	protected void commitTransaction() {
-		Log.get().debug("Commiting transaction");
-		boolean success = false;
-		try {
-			tx.commit();
-			success = true;
-		} catch (Exception e) {
-			Log.get().error("Could not commit transaction: " + e.getMessage());
-		} finally	{
-			if (tx.isActive())
-			{
-				Log.get().error("Could not finish transaction. Rolling back.");
-				tx.rollback();
-				
-			
-			}
-			
-		}
-		if ( !success ) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction.");
-		}
-	}
 	
-	protected void rollbackAndThrowException(ResourceException re) {
-		Log.get().error(re.getMessage());
-		if ( this.tx.isActive() ) {
-			this.tx.rollback();
-		}
-		throw re;
-	}
-	
-	protected void rollbackTransaction() {
-		this.tx.rollback();
-	}
+
 	
 	protected abstract Object doPost(Object incoming);
 	protected abstract Object doPut(Object incoming);
@@ -279,6 +212,7 @@ public abstract class GenericResource extends ServerResource {
 	protected abstract Class getResourceClass();
 	
 	// DELETE Methods
+	@Override
 	@Delete
 	public Representation delete() {
 		Object object = doDelete();
@@ -351,6 +285,7 @@ public abstract class GenericResource extends ServerResource {
 	private Object deserializeJSON(Representation entity) {
 		JacksonRepresentation jr = new JacksonRepresentation(entity, this.getResourceClass());
 		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
+			@Override
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
 				if (propertyName.equalsIgnoreCase("__gwt_ObjectId")) {
 					Log.get().debug("Ignoring __gwt_ObjectId property.");

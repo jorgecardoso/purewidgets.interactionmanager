@@ -10,8 +10,8 @@ import java.util.Iterator;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.comm.InputRequest;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.DsoFetcher;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
 import org.instantplaces.im.server.rest.ApplicationArrayListREST;
 import org.instantplaces.im.server.rest.ApplicationREST;
 import org.instantplaces.im.server.rest.RestConverter;

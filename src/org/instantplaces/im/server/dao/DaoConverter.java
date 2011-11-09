@@ -1,4 +1,4 @@
-package org.instantplaces.im.server.dso;
+package org.instantplaces.im.server.dao;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.rest.WidgetOptionREST;
@@ -8,10 +8,10 @@ import org.instantplaces.im.shared.WidgetOption;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
-public class DsoConverter {
+public class DaoConverter {
 
-	public static WidgetOptionDSO widgetOptionDSOfromRest(WidgetDSO parent, WidgetOptionREST widgetOptionREST) {
-		WidgetOptionDSO woDSO = new WidgetOptionDSO(parent, widgetOptionREST.getWidgetOptionId());
+	public static WidgetOptionDAO widgetOptionDSOfromRest(WidgetDAO parent, WidgetOptionREST widgetOptionREST) {
+		WidgetOptionDAO woDSO = new WidgetOptionDAO(parent, widgetOptionREST.getWidgetOptionId());
 
 		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
 		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
@@ -27,13 +27,13 @@ public class DsoConverter {
 	 * @param widgetREST
 	 * @return
 	 */
-	public static WidgetDSO widgetDSOfromRest(ApplicationDSO parent, WidgetREST widgetREST) {
-		WidgetDSO wDSO = new WidgetDSO(parent, widgetREST.getWidgetId(), widgetREST.getControlType(), widgetREST.getShortDescription(), widgetREST.getLongDescription());
+	public static WidgetDAO widgetDSOfromRest(ApplicationDAO parent, WidgetREST widgetREST) {
+		WidgetDAO wDSO = new WidgetDAO(parent, widgetREST.getWidgetId(), widgetREST.getControlType(), widgetREST.getShortDescription(), widgetREST.getLongDescription());
 		
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
 		
 		for (WidgetOptionREST woRest : widgetREST.getWidgetOptions()) {
-			wDSO.addWidgetOption(DsoConverter.widgetOptionDSOfromRest(wDSO, woRest));
+			wDSO.addWidgetOption(DaoConverter.widgetOptionDSOfromRest(wDSO, woRest));
 		}
 		
 		return wDSO;

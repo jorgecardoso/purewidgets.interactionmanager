@@ -6,10 +6,10 @@ package org.instantplaces.im.server.rest;
 import java.util.ArrayList;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetInputDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetInputDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDAO;
 
 /**
  * @author "Jorge C. S. Cardoso"
@@ -17,10 +17,10 @@ import org.instantplaces.im.server.dso.WidgetOptionDSO;
  */
 public class RestConverter {
 
-	public static WidgetArrayListREST widgetArrayListFromDso(ArrayList<WidgetDSO> widgetDSOList) {
+	public static WidgetArrayListREST widgetArrayListFromDso(ArrayList<WidgetDAO> widgetDSOList) {
 		
 		ArrayList<WidgetREST> widgetListREST = new ArrayList<WidgetREST>();
-		for ( WidgetDSO wDSO : widgetDSOList ) {
+		for ( WidgetDAO wDSO : widgetDSOList ) {
 			WidgetREST wREST = RestConverter.widgetRestFromDso(wDSO);
 			widgetListREST.add(wREST);
 		}
@@ -36,17 +36,17 @@ public class RestConverter {
 	 * @param widgetDSO
 	 * @return
 	 */
-	public static WidgetREST widgetRestFromDso(WidgetDSO widgetDSO) {
+	public static WidgetREST widgetRestFromDso(WidgetDAO widgetDSO) {
 		WidgetREST  w = new WidgetREST();
 	
 		if ( null != widgetDSO.getWidgetOptions() ) {
-			for (WidgetOptionDSO option : widgetDSO.getWidgetOptions()) {
+			for (WidgetOptionDAO option : widgetDSO.getWidgetOptions()) {
 				w.addWidgetOption( RestConverter.widgetOptionFromDSO(option) );
 			}
 		}
 		
-		w.setPlaceId(widgetDSO.getPlaceId());
-		w.setApplicationId(widgetDSO.getApplicationId());
+		w.setPlaceId (widgetDSO.getApplicationKey().getParent().getName() );
+		w.setApplicationId( widgetDSO.getApplicationKey().getName() );
 		w.setWidgetId(widgetDSO.getWidgetId());
 		w.setControlType(widgetDSO.getControlType());
 		w.setVolatileWidget(widgetDSO.isVolatileWidget());
@@ -61,7 +61,7 @@ public class RestConverter {
 	 * @param widgetOptionDSO
 	 * @return
 	 */
-	public static WidgetOptionREST widgetOptionFromDSO(WidgetOptionDSO widgetOptionDSO) {
+	public static WidgetOptionREST widgetOptionFromDSO(WidgetOptionDAO widgetOptionDSO) {
 		WidgetOptionREST woREST = new WidgetOptionREST();
 		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
 		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
@@ -79,11 +79,11 @@ public class RestConverter {
 	 * @param widgetDSO
 	 * @return
 	 */
-	public static ApplicationREST applicationFromDSO(ApplicationDSO applicationDSO) {
+	public static ApplicationREST applicationFromDSO(ApplicationDAO applicationDSO) {
 		Log.get().debug("Converting to REST " + applicationDSO.toString());
 		ApplicationREST  a = new ApplicationREST();
 	
-		a.setPlaceId( applicationDSO.getPlaceId() );
+		a.setPlaceId( applicationDSO.getPlaceKey().getName() );
 		a.setApplicationId( applicationDSO.getApplicationId() );
 		
 		
@@ -97,10 +97,10 @@ public class RestConverter {
 		return a; 
 	}
 
-	public static ApplicationArrayListREST applicationArrayListFromDSO(ArrayList<ApplicationDSO> applicationDSOList) {
+	public static ApplicationArrayListREST applicationArrayListFromDSO(ArrayList<ApplicationDAO> applicationDSOList) {
 		
 		ArrayList<ApplicationREST> applicationListREST = new ArrayList<ApplicationREST>();
-		for ( ApplicationDSO aDSO : applicationDSOList ) {
+		for ( ApplicationDAO aDSO : applicationDSOList ) {
 			ApplicationREST aREST = applicationFromDSO(aDSO);
 			applicationListREST.add(aREST);
 		}
@@ -110,10 +110,10 @@ public class RestConverter {
 		return applicationArrayList;
 	}
 	
-	public static WidgetInputArrayListREST widgetInputArrayListFromDso(ArrayList<WidgetInputDSO> widgetInputDSOList) {
+	public static WidgetInputArrayListREST widgetInputArrayListFromDso(ArrayList<WidgetInputDAO> widgetInputDSOList) {
 		
 		ArrayList<WidgetInputREST> widgetListREST = new ArrayList<WidgetInputREST>();
-		for ( WidgetInputDSO aDSO : widgetInputDSOList ) {
+		for ( WidgetInputDAO aDSO : widgetInputDSOList ) {
 			WidgetInputREST aREST = widgetInputFromDSO(aDSO);
 			widgetListREST.add(aREST);
 		}
@@ -124,14 +124,14 @@ public class RestConverter {
 	}
 
 
-	public static WidgetInputREST widgetInputFromDSO(WidgetInputDSO wiDso) {
+	public static WidgetInputREST widgetInputFromDSO(WidgetInputDAO wiDso) {
 		
 		
 		WidgetInputREST  w = new WidgetInputREST();
 	
 		
-		w.setWidgetOptionId(wiDso.getWidgetOptionId());
-		w.setWidgetId(wiDso.getWidgetId());
+		w.setWidgetOptionId( wiDso.getWidgetOptionKey().getName() );
+		w.setWidgetId( wiDso.getWidgetOptionKey().getParent().getName() );
 		
 		w.setParameters(wiDso.getParameters());
 		w.setPersona(wiDso.getPersona());

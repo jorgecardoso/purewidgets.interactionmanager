@@ -6,6 +6,7 @@ import org.instantplaces.im.server.resource.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.resource.CronDeleteVolatileResource;
 import org.instantplaces.im.server.resource.CronRebuildCodesResource;
 import org.instantplaces.im.server.resource.TaskFetchInputResource;
+import org.instantplaces.im.server.resource.TestResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
 import org.restlet.Application;
@@ -66,6 +67,15 @@ public class InteractionManagerApplication extends Application {
          * Tasks
          */
         router.attach("/task/fetch-input", TaskFetchInputResource.class);
+        
+        
+        
+        /*
+         * Tst
+         */
+        router.attach("/test", TestResource.class);
+        
+        
         return router;
 	}    
 }

@@ -12,12 +12,12 @@ import javax.jdo.Transaction;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.DsoFetcher;
-import org.instantplaces.im.server.dso.PlaceDSO;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
-import org.instantplaces.im.server.referencecode.ReferenceCodeGenerator;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
+import org.instantplaces.im.server.dao.PlaceDAO;
+import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
+import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDAO;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -43,17 +43,17 @@ public class CronRebuildCodesResource extends ServerResource {
 		{
 		    tx.begin();
 		    
-		    ArrayList<PlaceDSO> places = DsoFetcher.getPlacesFromDSO(pm);
-		    for ( PlaceDSO place : places ) {
-		    	ReferenceCodeGenerator rcg = place.getCodeGenerator();
-		    	rcg.rebuild();
-		    	ArrayList<WidgetOptionDSO> options = DsoFetcher.getWidgetOptionFromDSO(pm, place.getPlaceId());
-		    	for ( WidgetOptionDSO option : options ) {
-		    		rcg.remove(option.getReferenceCode());
-					Log.get().debug("Removing used code: " + option.getReferenceCode());
-		    	}
-		    }
-		   
+		    ArrayList<PlaceDAO> places = DsoFetcher.getPlacesFromDSO(pm);
+//		    for ( PlaceDAO place : places ) {
+//		    	ReferenceCodeGeneratorDAO rcg = place.getCodeGenerator();
+//		    	rcg.rebuild();
+//		    	ArrayList<WidgetOptionDAO> options = DsoFetcher.getWidgetOptionFromDSO(pm, place.getPlaceId());
+//		    	for ( WidgetOptionDAO option : options ) {
+//		    		rcg.remove(option.getReferenceCode());
+//					Log.get().debug("Removing used code: " + option.getReferenceCode());
+//		    	}
+//		    }
+//		   
 		    tx.commit();
 		}
 		finally

@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dso.ApplicationDSO;
-import org.instantplaces.im.server.dso.DsoFetcher;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.DAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
+import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDAO;
 import org.instantplaces.im.server.rest.ApplicationArrayListREST;
 import org.instantplaces.im.server.rest.ApplicationREST;
 import org.instantplaces.im.server.rest.RestConverter;
@@ -80,12 +81,13 @@ public class ApplicationResource extends GenericResource {
 		}
 
 		
-		this.beginTransaction();
+		DAO.beginTransaction();
 		/*
 		 * Return the list of applications
 		 */
-		ArrayList<ApplicationDSO> applications = DsoFetcher.getApplicationsDSO(this.pm, this.placeId);
-		this.commitTransaction();
+		ArrayList<ApplicationDAO> applications = DAO.getApplications(this.placeId);
+		
+		DAO.commitOrRollbackTransaction();
 		
 		
 

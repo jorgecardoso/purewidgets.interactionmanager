@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.instantplaces.im.server.dso;
+package org.instantplaces.im.server.dao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class DsoFetcher {
 	 */
 	public static void deleteWidgetFromDSO(PersistenceManager pm,
 			String placeId, String applicationId, String widgetId) {
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
 	    query.deletePersistentAll(placeId, applicationId, widgetId );
@@ -39,7 +39,7 @@ public class DsoFetcher {
 
 	public static void deleteWidgetFromDSO(PersistenceManager pm,
 			String placeId, String applicationId) {
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam ");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    query.deletePersistentAll(placeId, applicationId );
@@ -57,7 +57,7 @@ public class DsoFetcher {
 	 */
 	public static void deleteWidgetOptionFromDSO(PersistenceManager pm,
 			String placeId, String applicationId) {
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam ");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    query.deletePersistentAll(placeId, applicationId);
@@ -72,7 +72,7 @@ public class DsoFetcher {
 	 */
 	public static void deleteWidgetOptionFromDSO(PersistenceManager pm,
 			String placeId, String applicationId, String widgetId) {
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
 	    query.deletePersistentAll(placeId, applicationId, widgetId);
@@ -88,7 +88,7 @@ public class DsoFetcher {
 	 * @param widgetId
 	 */
 	public static void deleteWidgetInputDSO(PersistenceManager pm, String placeId, String applicationId) {
-		Query query = pm.newQuery(WidgetInputDSO.class);
+		Query query = pm.newQuery(WidgetInputDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam ");
 	    query.declareParameters("String placeIdParam, String applicationIdParam  ");
 	    query.deletePersistentAll(placeId, applicationId);
@@ -102,64 +102,65 @@ public class DsoFetcher {
 	 * @param widgetId
 	 */
 	public static void deleteWidgetInputDSO(PersistenceManager pm, String placeId, String applicationId, String widgetId) {
-		Query query = pm.newQuery(WidgetInputDSO.class);
+		Query query = pm.newQuery(WidgetInputDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
 	    query.deletePersistentAll(placeId, applicationId, widgetId);
 	}
 	
 	public static void deleteWidgetInputDSO(PersistenceManager pm, String placeId, String applicationId, String widgetId, String widgetOptionId) {
-		Query query = pm.newQuery(WidgetInputDSO.class);
+		Query query = pm.newQuery(WidgetInputDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam && widgetOptionId == widgetOptionIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam, String widgetOptionIdParam");
 	    query.deletePersistentAll(placeId, applicationId, widgetId, widgetOptionId);
 	}
 	
 	public static void deleteApplicationDSO(PersistenceManager pm, String placeId, String applicationId) {
-		Query query = pm.newQuery(ApplicationDSO.class);
+		Query query = pm.newQuery(ApplicationDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    query.deletePersistentAll(placeId, applicationId);
 	}
 	
-	public static void deleteApplicationsDSO(PersistenceManager pm,  long earlierThan) {
-		Query query = pm.newQuery(ApplicationDSO.class);
-	    query.setFilter("lastRequestTimestamp < earlierThanParam");
-	    query.declareParameters("long earlierThanParam");
-	    
-	    
-	    try {
-	    	List<ApplicationDSO> result = (List<ApplicationDSO>)  query.execute(earlierThan);
-	        if ( null != result ) {
-	        	Log.get().warn("Found " + result.size() + " applications. Deleting...");
-	        	for ( ApplicationDSO app : result ) {
-	        		Log.get().warn("Deleting application: " + app.getApplicationId());
-	        		DsoFetcher.deleteWidgetInputDSO(pm, app.getPlaceId(), app.getApplicationId());
-	        		DsoFetcher.deleteWidgetOptionFromDSO(pm, app.getPlaceId(), app.getApplicationId());
-	        		DsoFetcher.deleteWidgetFromDSO(pm, app.getPlaceId(), app.getApplicationId());
-	        		DsoFetcher.deleteApplicationDSO(pm, app.getPlaceId(), app.getApplicationId());
-	        	}
-	        } else {
-	        	Log.get().debug("No applications found.");
-	        }
-	    } catch (Exception e) {
-	    	Log.get().error("Could not access data store." + e.getMessage());
-	    }  finally {
-	        query.closeAll();
-	    }
-	  
-	}
-	public static ApplicationDSO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
+//	public static void deleteApplicationsDSO(PersistenceManager pm,  long earlierThan) {
+//		Query query = pm.newQuery(ApplicationDAO.class);
+//	    query.setFilter("lastRequestTimestamp < earlierThanParam");
+//	    query.declareParameters("long earlierThanParam");
+//	    
+//	    
+//	    try {
+//	    	List<ApplicationDAO> result = (List<ApplicationDAO>)  query.execute(earlierThan);
+//	        if ( null != result ) {
+//	        	Log.get().warn("Found " + result.size() + " applications. Deleting...");
+//	        	for ( ApplicationDAO app : result ) {
+//	        		Log.get().warn("Deleting application: " + app.getApplicationId());
+//	        		DsoFetcher.deleteWidgetInputDSO(pm, app.getPlaceId(), app.getApplicationId());
+//	        		DsoFetcher.deleteWidgetOptionFromDSO(pm, app.getPlaceId(), app.getApplicationId());
+//	        		DsoFetcher.deleteWidgetFromDSO(pm, app.getPlaceId(), app.getApplicationId());
+//	        		DsoFetcher.deleteApplicationDSO(pm, app.getPlaceId(), app.getApplicationId());
+//	        	}
+//	        } else {
+//	        	Log.get().debug("No applications found.");
+//	        }
+//	    } catch (Exception e) {
+//	    	Log.get().error("Could not access data store." + e.getMessage());
+//	    }  finally {
+//	        query.closeAll();
+//	    }
+//	  
+//	}
+//	
+	public static ApplicationDAO getApplicationDSO( PersistenceManager pm, String placeId, String applicationId ) {
 	Log.get().debug("Fetching application Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 	
 		
-		Query query = pm.newQuery(ApplicationDSO.class);
+		Query query = pm.newQuery(ApplicationDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    query.setUnique(true);
 	    
 	    try {
-	    	ApplicationDSO result = (ApplicationDSO) query.execute(placeId, applicationId);
+	    	ApplicationDAO result = (ApplicationDAO) query.execute(placeId, applicationId);
 	        if ( null != result ) {
 	        	Log.get().debug("Found applications. Returning first.");
 	        	
@@ -175,16 +176,16 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<ApplicationDSO> getApplicationsDSO( PersistenceManager pm, String placeId ) {
+	public static ArrayList<ApplicationDAO> getApplicationsDSO( PersistenceManager pm, String placeId ) {
 		Log.get().debug("Fetching applications for Place(" + placeId + ") from Data Store.");
 		
-		Query query = pm.newQuery(ApplicationDSO.class);
+		Query query = pm.newQuery(ApplicationDAO.class);
 	    query.setFilter("placeId == placeIdParam ");
 	    query.declareParameters("String placeIdParam");
 	    
 	    
 	    try {
-	    	List<ApplicationDSO> result = (List<ApplicationDSO>) query.execute(placeId);
+	    	List<ApplicationDAO> result = (List<ApplicationDAO>) query.execute(placeId);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Applications not found.");
@@ -193,7 +194,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found applications");
 	    	}
 	    	
-	    	ArrayList<ApplicationDSO> toReturn = new ArrayList<ApplicationDSO>();
+	    	ArrayList<ApplicationDAO> toReturn = new ArrayList<ApplicationDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -205,16 +206,16 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<ApplicationDSO> getApplicationsDSO( PersistenceManager pm, long lastActivityTimeLessThan ) {
+	public static ArrayList<ApplicationDAO> getApplicationsDSO( PersistenceManager pm, long lastActivityTimeLessThan ) {
 		Log.get().debug("Fetching applications from Data Store.");
 		
-		Query query = pm.newQuery(ApplicationDSO.class);
+		Query query = pm.newQuery(ApplicationDAO.class);
 	    query.setFilter("lastRequestTimestamp < timeParam");
 	    query.declareParameters("long timeParam");
 	    
 	    
 	    try {
-	    	List<ApplicationDSO> result = (List<ApplicationDSO>) query.execute(lastActivityTimeLessThan);
+	    	List<ApplicationDAO> result = (List<ApplicationDAO>) query.execute(lastActivityTimeLessThan);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Applications not found.");
@@ -223,7 +224,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " applications");
 	    	}
 	    	
-	    	ArrayList<ApplicationDSO> toReturn = new ArrayList<ApplicationDSO>();
+	    	ArrayList<ApplicationDAO> toReturn = new ArrayList<ApplicationDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -235,14 +236,14 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static ArrayList<PlaceDSO> getPlacesFromDSO( PersistenceManager pm ) {
+	public static ArrayList<PlaceDAO> getPlacesFromDSO( PersistenceManager pm ) {
 		Log.get().debug("Fetching places from Data Store.");
 		
-		Query query = pm.newQuery(PlaceDSO.class);
+		Query query = pm.newQuery(PlaceDAO.class);
 	   
 	    
 	    try {
-	    	List<PlaceDSO> result = (List<PlaceDSO>) query.execute();
+	    	List<PlaceDAO> result = (List<PlaceDAO>) query.execute();
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Places not found.");
@@ -251,7 +252,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " places");
 	    	}
 	    	
-	    	ArrayList<PlaceDSO> toReturn = new ArrayList<PlaceDSO>();
+	    	ArrayList<PlaceDAO> toReturn = new ArrayList<PlaceDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -263,17 +264,17 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static WidgetInputDSO getLastWidgetInputFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
+	public static WidgetInputDAO getLastWidgetInputFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
 		Log.get().debug("Fetching input Place(" + placeId + "), Application("+ applicationId + "),  from Data Store.");
 	
-		Query query = pm.newQuery(WidgetInputDSO.class);
+		Query query = pm.newQuery(WidgetInputDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam" );
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
 	    query.setOrdering("timeStamp desc");
 	    query.setUnique(true);
 	    
 	    try {
-	    	WidgetInputDSO result = (WidgetInputDSO) query.execute(placeId, applicationId, widgetId);
+	    	WidgetInputDAO result = (WidgetInputDAO) query.execute(placeId, applicationId, widgetId);
 	    
 	    	
 	    	return result;
@@ -286,16 +287,16 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static ArrayList<WidgetInputDSO> getWidgetInputFromDSO( PersistenceManager pm, String placeId, String applicationId, long from) {
+	public static ArrayList<WidgetInputDAO> getWidgetInputFromDSO( PersistenceManager pm, String placeId, String applicationId, long from) {
 		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "),  from Data Store.");
 	
-		Query query = pm.newQuery(WidgetInputDSO.class);
+		Query query = pm.newQuery(WidgetInputDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && timeStamp > fromParameter" );
 	    query.declareParameters("String placeIdParam, String applicationIdParam, long fromParameter");
 	    
 	    
 	    try {
-	    	List<WidgetInputDSO> result = (List<WidgetInputDSO>) query.execute(placeId, applicationId, from);
+	    	List<WidgetInputDAO> result = (List<WidgetInputDAO>) query.execute(placeId, applicationId, from);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Input not found.");
@@ -304,7 +305,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " inputs");
 	    	}
 	    	
-	    	ArrayList<WidgetInputDSO> toReturn = new ArrayList<WidgetInputDSO>();
+	    	ArrayList<WidgetInputDAO> toReturn = new ArrayList<WidgetInputDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -316,16 +317,16 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static WidgetDSO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
+	public static WidgetDAO getWidgetFromDSO( PersistenceManager pm, String placeId, String applicationId, String widgetId) {
 		Log.get().debug("Fetching widget Place(" + placeId + "), Application("+ applicationId + "), Widget(" + widgetId + ") from Data Store.");
 	
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && widgetId == widgetIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam, String widgetIdParam");
 	    query.setUnique(true);
 	    
 	    try {
-	    	WidgetDSO result = (WidgetDSO) query.execute(placeId, applicationId, widgetId);
+	    	WidgetDAO result = (WidgetDAO) query.execute(placeId, applicationId, widgetId);
 	        if ( null != result ) {
 	        	Log.get().debug("Found widgets. Returning first.");
 	        	
@@ -341,18 +342,18 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static WidgetOptionDSO getWidgetOptionDSOByReferenceCode(PersistenceManager pm, String referenceCode ) {
+	public static WidgetOptionDAO getWidgetOptionDSOByReferenceCode(PersistenceManager pm, String referenceCode ) {
 		Log.get().debug("Fetching WidgetOptionDSO with referenceCode(" + referenceCode + ") from Data Store.");
 		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("referenceCode == idParam");
 	    query.declareParameters("String idParam");
 	    
 	    try {
-	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(referenceCode);
+	        List<WidgetOptionDAO> results = (List<WidgetOptionDAO>) query.execute(referenceCode);
 	        if (!results.isEmpty()) {
 	        	Log.get().debug("Found " + results.size() + " widget options. Returning first.");
-	        	WidgetOptionDSO widgetOption = results.get(0);
+	        	WidgetOptionDAO widgetOption = results.get(0);
 	        	return widgetOption;
 	        } else {
 	        	Log.get().debug("Widget option not found.");
@@ -367,17 +368,17 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<WidgetOptionDSO> getWidgetOptionFromDSO(
+	public static ArrayList<WidgetOptionDAO> getWidgetOptionFromDSO(
 			PersistenceManager pm, String placeId) {
 		Log.get().debug("Fetching WidgetOptionDSO from Data Store.");
 		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("placeId == placeIdParam ");
 	    query.declareParameters("String placeIdParam");
 	    
 	    try {
-	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(placeId);
-	        ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
+	        List<WidgetOptionDAO> results = (List<WidgetOptionDAO>) query.execute(placeId);
+	        ArrayList<WidgetOptionDAO> toReturn = new ArrayList<WidgetOptionDAO>();
 	        
 	        if ( null == results) {
 	    		Log.get().warn("Widget options not found.");
@@ -399,17 +400,17 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static ArrayList<WidgetOptionDSO> getWidgetOptionFromDSO(
+	public static ArrayList<WidgetOptionDAO> getWidgetOptionFromDSO(
 			PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching WidgetOptionDSO from Data Store.");
 		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    
 	    try {
-	        List<WidgetOptionDSO> results = (List<WidgetOptionDSO>) query.execute(placeId, applicationId);
-	        ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
+	        List<WidgetOptionDAO> results = (List<WidgetOptionDAO>) query.execute(placeId, applicationId);
+	        ArrayList<WidgetOptionDAO> toReturn = new ArrayList<WidgetOptionDAO>();
 	        
 	        if ( null == results) {
 	    		Log.get().warn("Widget options not found.");
@@ -431,14 +432,14 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<WidgetOptionDSO> getWidgetOptionsFromDSO( PersistenceManager pm, String placeId) {
+	public static ArrayList<WidgetOptionDAO> getWidgetOptionsFromDSO( PersistenceManager pm, String placeId) {
 		Log.get().debug("Fetching widgets options for Place(" + placeId + ") from Data Store.");
 		
-		Query query = pm.newQuery(WidgetOptionDSO.class);
+		Query query = pm.newQuery(WidgetOptionDAO.class);
 	    query.setFilter("placeId == placeIdParam ");
 	    query.declareParameters("String placeIdParam");
 	    try {
-	    	List<WidgetOptionDSO> result = (List<WidgetOptionDSO>) query.execute(placeId);
+	    	List<WidgetOptionDAO> result = (List<WidgetOptionDAO>) query.execute(placeId);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Widgets not found.");
@@ -447,7 +448,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " widgets");
 	    	}
 	    	
-	    	ArrayList<WidgetOptionDSO> toReturn = new ArrayList<WidgetOptionDSO>();
+	    	ArrayList<WidgetOptionDAO> toReturn = new ArrayList<WidgetOptionDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -459,14 +460,14 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId) {
+	public static ArrayList<WidgetDAO> getWidgetsFromDSO( PersistenceManager pm, String placeId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + ") from Data Store.");
 		
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam ");
 	    query.declareParameters("String placeIdParam");
 	    try {
-	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId);
+	    	List<WidgetDAO> result = (List<WidgetDAO>) query.execute(placeId);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Widgets not found.");
@@ -475,7 +476,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " widgets");
 	    	}
 	    	
-	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
+	    	ArrayList<WidgetDAO> toReturn = new ArrayList<WidgetDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -487,14 +488,14 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static ArrayList<WidgetDSO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
+	public static ArrayList<WidgetDAO> getWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam");
 	    query.declareParameters("String placeIdParam, String applicationIdParam");
 	    try {
-	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId, applicationId);
+	    	List<WidgetDAO> result = (List<WidgetDAO>) query.execute(placeId, applicationId);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Widgets not found.");
@@ -503,7 +504,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " widgets");
 	    	}
 	    	
-	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
+	    	ArrayList<WidgetDAO> toReturn = new ArrayList<WidgetDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -515,14 +516,14 @@ public class DsoFetcher {
 	    return null;
 	}
 	
-	public static ArrayList<WidgetDSO> getVolatileWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
+	public static ArrayList<WidgetDAO> getVolatileWidgetsFromDSO( PersistenceManager pm, String placeId, String applicationId) {
 		Log.get().debug("Fetching widgets for Place(" + placeId + "), Application("+ applicationId + ") from Data Store.");
 		
-		Query query = pm.newQuery(WidgetDSO.class);
+		Query query = pm.newQuery(WidgetDAO.class);
 	    query.setFilter("placeId == placeIdParam && applicationId == applicationIdParam && volatileWidget == true");
 	    query.declareParameters("String placeIdParam, String applicationIdParam ");
 	    try {
-	    	List<WidgetDSO> result = (List<WidgetDSO>) query.execute(placeId, applicationId);
+	    	List<WidgetDAO> result = (List<WidgetDAO>) query.execute(placeId, applicationId);
 	    
 	    	if ( null == result) {
 	    		Log.get().warn("Widgets not found.");
@@ -531,7 +532,7 @@ public class DsoFetcher {
 	    		Log.get().debug("Found " + result.size() + " widgets");
 	    	}
 	    	
-	    	ArrayList<WidgetDSO> toReturn = new ArrayList<WidgetDSO>();
+	    	ArrayList<WidgetDAO> toReturn = new ArrayList<WidgetDAO>();
 	    	toReturn.addAll(result);
 	    	return toReturn;
 	    	
@@ -543,16 +544,16 @@ public class DsoFetcher {
 	    return null;
 	}
 
-	public static PlaceDSO getPlaceFromDSO(PersistenceManager pm, String placeId ) {
+	public static PlaceDAO getPlaceFromDSO(PersistenceManager pm, String placeId ) {
 		Log.get().debug("Fetching place Place(" + placeId + ") from Data Store.");
 		
-		Query query = pm.newQuery(PlaceDSO.class);
+		Query query = pm.newQuery(PlaceDAO.class);
 	    query.setFilter("placeId == idParam");
 	    query.declareParameters("String idParam");
 	    query.setUnique(true);
 	    
 	    try {
-	        PlaceDSO result = (PlaceDSO) query.execute(placeId);
+	        PlaceDAO result = (PlaceDAO) query.execute(placeId);
 	        if ( null != result ) {
 	        	Log.get().debug("Found places. Returning first.");
 	        	

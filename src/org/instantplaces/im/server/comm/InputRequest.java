@@ -14,10 +14,12 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.PMF;
-import org.instantplaces.im.server.dso.DsoFetcher;
-import org.instantplaces.im.server.dso.WidgetDSO;
-import org.instantplaces.im.server.dso.WidgetInputDSO;
-import org.instantplaces.im.server.dso.WidgetOptionDSO;
+import org.instantplaces.im.server.dao.DAO;
+import org.instantplaces.im.server.dao.DsoFetcher;
+import org.instantplaces.im.server.dao.PlaceDAO;
+import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetInputDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDAO;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -26,8 +28,8 @@ import org.jdom.input.SAXBuilder;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.googlecode.objectify.Key;
 
-import javax.jdo.PersistenceManager;
 
 /**
  * Requests input for a place from the Instant Places main service and
@@ -189,9 +191,28 @@ public class InputRequest {
 
 		String name = resolveIdentity(identity);
 
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		WidgetOptionDAO widgetOption = null; 
+		
+		
+		List<Key<PlaceDAO>> placeKeys = DAO.getPlaceKeys();
+		
+		DAO.beginTransaction();
+		
+		for ( Key<PlaceDAO> placeKey : placeKeys ) {
+			ArrayList<WidgetOptionDAO> options = DAO.getWidgetOption(placeKey.getName());
+			
+			for ( WidgetOptionDAO option : options ) {
+				if ( option.getReferenceCode().equals(refCode)) {
+					widgetOption = option;
+					break;
+				}
+			}
+			if ( null != widgetOption ) {
+				break;
+			}
+		}
 
-		WidgetOptionDSO widgetOption = DsoFetcher.getWidgetOptionDSOByReferenceCode(pm, refCode);
+		//= DsoFetcher.getWidgetOptionDSOByReferenceCode(pm, refCode);
 
 		// TODO: save statistics in PlaceDSO here. Save input to existing
 		// widgets and to non-existing widgets
@@ -201,16 +222,12 @@ public class InputRequest {
 		} else {
 			Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
-			WidgetInputDSO input = new WidgetInputDSO(widgetOption, System.currentTimeMillis(), parameters, name );
-			pm.makePersistent(input);
-			try {
-				pm.close();
-			} catch (Exception e) {
+			WidgetInputDAO input = new WidgetInputDAO(widgetOption, System.currentTimeMillis(), parameters, name );
+			DAO.putWidgetInput(input);
+			
+			if ( !DAO.commitOrRollbackTransaction() ) {
+		
 				Log.get().error("Could not save input to datastore");
-				Log.get().error(e.getMessage());
-				e.printStackTrace();
-			} finally {
-
 			}
 		}
 
