@@ -6,9 +6,9 @@ package org.instantplaces.im.server.resource;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDAO;
-import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.PlaceDAO;
+import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -35,19 +35,19 @@ public class CronDeleteOldAppsResource extends ServerResource {
 	public Representation runCron() {
 		long current = System.currentTimeMillis();
 
-		DAO.beginTransaction();
+		Dao.beginTransaction();
 
-		List<Key<PlaceDAO>> placeKeys = DAO.getPlaceKeys();
+		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
-		for (Key<PlaceDAO> placeKey : placeKeys) {
-			List<ApplicationDAO> applications = DAO.getApplications(placeKey);
+		for (Key<PlaceDao> placeKey : placeKeys) {
+			List<ApplicationDao> applications = Dao.getApplications(placeKey);
 
-			for (ApplicationDAO app : applications) {
+			for (ApplicationDao app : applications) {
 				if ((current - app.getLastRequestTimestamp()) > OLD) {
-					DAO.delete(app);
-					DAO.delete(DAO.getWidgetsKeys(app.getKey()));
-					DAO.delete(DAO.getWidgetOptionsKeys(app.getKey()));
-					DAO.delete(DAO.getWidgetInputsKeys(app.getKey()));
+					Dao.delete(app);
+					Dao.delete(Dao.getWidgetsKeys(app.getKey()));
+					Dao.delete(Dao.getWidgetOptionsKeys(app.getKey()));
+					Dao.delete(Dao.getWidgetInputsKeys(app.getKey()));
 				}
 			}
 		}

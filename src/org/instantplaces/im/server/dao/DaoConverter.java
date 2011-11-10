@@ -5,8 +5,8 @@ import org.instantplaces.im.server.rest.WidgetREST;
 
 public class DaoConverter {
 
-	public static WidgetOptionDAO widgetOptionDSOfromRest(WidgetDAO parent, WidgetOptionREST widgetOptionREST) {
-		WidgetOptionDAO woDSO = new WidgetOptionDAO(parent, widgetOptionREST.getWidgetOptionId());
+	public static WidgetOptionDao widgetOptionDSOfromRest(WidgetDao parent, WidgetOptionREST widgetOptionREST) {
+		WidgetOptionDao woDSO = new WidgetOptionDao(parent, widgetOptionREST.getWidgetOptionId());
 
 		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
 		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
@@ -22,8 +22,8 @@ public class DaoConverter {
 	 * @param widgetREST
 	 * @return
 	 */
-	public static WidgetDAO widgetDSOfromRest(ApplicationDAO parent, WidgetREST widgetREST) {
-		WidgetDAO wDSO = new WidgetDAO(parent, widgetREST.getWidgetId(), widgetREST.getControlType(), widgetREST.getShortDescription(), widgetREST.getLongDescription());
+	public static WidgetDao widgetDSOfromRest(ApplicationDao parent, WidgetREST widgetREST) {
+		WidgetDao wDSO = new WidgetDao(parent, widgetREST.getWidgetId(), widgetREST.getControlType(), widgetREST.getShortDescription(), widgetREST.getLongDescription());
 		
 		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
 		

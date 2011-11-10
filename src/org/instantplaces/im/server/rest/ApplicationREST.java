@@ -9,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.instantplaces.im.server.dao.ApplicationDAO;
+import org.instantplaces.im.server.dao.ApplicationDao;
 
 
 
@@ -96,7 +96,7 @@ public class ApplicationREST {
 	}
 
 	public boolean isActive() {
-		return (System.currentTimeMillis()-this.lastRequestTimestamp) < ApplicationDAO.MAXIMUM_ACTIVITY_INTERVAL;
+		return (System.currentTimeMillis()-this.lastRequestTimestamp) < ApplicationDao.MAXIMUM_ACTIVITY_INTERVAL;
 	}
 	
 }

@@ -9,8 +9,8 @@ import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDAO;
-import org.instantplaces.im.server.dao.DAO;
+import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -60,9 +60,9 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	protected String requestingAppId;
 	
-	protected ApplicationDAO applicationDAO;
+	protected ApplicationDao applicationDAO;
 	
-	protected ApplicationDAO requestingApplicationDAO;
+	protected ApplicationDao requestingApplicationDAO;
 	
 	
 	public GenericResource() {
@@ -97,15 +97,15 @@ public abstract class GenericResource extends ServerResource {
 		/*
 		 * Update the requesting app's last request timestamp
 		 */
-		DAO.beginTransaction();
-		this.requestingApplicationDAO = DAO.getApplication(this.placeId, this.requestingAppId);
+		Dao.beginTransaction();
+		this.requestingApplicationDAO = Dao.getApplication(this.placeId, this.requestingAppId);
 		
 		if ( null != this.requestingApplicationDAO ) {
 			this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
-			DAO.put(this.requestingApplicationDAO);
+			Dao.put(this.requestingApplicationDAO);
 		} 
 		
-		if ( !DAO.commitOrRollbackTransaction() ) {
+		if ( !Dao.commitOrRollbackTransaction() ) {
 			Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
 		}
 			
@@ -144,6 +144,8 @@ public abstract class GenericResource extends ServerResource {
 	protected abstract Object doPut(Object incoming);
 	protected abstract Object doGet();
 	protected abstract Object doDelete();
+	
+	@SuppressWarnings("rawtypes")
 	protected abstract Class getResourceClass();
 	
 	// DELETE Methods

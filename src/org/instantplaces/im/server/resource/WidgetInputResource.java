@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.WidgetDAO;
-import org.instantplaces.im.server.dao.WidgetInputDAO;
+import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.WidgetDao;
+import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetInputArrayListREST;
 import org.instantplaces.im.server.rest.WidgetInputREST;
@@ -53,29 +53,29 @@ public class WidgetInputResource extends GenericResource {
 			/*
 			 * Fetch the widgets from the data store.
 			 */
-			DAO.beginTransaction();
-			List<WidgetInputDAO> widgetInputs = DAO.getWidgetInputs(this.placeId, this.appId, from); 
+			Dao.beginTransaction();
+			List<WidgetInputDao> widgetInputs = Dao.getWidgetInputs(this.placeId, this.appId, from); 
 					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
-			DAO.commitOrRollbackTransaction();
+			Dao.commitOrRollbackTransaction();
 			
 			return RestConverter.widgetInputArrayListFromDso(widgetInputs);
 		/*
 		 * Return the last input to every widget
 		 */
 		} else {
-			DAO.beginTransaction();
-			List<WidgetDAO> widgets = DAO.getWidgets(this.placeId, this.appId);
+			Dao.beginTransaction();
+			List<WidgetDao> widgets = Dao.getWidgets(this.placeId, this.appId);
 					//DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
-			ArrayList<WidgetInputDAO> inputs = new ArrayList<WidgetInputDAO>();
+			ArrayList<WidgetInputDao> inputs = new ArrayList<WidgetInputDao>();
 			
-			for ( WidgetDAO w : widgets ) {
-				WidgetInputDAO input = DAO.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
+			for ( WidgetDao w : widgets ) {
+				WidgetInputDao input = Dao.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
 						//DsoFetcher.getLastWidgetInputFromDSO(this.pm, this.placeId, this.appId, w.getWidgetId());
 				if ( null != input ) {
 					inputs.add(input);
 				}
 			}
-			DAO.commitOrRollbackTransaction();
+			Dao.commitOrRollbackTransaction();
 			return RestConverter.widgetInputArrayListFromDso(inputs);
 		}
 	}

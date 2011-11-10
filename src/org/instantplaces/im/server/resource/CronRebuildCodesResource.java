@@ -6,10 +6,10 @@ package org.instantplaces.im.server.resource;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.PlaceDAO;
+import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDAO;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -30,23 +30,23 @@ public class CronRebuildCodesResource extends ServerResource {
 	@Get
 	public Representation runCron() {
 
-		DAO.beginTransaction();
-		List<Key<PlaceDAO>> placeKeys = DAO.getPlaceKeys();
+		Dao.beginTransaction();
+		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
-		for (Key<PlaceDAO> placeKey : placeKeys) {
+		for (Key<PlaceDao> placeKey : placeKeys) {
 
-			ReferenceCodeGeneratorDAO rcg = DAO.getReferenceCodeGenerator(placeKey);
+			ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(placeKey);
 
 			rcg.rebuild();
-			List<WidgetOptionDAO> options = DAO.getWidgetOptions(placeKey);
+			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey);
 
-			for (WidgetOptionDAO option : options) {
+			for (WidgetOptionDao option : options) {
 				rcg.remove(option.getReferenceCode());
 				Log.get().debug("Removing used code: " + option.getReferenceCode());
 			}
 		}
 
-		DAO.commitOrRollbackTransaction();
+		Dao.commitOrRollbackTransaction();
 
 		return null;
 	}

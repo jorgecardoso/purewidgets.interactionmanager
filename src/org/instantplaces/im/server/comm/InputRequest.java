@@ -12,10 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.PlaceDAO;
-import org.instantplaces.im.server.dao.WidgetInputDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDAO;
+import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.WidgetInputDao;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -187,17 +187,17 @@ public class InputRequest {
 
 		String name = resolveIdentity(identity);
 
-		WidgetOptionDAO widgetOption = null; 
+		WidgetOptionDao widgetOption = null; 
 		
 		
-		List<Key<PlaceDAO>> placeKeys = DAO.getPlaceKeys();
+		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 		
-		DAO.beginTransaction();
+		Dao.beginTransaction();
 		
-		for ( Key<PlaceDAO> placeKey : placeKeys ) {
-			List<WidgetOptionDAO> options = DAO.getWidgetOptions(placeKey.getName());
+		for ( Key<PlaceDao> placeKey : placeKeys ) {
+			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey.getName());
 			
-			for ( WidgetOptionDAO option : options ) {
+			for ( WidgetOptionDao option : options ) {
 				if ( option.getReferenceCode().equals(refCode)) {
 					widgetOption = option;
 					break;
@@ -217,13 +217,13 @@ public class InputRequest {
 		} else {
 			Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
-			WidgetInputDAO input = new WidgetInputDAO(widgetOption, System.currentTimeMillis(), parameters, name );
-			DAO.put(input);
+			WidgetInputDao input = new WidgetInputDao(widgetOption, System.currentTimeMillis(), parameters, name );
+			Dao.put(input);
 			
 			
 		}
 		
-		if ( !DAO.commitOrRollbackTransaction() ) {
+		if ( !Dao.commitOrRollbackTransaction() ) {
 			Log.get().error("Could not save input to datastore");
 		}
 
