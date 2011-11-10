@@ -2,38 +2,28 @@ package org.instantplaces.im.server.rest;
 
 import java.util.ArrayList;
 
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlAccessType;
-
 import org.instantplaces.im.shared.Widget;
 import org.instantplaces.im.shared.WidgetOption;
-import org.instantplaces.im.server.Log;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="widget")
 public class WidgetREST implements Widget {
 
-	@XmlAttribute
 	private	String placeId;
 	
-	@XmlAttribute
+
 	private String applicationId;
 	
-	@XmlAttribute
+	 
 	private String widgetId;
 	
 	
-	@XmlAttribute
+	 
 	private String controlType;
 
-	@XmlElement
+
 	private ArrayList<WidgetOptionREST>widgetOptions;
 
-	@XmlElement
+
 	private boolean volatileWidget;
 	
 	/**
@@ -41,14 +31,12 @@ public class WidgetREST implements Widget {
 	 * can be used to generate a more informative GUI by other system applications.
 	 *
 	 */	
-	@XmlElement
 	private String shortDescription;
 	
 	/**
 	 * A long description for the widget. The descriptions
 	 * can be used to generate a more informative GUI by other system applications.
 	 */	
-	@XmlElement
 	private String longDescription;
 	
 	public WidgetREST() {
@@ -137,10 +125,12 @@ public class WidgetREST implements Widget {
 		return sb.toString();
 	}
 
+	@Override
 	public boolean isVolatileWidget() {
 		return volatileWidget;
 	}
 
+	@Override
 	public void setVolatileWidget(boolean volatileWidget) {
 		this.volatileWidget = volatileWidget;
 	}

@@ -105,6 +105,9 @@ public class ApplicationDAO  {
 		}
 	}
 
+	public Key<ApplicationDAO> getKey() {
+		return new Key<ApplicationDAO>(this.placeKey, ApplicationDAO.class, this.applicationId);
+	}
 	
 
 	/**

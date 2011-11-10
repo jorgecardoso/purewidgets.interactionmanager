@@ -7,17 +7,13 @@ import java.net.HttpURLConnection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.PMF;
 import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.DsoFetcher;
 import org.instantplaces.im.server.dao.PlaceDAO;
-import org.instantplaces.im.server.dao.WidgetDAO;
 import org.instantplaces.im.server.dao.WidgetInputDAO;
 import org.instantplaces.im.server.dao.WidgetOptionDAO;
 
@@ -199,7 +195,7 @@ public class InputRequest {
 		DAO.beginTransaction();
 		
 		for ( Key<PlaceDAO> placeKey : placeKeys ) {
-			ArrayList<WidgetOptionDAO> options = DAO.getWidgetOption(placeKey.getName());
+			List<WidgetOptionDAO> options = DAO.getWidgetOptions(placeKey.getName());
 			
 			for ( WidgetOptionDAO option : options ) {
 				if ( option.getReferenceCode().equals(refCode)) {
@@ -218,17 +214,17 @@ public class InputRequest {
 		// widgets and to non-existing widgets
 		if (widgetOption == null) {
 			Log.get().debug("No widgets are using this reference code.");
-			return;
 		} else {
 			Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
 			WidgetInputDAO input = new WidgetInputDAO(widgetOption, System.currentTimeMillis(), parameters, name );
-			DAO.putWidgetInput(input);
+			DAO.put(input);
 			
-			if ( !DAO.commitOrRollbackTransaction() ) {
+			
+		}
 		
-				Log.get().error("Could not save input to datastore");
-			}
+		if ( !DAO.commitOrRollbackTransaction() ) {
+			Log.get().error("Could not save input to datastore");
 		}
 
 	}

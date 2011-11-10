@@ -5,9 +5,6 @@ package org.instantplaces.im.server.rest;
 
 import java.util.ArrayList;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 
 
 /**
@@ -15,9 +12,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 
-@XmlRootElement(name="applications")
+
 public class ApplicationArrayListREST {
-	@XmlElement(name = "application")
+
 	public ArrayList<ApplicationREST> applications;
 	
 	public ApplicationArrayListREST() {

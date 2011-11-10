@@ -1,11 +1,5 @@
 package org.instantplaces.im.server.rest;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.instantplaces.im.shared.WidgetInput;
 
 /**
@@ -16,29 +10,28 @@ import org.instantplaces.im.shared.WidgetInput;
  *
  */
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
+
 public class WidgetInputREST implements WidgetInput{
 	
-	@XmlAttribute
+
 	private String widgetId;
 	
-	@XmlAttribute
+
 	private String widgetOptionId;
 	
-	@XmlAttribute
+
 	private String timeStamp;	
 	
-	@XmlElement
+
 	private String[] parameters;
 	
-	@XmlAttribute
+
 	private String persona;	
 	
 	/**
 	 * The input mechanism that was used to generate this input
 	 */
-	@XmlAttribute
+
 	private String inputMechanism;
 	
 	/**

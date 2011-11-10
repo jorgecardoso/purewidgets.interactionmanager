@@ -2,8 +2,7 @@ package org.instantplaces.im.server.dao;
 
 import javax.persistence.Id;
 
-
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.Key;
 
 
 public class PlaceDAO {
@@ -35,7 +34,9 @@ public class PlaceDAO {
 		return this.placeId;
 	}
 
-
+	public Key<PlaceDAO> getKey() {
+		return new Key<PlaceDAO>(PlaceDAO.class, this.placeId);
+	}
 	
 	
 	@Override

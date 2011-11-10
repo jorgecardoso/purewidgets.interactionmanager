@@ -4,15 +4,12 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDAO;
 import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.DsoFetcher;
-import org.instantplaces.im.server.dao.WidgetDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDAO;
 import org.instantplaces.im.server.rest.ApplicationArrayListREST;
 import org.instantplaces.im.server.rest.ApplicationREST;
 import org.instantplaces.im.server.rest.RestConverter;
@@ -85,7 +82,7 @@ public class ApplicationResource extends GenericResource {
 		/*
 		 * Return the list of applications
 		 */
-		ArrayList<ApplicationDAO> applications = DAO.getApplications(this.placeId);
+		List<ApplicationDAO> applications = DAO.getApplications(this.placeId);
 		
 		DAO.commitOrRollbackTransaction();
 		

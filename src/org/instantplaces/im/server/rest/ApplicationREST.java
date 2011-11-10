@@ -5,19 +5,11 @@ package org.instantplaces.im.server.rest;
 
 import java.util.ArrayList;
 
-import javax.jdo.annotations.Persistent;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.instantplaces.im.server.dao.ApplicationDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDAO;
 
 
 
@@ -25,26 +17,24 @@ import org.instantplaces.im.server.dao.WidgetOptionDAO;
  * @author "Jorge C. S. Cardoso"
  *
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="application")
+
 @JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
 @JsonIgnoreProperties({ "widgets" }) // @JsonIgnore seems to not work correctly, so we duplicate
 public class ApplicationREST {
 	
-	@XmlAttribute
+
 	private	String placeId;
 
-	@XmlAttribute
+	
 	private String applicationId;
 	
 	/**
 	 * The timestamp of the last request made by this app.
 	 * This is used to determine if an application is still active or not.
 	 */
-	@XmlElement
 	private long lastRequestTimestamp;
 	
-	@XmlElement
+
 	@JsonIgnore
 	private ArrayList<WidgetREST> widgets;
 

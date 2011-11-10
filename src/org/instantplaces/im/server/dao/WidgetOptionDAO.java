@@ -59,6 +59,9 @@ public class WidgetOptionDAO {
 		}
 	}
 
+	public Key<WidgetOptionDAO> getKey() {
+		return new Key<WidgetOptionDAO>(this.widgetKey, WidgetOptionDAO.class, this.widgetOptionId);
+	}
 
 	public WidgetDAO getWidget() {
 		return this.widget;

@@ -1,36 +1,24 @@
 package org.instantplaces.im.server.rest;
 
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.instantplaces.im.shared.WidgetOption;
-import org.instantplaces.im.server.Log;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class WidgetOptionREST implements WidgetOption {
 	
-	//@XmlAttribute
-	//private	String widgetId;
-	
-	
-	@XmlAttribute
+
 	private String widgetOptionId;
 	
-	@XmlAttribute
+
 	private String suggestedReferenceCode;
 	
-	@XmlAttribute
+
 	private String referenceCode;
 	
-	@XmlAttribute
+
 	private String shortDescription;
 	
-	@XmlAttribute
+
 	private String longDescription;
 	
 	

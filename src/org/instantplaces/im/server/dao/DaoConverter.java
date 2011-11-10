@@ -1,12 +1,7 @@
 package org.instantplaces.im.server.dao;
 
-import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.rest.WidgetOptionREST;
 import org.instantplaces.im.server.rest.WidgetREST;
-import org.instantplaces.im.shared.WidgetOption;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 public class DaoConverter {
 

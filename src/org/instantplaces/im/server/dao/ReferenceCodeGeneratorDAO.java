@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import javax.persistence.Id;
 
-
-
 import org.instantplaces.im.server.Log;
 
 import com.googlecode.objectify.Key;
@@ -28,7 +26,7 @@ public class ReferenceCodeGeneratorDAO {
 	private ArrayList<Integer> codes;
 	
 	@NotSaved
-	private static final int MAX_CODE = 50;
+	private static final int MAX_CODE = 500;
 	
 	@NotSaved
 	private PlaceDAO place;

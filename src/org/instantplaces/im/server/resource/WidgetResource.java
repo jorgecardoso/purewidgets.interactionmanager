@@ -1,11 +1,9 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
-
+import java.util.List;
 
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetArrayListREST;
@@ -14,15 +12,17 @@ import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDAO;
 import org.instantplaces.im.server.dao.DAO;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.DsoFetcher;
 import org.instantplaces.im.server.dao.PlaceDAO;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.dao.WidgetDAO;
+import org.instantplaces.im.server.dao.WidgetInputDAO;
 import org.instantplaces.im.server.dao.WidgetOptionDAO;
 
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+
+import com.googlecode.objectify.Key;
 
 
 public class WidgetResource extends GenericResource {
@@ -58,16 +58,16 @@ public class WidgetResource extends GenericResource {
 	    if (null == existingPlaceDSO) {
 	    	Log.get().info("The specified place " + this.placeId + " was not found. Creating new...");
 	        existingPlaceDSO = new PlaceDAO(this.placeId);
-	        DAO.putPlace(existingPlaceDSO);
+	        DAO.put(existingPlaceDSO);
 	        
 	        /*
 	         * A new place needs a new ReferenceCodeGenerator
 	         */
 	        rcg = new ReferenceCodeGeneratorDAO(existingPlaceDSO);
-	        DAO.putReferenceCodeGenerator(rcg);
+	        DAO.put(rcg);
 	    } else {
 	    	rcg = DAO.getReferenceCodeGenerator(this.placeId);
-	    	Log.get().debug("Init: " + rcg.getCodes());
+	    	
 	    }
 	   
 	   
@@ -78,7 +78,7 @@ public class WidgetResource extends GenericResource {
 	    if (null == existingApplicationDSO) {
 	    	Log.get().info("The specified application " + this.appId + "was not found. Creating new...");
 	        existingApplicationDSO = new ApplicationDAO(existingPlaceDSO, this.appId);
-	        DAO.putApplication(existingApplicationDSO);
+	        DAO.put(existingApplicationDSO);
 	    }   
 		
 		
@@ -88,7 +88,7 @@ public class WidgetResource extends GenericResource {
 			
 			WidgetDAO widget = DAO.getWidget(this.placeId, this.appId, receivedWidget.getWidgetId());
 			
-			if ( null != widget ) { 
+			if ( null != widget ) {  
 				/* 
 				 * Widget exists in data store so merge
 				 */
@@ -96,22 +96,30 @@ public class WidgetResource extends GenericResource {
 				widget.mergeOptionsToAdd(wDSO);
 				ArrayList<WidgetOptionDAO> optionsToDelete = widget.mergeOptionsToDelete(wDSO);
 				
+				/*
+				 * Recycle the reference codes and delete all input associated with each option that not longer exists in the widget
+				 */
 				for (WidgetOptionDAO option : optionsToDelete) {
 					rcg.recycleCode(option.getReferenceCode());
+					DAO.delete( DAO.getWidgetInputsKeys(this.placeId, this.appId, widget.getWidgetId(), option.getWidgetOptionId()) );
 				}
 				
-				DAO.deleteWidgetOptions(optionsToDelete);
-				DAO.putWidgetOption( widget.getWidgetOptions() );
+				/*
+				 * Bulk delete the options
+				 */
+				DAO.delete(optionsToDelete);
+				
+				
+				DAO.put( widget.getWidgetOptions() );
+				
+				
 			} else {
 				widget = DaoConverter.widgetDSOfromRest(existingApplicationDSO, receivedWidget);
 				widget.assignReferenceCodes(rcg);
-				DAO.putWidget( widget );
-				DAO.putWidgetOption( widget.getWidgetOptions() );
+				DAO.put( widget );
+				DAO.put( widget.getWidgetOptions() );
 			}
-			
 			widgetsAdded.add(widget);
-			
-			//storedWidget.assignReferenceCodes(rcg); 
 		}
 		
 		
@@ -121,14 +129,14 @@ public class WidgetResource extends GenericResource {
 		WidgetArrayListREST walr = RestConverter.widgetArrayListFromDso(widgetsAdded);
 		
 		
-		DAO.putReferenceCodeGenerator(rcg);
-		Log.get().debug(rcg.getCodes());
-		
+		/*
+		 * Save the reference code
+		 */
+		DAO.put(rcg);
 		
 		if ( !DAO.commitOrRollbackTransaction() ) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction");
 		}
-		
 		
 		long end = System.currentTimeMillis();
 		Log.get().debug("Time: " + (end-start));
@@ -186,106 +194,144 @@ public class WidgetResource extends GenericResource {
 //	}
 //	
 	
-	private WidgetArrayListREST deleteSpecifiedWidgets(String [] widgetsToDelete) {
+	
+	
+	private WidgetArrayListREST deleteSpecifiedWidgets(ArrayList<Key<WidgetDAO>> widgetsToDeleteKeys, boolean volatileOnly) {
+		
+		ReferenceCodeGeneratorDAO rcg = DAO.getReferenceCodeGenerator(this.placeId);
+		
+		
+		Collection<WidgetDAO> widgetsToDelete = DAO.get(widgetsToDeleteKeys).values();
+		
+		ArrayList<WidgetOptionDAO> widgetOptionsToDelete = new ArrayList<WidgetOptionDAO>();
+		
+		ArrayList<WidgetInputDAO> widgetInputToDelete = new ArrayList<WidgetInputDAO>();
+		
+		Iterator<WidgetDAO> iterator = widgetsToDelete.iterator();
+		
+		while ( iterator.hasNext() ) {
+			WidgetDAO widget = iterator.next();
+			
+			if ( volatileOnly && !widget.isVolatileWidget() ) {
+				iterator.remove();
+				continue;
+			}
+			
+			/*
+			 * Recycle the reference codes
+			 */
+			List<WidgetOptionDAO> widgetOptions = DAO.getWidgetOptions(this.placeId, this.appId, widget.getWidgetId());
+			
+			for ( WidgetOptionDAO option : widgetOptions ) {
+				rcg.recycleCode(option.getReferenceCode());
+				
+				/*
+				 * Add the option to the list of options that are going to be deleted in the end.
+				 */
+				widgetOptionsToDelete.add(option);
+			}
+			
+			
+			
+			
+			/*
+			 * Get the list of input that belong to this widget, so that it can be deleted later
+			 */
+			widgetInputToDelete.addAll( DAO.getWidgetInputs(this.placeId, this.appId, widget.getWidgetId()) );
+			
+			
+			
+			
+			
+		}
+		DAO.delete(widgetInputToDelete);
+		DAO.delete(widgetOptionsToDelete);
+		DAO.delete(widgetsToDelete);
+		
+		
 		/*
 		 * To be returned
 		 */
 		WidgetArrayListREST walr = new WidgetArrayListREST();
 		walr.widgets = new ArrayList<WidgetREST>();
 		
-		if ( null != widgetsToDelete && widgetsToDelete.length > 0 ) {
-			
-			DAO.beginTransaction();
-			
-			for ( String widgetId : widgetsToDelete ) {  
-				/*
-				 * Fetch the widget from the data store 
-				 */
-				DAO.deleteWidget(this.placeId, this.appId, widgetId);
+		
+		for ( Key<WidgetDAO>  widgetKey : widgetsToDeleteKeys ) {
+		/*
+		 * Add the rest version to the list to return to the client
+		 */
+		WidgetREST toReturn = new WidgetREST();
+		toReturn.setPlaceId(this.placeId);
+		toReturn.setApplicationId(this.appId);
+		toReturn.setWidgetId(widgetKey.getName());
+		
 				
-				WidgetREST toReturn = new WidgetREST();
-				toReturn.setPlaceId(this.placeId);
-				toReturn.setApplicationId(this.appId);
-				toReturn.setWidgetId(widgetId);
-				
-				
-				walr.widgets.add(toReturn);
-			}
-			if ( !DAO.commitOrRollbackTransaction() ) {
-				 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction");
-				
-			}
+			walr.widgets.add(toReturn);
 		}
+		
+		
 		return walr;
 	}
 	
 	
-	private WidgetArrayListREST deleteAllWidgets(boolean volatileOnly) {
-		Log.get().debug("Deleting all "+(volatileOnly?" volatile ":"")+"widgets from " + this.appId );
-		
-		WidgetArrayListREST walr = new WidgetArrayListREST();
-		walr.widgets = new ArrayList<WidgetREST>();
-		
-		DAO.beginTransaction();
-		
-		ArrayList<WidgetDAO> widgetsToDelete = DAO.getWidgets(this.placeId, this.appId);
-			
-					//DsoFetcher.getVolatileWidgetsFromDSO(this.pm, this.placeId, this.appId);
 	
-		//TODO: Recycle reference codes
-		for ( WidgetDAO widget : widgetsToDelete ) {
-			if ( volatileOnly ) {
-				//DsoFetcher.deleteWidgetFromDSO(this.pm, this.placeId, this.appId, widget.getWidgetId());
-				if ( widget.isVolatileWidget() ) {
-					walr.widgets.add(RestConverter.widgetRestFromDso(widget));
-					DAO.deleteWidget(this.placeId, this.appId, widget.getWidgetId());
-				}
-			} else {
-				walr.widgets.add(RestConverter.widgetRestFromDso(widget));
-				DAO.deleteWidget(this.placeId, this.appId, widget.getWidgetId());
-			}
-			
-		}
-			
-		if ( !DAO.commitOrRollbackTransaction() ) {
-			 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction");
-			
-		}
-			
-		return walr;
-			
-		
-	}
-
 	
 	
 	@Override
 	protected Object doDelete() {
 		
 		Log.get().debug("Responding to DELETE request.");
+
+		WidgetArrayListREST toReturn = new WidgetArrayListREST();
+		ArrayList<Key<WidgetDAO>> list = new ArrayList<Key<WidgetDAO>>();
 		
-		
-		
-		
+		DAO.beginTransaction();
 		
 		if (this.widgetId != null) { // Delete the specified widget
 			
-			return this.deleteSpecifiedWidgets(new String[] {this.widgetId});
+			Key<PlaceDAO> placeKey = new Key<PlaceDAO>(PlaceDAO.class, this.placeId);
+			Key<ApplicationDAO> applicationKey = new Key<ApplicationDAO>(placeKey,	ApplicationDAO.class, this.appId);
+			Key<WidgetDAO> widgetKey = new Key<WidgetDAO>(applicationKey,	WidgetDAO.class, this.widgetId);
+			
+			list.add(widgetKey);
+			toReturn = this.deleteSpecifiedWidgets(list, false);
+			
 		} else { // delete the widgets passed in the url param
 		
 			String widgetsToDeleteParam =  this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("widgets", "");
-	
+			
+			
 			if ( widgetsToDeleteParam.length() > 0 ) {
-				return this.deleteSpecifiedWidgets(widgetsToDeleteParam.split(","));
+				
+				Log.get().debug("Deleting widgets: " + widgetsToDeleteParam );
+				for ( String widgetId : widgetsToDeleteParam.split(",") ) {
+					Key<PlaceDAO> placeKey = new Key<PlaceDAO>(PlaceDAO.class, this.placeId);
+					Key<ApplicationDAO> applicationKey = new Key<ApplicationDAO>(placeKey,	ApplicationDAO.class, this.appId);
+					Key<WidgetDAO> widgetKey = new Key<WidgetDAO>(applicationKey,	WidgetDAO.class, widgetId);
+					
+					list.add(widgetKey);
+				}
+				
+				
+				toReturn = this.deleteSpecifiedWidgets(list, false);
 				
 			} else { // delete all widgets from the app
 				boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
 				
-				return this.deleteAllWidgets(volatileOnly);
+				list.addAll( DAO.getWidgetsKeys(this.placeId, this.appId) );
+				
+				toReturn = this.deleteSpecifiedWidgets(list, volatileOnly);
 				
 			}
 		}
 		
+		
+		
+		if ( !DAO.commitOrRollbackTransaction() ) {
+			 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not commit transaction");
+			
+		}
+		return toReturn;
 	
 	}
 	

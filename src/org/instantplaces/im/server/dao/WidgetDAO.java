@@ -78,6 +78,9 @@ public class WidgetDAO {
 		}
 	}
 	
+	public Key<WidgetDAO> getKey() {
+		return new Key<WidgetDAO>(this.applicationKey, WidgetDAO.class, this.widgetId);
+	}
 
 	
 	public void setWidgetId(String id) {

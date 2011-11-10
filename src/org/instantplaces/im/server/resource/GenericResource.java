@@ -1,7 +1,6 @@
 package org.instantplaces.im.server.resource;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.codehaus.jackson.JsonParseException;
@@ -15,16 +14,13 @@ import org.instantplaces.im.server.dao.DAO;
 import org.instantplaces.im.server.rest.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.jaxb.JaxbRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 
 
@@ -40,33 +36,8 @@ import org.restlet.data.Status;
  */
 public abstract class GenericResource extends ServerResource {
 	protected Logger log = Logger.getLogger("InteractionManagerApplication"); 
-	
-	// TODO: failureCallback is not being used. 
-	
-	/**
-	 * The accepted types.
-	 */
-	protected static enum ContentType {JSONP, JSON, XML, HTML};
 
-	/**
-	 * If the request is for JSONP, this is the name of the callback function
-	 * requested. The name "defaultCallback" is used if the client didn't supply
-	 * a callback name.
-	 */
-	protected String callback;
 	
-	/**
-	 * If the request is for JSONP, this is the name of the failure callback function
-	 * requested. The name "defaultFailureCallback" is used if the client didn't supply
-	 * a callback name.
-	 */	
-	protected String failureCallback;
-	
-	/**
-	 * The name of the data format to be sent back.
-	 * We're bypassing Restlet's automatic content-negotiation and conversion.
-	 */
-	protected String contentType;
 	
 	/**
 	 * The placeId extracted from the request URL
@@ -131,35 +102,13 @@ public abstract class GenericResource extends ServerResource {
 		
 		if ( null != this.requestingApplicationDAO ) {
 			this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
-			DAO.putApplication(this.requestingApplicationDAO);
+			DAO.put(this.requestingApplicationDAO);
 		} 
 		
 		if ( !DAO.commitOrRollbackTransaction() ) {
 			Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
 		}
 			
-		
-		
-		/*
-		 * Check if the user specified content-type (if any) matches any of the 
-		 * accepted ones.
-		 */
-		for (ContentType t: ContentType.values()) {
-			if (t.name().equalsIgnoreCase(this.contentType)) {
-				return;
-			}
-		}
-		
-		/*
-		 * If not, return the error message
-		 */
-		String errorMessage =  "Sorry, you have to specify a valid content-type through the 'output' " +
-				"query parameter.";
-		errorMessage += "Valid types are: " + Arrays.toString(ContentType.values());
-		
-		Log.get().error(errorMessage);
-		
-		throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, errorMessage);
 	}
 
 	
@@ -170,24 +119,10 @@ public abstract class GenericResource extends ServerResource {
 	 * The extracted parameters are put in object variables.
 	 */
 	private void extractURLParameters() {
-		/*
-		 * Read the user specified content-type. 
-		 */
-		contentType = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("output", "");
-	
+		
 		this.requestingAppId = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("appid", "");
 		
-		/*
-		 * Read the user specified callback function name (used for JSONP only)
-		 */
-		callback = this.getQuery().getFirstValue("callback", "defaultCallback");
-		failureCallback = this.getQuery().getFirstValue("failurecallback",
-				"defaultFailureCallback");
-				
-		Log.get().info("Client specified content-type: " + contentType);
-		if (contentType.equalsIgnoreCase(ContentType.JSONP.name())) {
-			Log.get().info("Using callback: " + callback + " and failureCallback: " +failureCallback);
-		}
+		
 		
 		this.placeId = (String)this.getRequestAttributes().get("placeid");
 		this.appId = (String)getRequestAttributes().get("appid");
@@ -219,35 +154,17 @@ public abstract class GenericResource extends ServerResource {
 		
 		return this.representAsJSON(object);
 	}
+
 	
-	// GET Methods
-	@Get("html")
-	public Representation returnAsHTML() {
-		Object object = doGet();
-		return this.representAsHTML(object);
-	}
-	
-	@Get("xml")
-	public Representation returnAsXML() {
-		Object object = doGet();
-		
-		return this.representAsXML(object);
-	}
-	
-	@Get("json")
+	@Get
 	public Representation returnAsJSON() {
 		Object object = doGet();
 		return this.representAsJSON(object);
 	}
 	
-	@Get("jsonp")
-	public Representation returnAsJSONP() {
-		Object object = doGet();
-		return this.representAsJSONP(object);
-	}
 	
 	// PUT Methods
-	@Put("json")
+	@Put
 	public Representation acceptItemToPut(Representation entity) { 
 		Object object = deserializeJSON(entity);
 		
@@ -260,7 +177,7 @@ public abstract class GenericResource extends ServerResource {
 	}
 	
 	// POST Methods
-	@Post("json")
+	@Post
 	public Representation acceptItem(Representation entity) { 
 		Object object = deserializeJSON(entity);
 		
@@ -288,7 +205,7 @@ public abstract class GenericResource extends ServerResource {
 			@Override
 			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
 				if (propertyName.equalsIgnoreCase("__gwt_ObjectId")) {
-					Log.get().debug("Ignoring __gwt_ObjectId property.");
+					//Log.get().debug("Ignoring __gwt_ObjectId property.");
 				} else {
 					Log.get().warn("Ignoring : " + propertyName);
 				}
@@ -306,41 +223,6 @@ public abstract class GenericResource extends ServerResource {
 		
 		Object object = jr.getObject();
 		return object;
-	}
-	
-	
-	
-	
-	public Representation representAsHTML(Object object) {
-		Log.get().info("Returning HTML representation of resource");
-		StringRepresentation sr = new StringRepresentation(object.toString());
-		sr.setMediaType(MediaType.TEXT_HTML);
-		return sr;
-	}
-	
-
-	public Representation representAsJSONP(Object object) {
-		Log.get().info("Returning JSONP representation of resource");
-		
-		String s = "";
-		try {
-			JacksonRepresentation jr = new JacksonRepresentation(object);
-			
-			s = callback + "(" + jr.getText() + ")";
-		} catch (Exception e) {
-			Log.get().fatal("Oops: " + e.getMessage());			
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Sorry an internal error has occurred.");
-		}
-		return new StringRepresentation(s);
-	}
-		
-
-	public Representation representAsXML(Object object) {
-		Log.get().info("Returning XML representation of resource");
-		
-		JaxbRepresentation jr = null;
-		jr = new JaxbRepresentation(object);
-		return jr;
 	}
 	
 

@@ -1,17 +1,12 @@
 package org.instantplaces.im.server.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.comm.InputRequest;
 import org.instantplaces.im.server.dao.DAO;
-import org.instantplaces.im.server.dao.DsoFetcher;
 import org.instantplaces.im.server.dao.WidgetDAO;
 import org.instantplaces.im.server.dao.WidgetInputDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDAO;
-import org.instantplaces.im.server.resource.GenericResource.ContentType;
-import org.instantplaces.im.server.rest.ErrorREST;
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetInputArrayListREST;
 import org.instantplaces.im.server.rest.WidgetInputREST;
@@ -59,7 +54,7 @@ public class WidgetInputResource extends GenericResource {
 			 * Fetch the widgets from the data store.
 			 */
 			DAO.beginTransaction();
-			ArrayList<WidgetInputDAO> widgetInputs = DAO.getWidgetInput(this.placeId, this.appId, from); 
+			List<WidgetInputDAO> widgetInputs = DAO.getWidgetInputs(this.placeId, this.appId, from); 
 					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
 			DAO.commitOrRollbackTransaction();
 			
@@ -69,7 +64,7 @@ public class WidgetInputResource extends GenericResource {
 		 */
 		} else {
 			DAO.beginTransaction();
-			ArrayList<WidgetDAO> widgets = DAO.getWidgets(this.placeId, this.appId);
+			List<WidgetDAO> widgets = DAO.getWidgets(this.placeId, this.appId);
 					//DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
 			ArrayList<WidgetInputDAO> inputs = new ArrayList<WidgetInputDAO>();
 			

@@ -4,6 +4,7 @@
 package org.instantplaces.im.server.rest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDAO;
@@ -17,7 +18,7 @@ import org.instantplaces.im.server.dao.WidgetOptionDAO;
  */
 public class RestConverter {
 
-	public static WidgetArrayListREST widgetArrayListFromDso(ArrayList<WidgetDAO> widgetDSOList) {
+	public static WidgetArrayListREST widgetArrayListFromDso(List<WidgetDAO> widgetDSOList) {
 		
 		ArrayList<WidgetREST> widgetListREST = new ArrayList<WidgetREST>();
 		for ( WidgetDAO wDSO : widgetDSOList ) {
@@ -97,7 +98,7 @@ public class RestConverter {
 		return a; 
 	}
 
-	public static ApplicationArrayListREST applicationArrayListFromDSO(ArrayList<ApplicationDAO> applicationDSOList) {
+	public static ApplicationArrayListREST applicationArrayListFromDSO(List<ApplicationDAO> applicationDSOList) {
 		
 		ArrayList<ApplicationREST> applicationListREST = new ArrayList<ApplicationREST>();
 		for ( ApplicationDAO aDSO : applicationDSOList ) {
@@ -110,7 +111,7 @@ public class RestConverter {
 		return applicationArrayList;
 	}
 	
-	public static WidgetInputArrayListREST widgetInputArrayListFromDso(ArrayList<WidgetInputDAO> widgetInputDSOList) {
+	public static WidgetInputArrayListREST widgetInputArrayListFromDso(List<WidgetInputDAO> widgetInputDSOList) {
 		
 		ArrayList<WidgetInputREST> widgetListREST = new ArrayList<WidgetInputREST>();
 		for ( WidgetInputDAO aDSO : widgetInputDSOList ) {
@@ -133,7 +134,11 @@ public class RestConverter {
 		w.setWidgetOptionId( wiDso.getWidgetOptionKey().getName() );
 		w.setWidgetId( wiDso.getWidgetOptionKey().getParent().getName() );
 		
-		w.setParameters(wiDso.getParameters());
+		if ( null == wiDso.getParameters() ) {
+			w.setParameters(new String[0]);
+		} else {
+			w.setParameters(wiDso.getParameters());
+		}
 		w.setPersona(wiDso.getPersona());
 		w.setTimeStamp(""+wiDso.getTimeStamp());
 		w.setInputMechanism(wiDso.getInputMechanism());
