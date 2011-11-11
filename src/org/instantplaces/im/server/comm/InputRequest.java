@@ -44,7 +44,7 @@ public class InputRequest {
 	// domain, i.e., ask all input for an application
 	private static final String url = "http://193.137.8.107/instantplacesservice/instantplacesservice.svc/domain/dsi/place/jorge/presences/commands";
 
-	private static final String IDENTITY_URL = "http://api2.instantplaces.org/InstantPlacesService/InstantPlacesService.svc/domain/dsi/place/jorge/identities/";
+	private static final String IDENTITY_URL = "http://193.137.8.107/InstantPlacesService/InstantPlacesService.svc/domain/dsi/place/jorge/identities/";
 
 
 	private static long minInterval = 15 * 1000; // 15 seconds

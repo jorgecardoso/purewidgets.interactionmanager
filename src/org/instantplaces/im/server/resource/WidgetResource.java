@@ -22,6 +22,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.Key;
 
 public class WidgetResource extends GenericResource {
@@ -37,7 +39,9 @@ public class WidgetResource extends GenericResource {
 	protected Object doPost(Object in) {
 		long start = System.currentTimeMillis();
 		Log.get().debug("Responding to Post request.");
-
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", null);
+		
 		PlaceDao existingPlaceDSO = null;
 		ReferenceCodeGeneratorDAO rcg = null;
 		ApplicationDao existingApplicationDSO = null;
@@ -144,9 +148,10 @@ public class WidgetResource extends GenericResource {
 		Log.get().debug("Responding to GET request.");
 
 		Object toReturn = null;
-		Dao.beginTransaction();
+		
 
 		if (this.widgetId != null) {
+			Dao.beginTransaction();
 			/*
 			 * Return the specified widget
 			 */
@@ -162,24 +167,34 @@ public class WidgetResource extends GenericResource {
 				toReturn = RestConverter.widgetRestFromDso(widget);
 			}
 		} else {
-			/*
-			 * Return the list of widgets
-			 */
-			List<WidgetDao> widgets = Dao.getWidgets(this.placeId, this.appId);
-
-			Dao.commitOrRollbackTransaction();
-
-			if (widgets != null) {
-
-				/*
-				 * Convert all to WidgetREST
-				 */
-				toReturn = RestConverter.widgetArrayListFromDso(widgets);
-
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			ArrayList<WidgetDao> widgets = (ArrayList<WidgetDao>) syncCache.get("place/"+this.placeId+"/application/"+this.appId+"/widget");
+			if ( null != widgets ) {
+				
 			} else {
-				Log.get().debug("Could not find any widget for the specified application");
-				toReturn = new WidgetArrayListREST();
+				/*
+				 * Return the list of widgets
+				 */
+				Dao.beginTransaction();
+				widgets = new ArrayList<WidgetDao>(Dao.getWidgets(this.placeId, this.appId));
+				for ( WidgetDao widget : widgets ) {
+					ArrayList<WidgetOptionDao> options =  new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(widget.getKey()));
+					
+					widget.setWidgetOptions(options);
+				}
+				Dao.commitOrRollbackTransaction();
+				syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", widgets);
 			}
+			
+
+			
+
+			/*
+			 * Convert all to WidgetREST
+			 */
+			toReturn = RestConverter.widgetArrayListFromDso(widgets);
+
+		
 
 		}
 
@@ -265,7 +280,11 @@ public class WidgetResource extends GenericResource {
 	protected Object doDelete() {
 
 		Log.get().debug("Responding to DELETE request.");
-
+		
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", null);
+		
+		
 		WidgetArrayListREST toReturn = new WidgetArrayListREST();
 		ArrayList<Key<WidgetDao>> list = new ArrayList<Key<WidgetDao>>();
 

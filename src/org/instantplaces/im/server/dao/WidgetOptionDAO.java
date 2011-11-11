@@ -1,5 +1,7 @@
 package org.instantplaces.im.server.dao;
 
+import java.io.Serializable;
+
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
@@ -7,7 +9,12 @@ import com.googlecode.objectify.annotation.NotSaved;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
-public class WidgetOptionDao {
+public class WidgetOptionDao implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Unindexed
 	private String longDescripton;
