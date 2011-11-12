@@ -145,4 +145,21 @@ public class WidgetOptionDao implements Serializable {
 		return "WidgetOption: " + this.widgetOptionId;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof WidgetOptionDao))
+			return false;
+		WidgetOptionDao other = (WidgetOptionDao) obj;
+		if (widgetOptionId == null) {
+			if (other.widgetOptionId != null)
+				return false;
+		} else if (!widgetOptionId.equals(other.widgetOptionId))
+			return false;
+		return true;
+	}
+
 }

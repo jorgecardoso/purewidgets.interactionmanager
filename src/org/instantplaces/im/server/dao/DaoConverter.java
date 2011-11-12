@@ -1,37 +1,39 @@
 package org.instantplaces.im.server.dao;
 
-import org.instantplaces.im.server.rest.WidgetOptionREST;
-import org.instantplaces.im.server.rest.WidgetREST;
+import org.instantplaces.im.server.rest.WidgetOptionRest;
+import org.instantplaces.im.server.rest.WidgetRest;
 
 public class DaoConverter {
 
-	public static WidgetOptionDao widgetOptionDSOfromRest(WidgetDao parent, WidgetOptionREST widgetOptionREST) {
-		WidgetOptionDao woDSO = new WidgetOptionDao(parent, widgetOptionREST.getWidgetOptionId());
+	public static WidgetOptionDao getWidgetOptionDao(WidgetDao parent, WidgetOptionRest widgetOptionRest) {
+		WidgetOptionDao widgetOptionDao = new WidgetOptionDao(parent, widgetOptionRest.getWidgetOptionId());
 
-		woDSO.setSuggestedReferenceCode(widgetOptionREST.getSuggestedReferenceCode());
-		woDSO.setReferenceCode(widgetOptionREST.getReferenceCode());
-		woDSO.setLongDescripton(widgetOptionREST.getLongDescription());
-		woDSO.setShortDescription(widgetOptionREST.getShortDescription());
+		widgetOptionDao.setSuggestedReferenceCode(widgetOptionRest.getSuggestedReferenceCode());
+		widgetOptionDao.setReferenceCode(widgetOptionRest.getReferenceCode());
+		widgetOptionDao.setLongDescripton(widgetOptionRest.getLongDescription());
+		widgetOptionDao.setShortDescription(widgetOptionRest.getShortDescription());
 		
-		return woDSO;
+		return widgetOptionDao;
 	}
 
 	/**
 	 * Converts a WidgetREST object to a WidgetDSO object.
 	 * 
-	 * @param widgetREST
+	 * @param widgetRest
 	 * @return
 	 */
-	public static WidgetDao widgetDSOfromRest(ApplicationDao parent, WidgetREST widgetREST) {
-		WidgetDao wDSO = new WidgetDao(parent, widgetREST.getWidgetId(), widgetREST.getControlType(), widgetREST.getShortDescription(), widgetREST.getLongDescription());
+	public static WidgetDao getWidgetDao(ApplicationDao parent, WidgetRest widgetRest) {
+		WidgetDao widgetDao = new WidgetDao(parent, widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
 		
-		wDSO.setVolatileWidget(widgetREST.isVolatileWidget());
+		widgetDao.setVolatileWidget(widgetRest.isVolatileWidget());
+		widgetDao.setContentUrl(widgetRest.getContentUrl());
+		widgetDao.setUserResponse(widgetRest.getUserResponse());
 		
-		for (WidgetOptionREST woRest : widgetREST.getWidgetOptions()) {
-			wDSO.addWidgetOption(DaoConverter.widgetOptionDSOfromRest(wDSO, woRest));
+		for (WidgetOptionRest woRest : widgetRest.getWidgetOptions()) {
+			widgetDao.addWidgetOption(DaoConverter.getWidgetOptionDao(widgetDao, woRest));
 		}
 		
-		return wDSO;
+		return widgetDao;
 	}
 
 }

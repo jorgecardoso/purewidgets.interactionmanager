@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class WidgetArrayListREST {
 
-	public ArrayList<WidgetREST> widgets;
+	public ArrayList<WidgetRest> widgets;
 	
 	public WidgetArrayListREST() {
 		

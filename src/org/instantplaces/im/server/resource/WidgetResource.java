@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetArrayListREST;
-import org.instantplaces.im.server.rest.WidgetREST;
+import org.instantplaces.im.server.rest.WidgetRest;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
@@ -83,16 +83,24 @@ public class WidgetResource extends GenericResource {
 
 		ArrayList<WidgetDao> widgetsAdded = new ArrayList<WidgetDao>();
 
-		for (WidgetREST receivedWidget : receivedWidgetListREST.widgets) {
+		for (WidgetRest receivedWidget : receivedWidgetListREST.widgets) {
 
 			WidgetDao widget = Dao
 					.getWidget(this.placeId, this.appId, receivedWidget.getWidgetId());
 
 			if (null != widget) {
+				//TODO: merge the other fields of the widget
+				
 				/*
-				 * Widget exists in data store so merge
+				 * The widget already exists, so fetch its options
 				 */
-				WidgetDao wDSO = DaoConverter.widgetDSOfromRest(existingApplicationDSO,
+				ArrayList<WidgetOptionDao> optionsFromDataStore = new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(widget.getKey()));
+				widget.setWidgetOptions(optionsFromDataStore);
+				
+				/*
+				 * And now merge with the received one
+				 */
+				WidgetDao wDSO = DaoConverter.getWidgetDao(existingApplicationDSO,
 						receivedWidget);
 				widget.mergeOptionsToAdd(wDSO);
 				ArrayList<WidgetOptionDao> optionsToDelete = widget.mergeOptionsToDelete(wDSO);
@@ -112,10 +120,19 @@ public class WidgetResource extends GenericResource {
 				 */
 				Dao.delete(optionsToDelete);
 
+				/*
+				 * Assign reference codes to the new options
+				 */
+				widget.assignReferenceCodes(rcg);
+				
+				/*
+				 * And save the options
+				 */
 				Dao.put(widget.getWidgetOptions());
+				
 
 			} else {
-				widget = DaoConverter.widgetDSOfromRest(existingApplicationDSO, receivedWidget);
+				widget = DaoConverter.getWidgetDao(existingApplicationDSO, receivedWidget);
 				widget.assignReferenceCodes(rcg);
 				Dao.put(widget);
 				Dao.put(widget.getWidgetOptions());
@@ -164,7 +181,7 @@ public class WidgetResource extends GenericResource {
 				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, errorMessage);
 			} else {
 				Log.get().debug("Widget found: " + widget.toString());
-				toReturn = RestConverter.widgetRestFromDso(widget);
+				toReturn = RestConverter.getWidgetRest(widget);
 			}
 		} else {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
@@ -259,13 +276,13 @@ public class WidgetResource extends GenericResource {
 		 * To be returned
 		 */
 		WidgetArrayListREST walr = new WidgetArrayListREST();
-		walr.widgets = new ArrayList<WidgetREST>();
+		walr.widgets = new ArrayList<WidgetRest>();
 
 		for (Key<WidgetDao> widgetKey : widgetsToDeleteKeys) {
 			/*
 			 * Add the rest version to the list to return to the client
 			 */
-			WidgetREST toReturn = new WidgetREST();
+			WidgetRest toReturn = new WidgetRest();
 			toReturn.setPlaceId(this.placeId);
 			toReturn.setApplicationId(this.appId);
 			toReturn.setWidgetId(widgetKey.getName());
@@ -345,7 +362,7 @@ public class WidgetResource extends GenericResource {
 	@Override
 	protected Class getResourceClass() {
 		if (this.getMethod().equals(Method.DELETE)) {
-			return WidgetREST.class;
+			return WidgetRest.class;
 		} else {
 			return WidgetArrayListREST.class;
 		}

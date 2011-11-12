@@ -20,9 +20,9 @@ public class RestConverter {
 
 	public static WidgetArrayListREST widgetArrayListFromDso(List<WidgetDao> widgetDSOList) {
 		
-		ArrayList<WidgetREST> widgetListREST = new ArrayList<WidgetREST>();
+		ArrayList<WidgetRest> widgetListREST = new ArrayList<WidgetRest>();
 		for ( WidgetDao wDSO : widgetDSOList ) {
-			WidgetREST wREST = RestConverter.widgetRestFromDso(wDSO);
+			WidgetRest wREST = RestConverter.getWidgetRest(wDSO);
 			widgetListREST.add(wREST);
 		}
 		
@@ -34,26 +34,29 @@ public class RestConverter {
 	/**
 	 * Converts a WidgetDSO object to a WidgetREST object.
 	 * 
-	 * @param widgetDSO
+	 * @param widgetDao
 	 * @return
 	 */
-	public static WidgetREST widgetRestFromDso(WidgetDao widgetDSO) {
-		WidgetREST  w = new WidgetREST();
+	public static WidgetRest getWidgetRest(WidgetDao widgetDao) {
+		WidgetRest  widgetRest = new WidgetRest();
 	
-		if ( null != widgetDSO.getWidgetOptions() ) {
-			for (WidgetOptionDao option : widgetDSO.getWidgetOptions()) {
-				w.addWidgetOption( RestConverter.widgetOptionFromDSO(option) );
+		if ( null != widgetDao.getWidgetOptions() ) {
+			for (WidgetOptionDao option : widgetDao.getWidgetOptions()) {
+				widgetRest.addWidgetOption( RestConverter.widgetOptionFromDSO(option) );
 			}
 		}
 		
-		w.setPlaceId (widgetDSO.getApplicationKey().getParent().getName() );
-		w.setApplicationId( widgetDSO.getApplicationKey().getName() );
-		w.setWidgetId(widgetDSO.getWidgetId());
-		w.setControlType(widgetDSO.getControlType());
-		w.setVolatileWidget(widgetDSO.isVolatileWidget());
-		w.setShortDescription(widgetDSO.getShortDescription());
-		w.setLongDescription(widgetDSO.getLongDescription());
-		return w; 
+		widgetRest.setPlaceId (widgetDao.getApplicationKey().getParent().getName() );
+		widgetRest.setApplicationId( widgetDao.getApplicationKey().getName() );
+		widgetRest.setWidgetId(widgetDao.getWidgetId());
+		widgetRest.setControlType(widgetDao.getControlType());
+		widgetRest.setVolatileWidget(widgetDao.isVolatileWidget());
+		widgetRest.setShortDescription(widgetDao.getShortDescription());
+		widgetRest.setLongDescription(widgetDao.getLongDescription());
+		widgetRest.setContentUrl(widgetDao.getContentUrl());
+		widgetRest.setUserResponse(widgetDao.getUserResponse());
+		
+		return widgetRest; 
 	}
 
 	/**
@@ -62,8 +65,8 @@ public class RestConverter {
 	 * @param widgetOptionDSO
 	 * @return
 	 */
-	public static WidgetOptionREST widgetOptionFromDSO(WidgetOptionDao widgetOptionDSO) {
-		WidgetOptionREST woREST = new WidgetOptionREST();
+	public static WidgetOptionRest widgetOptionFromDSO(WidgetOptionDao widgetOptionDSO) {
+		WidgetOptionRest woREST = new WidgetOptionRest();
 		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
 		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
 		woREST.setSuggestedReferenceCode(widgetOptionDSO.getSuggestedReferenceCode());

@@ -43,6 +43,18 @@ public class WidgetDao implements Serializable {
 	 */
 	@Unindexed
 	private String shortDescription;
+	
+	
+	@Unindexed 
+	private String userResponse;
+	
+	
+	/**
+	 * For download widgets, specifies the URL of the content to send to the user
+	 */
+	@Unindexed
+	private String contentUrl;
+	
 
 	@Unindexed
 	private boolean volatileWidget;
@@ -147,6 +159,7 @@ public class WidgetDao implements Serializable {
 	}
 
 	public ArrayList<WidgetOptionDao> mergeOptionsToAdd(WidgetDao that) {
+		
 		ArrayList<WidgetOptionDao> toAdd = new ArrayList<WidgetOptionDao>();
 		if (null == this.widgetOptions) {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
@@ -165,6 +178,23 @@ public class WidgetDao implements Serializable {
 		}
 
 		return toAdd;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof WidgetDao))
+			return false;
+		WidgetDao other = (WidgetDao) obj;
+		if (widgetId == null) {
+			if (other.widgetId != null)
+				return false;
+		} else if (!widgetId.equals(other.widgetId))
+			return false;
+		return true;
 	}
 
 	public ArrayList<WidgetOptionDao> mergeOptionsToDelete(WidgetDao that) {
@@ -250,5 +280,33 @@ public class WidgetDao implements Serializable {
 	public String toString() {
 	
 		return "Widget: " + this.widgetId;
+	}
+
+	/**
+	 * @return the userResponse
+	 */
+	public String getUserResponse() {
+		return userResponse;
+	}
+
+	/**
+	 * @param userResponse the userResponse to set
+	 */
+	public void setUserResponse(String userResponse) {
+		this.userResponse = userResponse;
+	}
+
+	/**
+	 * @return the contentUrl
+	 */
+	public String getContentUrl() {
+		return contentUrl;
+	}
+
+	/**
+	 * @param contentUrl the contentUrl to set
+	 */
+	public void setContentUrl(String contentUrl) {
+		this.contentUrl = contentUrl;
 	}
 }

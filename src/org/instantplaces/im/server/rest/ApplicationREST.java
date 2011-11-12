@@ -36,11 +36,11 @@ public class ApplicationREST {
 	
 
 	@JsonIgnore
-	private ArrayList<WidgetREST> widgets;
+	private ArrayList<WidgetRest> widgets;
 
 	
 	public ApplicationREST() {
-		this.widgets = new ArrayList<WidgetREST>();
+		this.widgets = new ArrayList<WidgetRest>();
 		
 	}	
 	
@@ -66,17 +66,17 @@ public class ApplicationREST {
 	}
 
 	
-	public void addWidget( WidgetREST widget ) {
+	public void addWidget( WidgetRest widget ) {
 		this.widgets.add(widget);
 	}
 	
-	public void setWidgets(ArrayList<WidgetREST> widgets) {
+	public void setWidgets(ArrayList<WidgetRest> widgets) {
 		this.widgets = widgets;
 		
 	}
 
 
-	public ArrayList<WidgetREST> getWidgets() {
+	public ArrayList<WidgetRest> getWidgets() {
 		return this.widgets;
 	}
 
