@@ -43,7 +43,9 @@ public class CronDeleteOldAppsResource extends ServerResource {
 			List<ApplicationDao> applications = Dao.getApplications(placeKey);
 
 			for (ApplicationDao app : applications) {
+				Log.get().debug("Application " + app.getApplicationId() + " is " + ((current - app.getLastRequestTimestamp())/(1000*60*60)) + " hours old.");
 				if ((current - app.getLastRequestTimestamp()) > OLD) {
+					Log.get().info("Deleting old application: " + app.getApplicationId());
 					Dao.delete(app);
 					Dao.delete(Dao.getWidgetsKeys(app.getKey()));
 					Dao.delete(Dao.getWidgetOptionsKeys(app.getKey()));
@@ -51,6 +53,7 @@ public class CronDeleteOldAppsResource extends ServerResource {
 				}
 			}
 		}
+		Dao.commitOrRollbackTransaction();
 
 		return null;
 	}
