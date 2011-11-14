@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
@@ -18,7 +19,29 @@ import org.instantplaces.im.server.dao.WidgetOptionDao;
  */
 public class RestConverter {
 
-	public static WidgetArrayListREST widgetArrayListFromDso(List<WidgetDao> widgetDSOList) {
+	public static PlaceRest getPlaceRest(PlaceDao placeDao) {
+		PlaceRest placeRest = new PlaceRest();
+		placeRest.setPlaceId(placeDao.getPlaceId());
+		
+		return placeRest;
+		
+	}
+	
+	public static PlaceListRest getPlaceListRest(List<PlaceDao> placeListDao) {
+		
+		
+		ArrayList<PlaceRest> placesRest = new ArrayList<PlaceRest>();
+		
+		for ( PlaceDao placeDao : placeListDao ) {
+			placesRest.add( RestConverter.getPlaceRest(placeDao) );
+		}
+		
+		PlaceListRest placeListRest = new PlaceListRest();
+		placeListRest.setPlaces(placesRest);
+		return placeListRest;
+	}
+	
+	public static WidgetListRest widgetArrayListFromDso(List<WidgetDao> widgetDSOList) {
 		
 		ArrayList<WidgetRest> widgetListREST = new ArrayList<WidgetRest>();
 		for ( WidgetDao wDSO : widgetDSOList ) {
@@ -26,8 +49,8 @@ public class RestConverter {
 			widgetListREST.add(wREST);
 		}
 		
-		WidgetArrayListREST widgetArrayList= new WidgetArrayListREST();
-		widgetArrayList.widgets = widgetListREST;
+		WidgetListRest widgetArrayList= new WidgetListRest();
+		widgetArrayList.setWidgets(widgetListREST);
 		return widgetArrayList;
 	}
 
@@ -83,9 +106,9 @@ public class RestConverter {
 	 * @param widgetDSO
 	 * @return
 	 */
-	public static ApplicationREST applicationFromDSO(ApplicationDao applicationDSO) {
+	public static ApplicationRest applicationFromDSO(ApplicationDao applicationDSO) {
 		Log.get().debug("Converting to REST " + applicationDSO.toString());
-		ApplicationREST  a = new ApplicationREST();
+		ApplicationRest  a = new ApplicationRest();
 	
 		a.setPlaceId( applicationDSO.getPlaceKey().getName() );
 		a.setApplicationId( applicationDSO.getApplicationId() );
@@ -101,16 +124,16 @@ public class RestConverter {
 		return a; 
 	}
 
-	public static ApplicationArrayListREST applicationArrayListFromDSO(List<ApplicationDao> applicationDSOList) {
+	public static ApplicationListRest applicationArrayListFromDSO(List<ApplicationDao> applicationDSOList) {
 		
-		ArrayList<ApplicationREST> applicationListREST = new ArrayList<ApplicationREST>();
+		ArrayList<ApplicationRest> applicationListREST = new ArrayList<ApplicationRest>();
 		for ( ApplicationDao aDSO : applicationDSOList ) {
-			ApplicationREST aREST = applicationFromDSO(aDSO);
+			ApplicationRest aREST = applicationFromDSO(aDSO);
 			applicationListREST.add(aREST);
 		}
 		
-		ApplicationArrayListREST applicationArrayList= new ApplicationArrayListREST();
-		applicationArrayList.applications = applicationListREST;
+		ApplicationListRest applicationArrayList= new ApplicationListRest();
+		applicationArrayList.setApplications(applicationListREST);
 		return applicationArrayList;
 	}
 	

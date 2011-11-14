@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.instantplaces.im.server.rest.RestConverter;
-import org.instantplaces.im.server.rest.WidgetArrayListREST;
+import org.instantplaces.im.server.rest.WidgetListRest;
 import org.instantplaces.im.server.rest.WidgetRest;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
@@ -46,7 +46,7 @@ public class WidgetResource extends GenericResource {
 		ReferenceCodeGeneratorDAO rcg = null;
 		ApplicationDao existingApplicationDSO = null;
 
-		WidgetArrayListREST receivedWidgetListREST = (WidgetArrayListREST) in;
+		WidgetListRest receivedWidgetListREST = (WidgetListRest) in;
 
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
@@ -83,7 +83,7 @@ public class WidgetResource extends GenericResource {
 
 		ArrayList<WidgetDao> widgetsAdded = new ArrayList<WidgetDao>();
 
-		for (WidgetRest receivedWidget : receivedWidgetListREST.widgets) {
+		for (WidgetRest receivedWidget : receivedWidgetListREST.getWidgets()) {
 
 			WidgetDao widget = Dao
 					.getWidget(this.placeId, this.appId, receivedWidget.getWidgetId());
@@ -143,7 +143,7 @@ public class WidgetResource extends GenericResource {
 		/*
 		 * We are going to return this
 		 */
-		WidgetArrayListREST walr = RestConverter.widgetArrayListFromDso(widgetsAdded);
+		WidgetListRest walr = RestConverter.widgetArrayListFromDso(widgetsAdded);
 
 		/*
 		 * Save the reference code
@@ -209,16 +209,17 @@ public class WidgetResource extends GenericResource {
 			/*
 			 * Convert all to WidgetREST
 			 */
-			toReturn = RestConverter.widgetArrayListFromDso(widgets);
-
-		
-
+			WidgetListRest listRest = RestConverter.widgetArrayListFromDso(widgets);
+			listRest.setPlaceId(this.placeId);
+			listRest.setApplicationId(this.appId);
+			
+			toReturn = listRest;
 		}
-
+		
 		return toReturn;
 	}
 
-	private WidgetArrayListREST deleteSpecifiedWidgets(
+	private WidgetListRest deleteSpecifiedWidgets(
 			ArrayList<Key<WidgetDao>> widgetsToDeleteKeys, boolean volatileOnly) {
 
 		ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(this.placeId);
@@ -275,8 +276,8 @@ public class WidgetResource extends GenericResource {
 		/*
 		 * To be returned
 		 */
-		WidgetArrayListREST walr = new WidgetArrayListREST();
-		walr.widgets = new ArrayList<WidgetRest>();
+		WidgetListRest walr = new WidgetListRest();
+		walr.setWidgets(new ArrayList<WidgetRest>());
 
 		for (Key<WidgetDao> widgetKey : widgetsToDeleteKeys) {
 			/*
@@ -287,7 +288,7 @@ public class WidgetResource extends GenericResource {
 			toReturn.setApplicationId(this.appId);
 			toReturn.setWidgetId(widgetKey.getName());
 
-			walr.widgets.add(toReturn);
+			walr.getWidgets().add(toReturn);
 		}
 
 		return walr;
@@ -302,7 +303,7 @@ public class WidgetResource extends GenericResource {
 		syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", null);
 		
 		
-		WidgetArrayListREST toReturn = new WidgetArrayListREST();
+		WidgetListRest toReturn = new WidgetListRest();
 		ArrayList<Key<WidgetDao>> list = new ArrayList<Key<WidgetDao>>();
 
 		Dao.beginTransaction();
@@ -364,7 +365,7 @@ public class WidgetResource extends GenericResource {
 		if (this.getMethod().equals(Method.DELETE)) {
 			return WidgetRest.class;
 		} else {
-			return WidgetArrayListREST.class;
+			return WidgetListRest.class;
 		}
 	}
 

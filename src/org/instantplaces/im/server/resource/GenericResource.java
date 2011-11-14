@@ -97,16 +97,18 @@ public abstract class GenericResource extends ServerResource {
 		/*
 		 * Update the requesting app's last request timestamp
 		 */
-		Dao.beginTransaction();
-		this.requestingApplicationDAO = Dao.getApplication(this.placeId, this.requestingAppId);
-		
-		if ( null != this.requestingApplicationDAO ) {
-			this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
-			Dao.put(this.requestingApplicationDAO);
-		} 
-		
-		if ( !Dao.commitOrRollbackTransaction() ) {
-			Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
+		if ( null != this.placeId ) {
+			Dao.beginTransaction();
+			this.requestingApplicationDAO = Dao.getApplication (this.placeId, this.requestingAppId);
+			
+			if ( null != this.requestingApplicationDAO ) {
+				this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
+				Dao.put(this.requestingApplicationDAO);
+			} 
+			
+			if ( !Dao.commitOrRollbackTransaction() ) {
+				Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
+			}
 		}
 			
 	}

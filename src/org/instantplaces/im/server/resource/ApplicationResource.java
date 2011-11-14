@@ -10,8 +10,8 @@ import java.util.List;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.rest.ApplicationArrayListREST;
-import org.instantplaces.im.server.rest.ApplicationREST;
+import org.instantplaces.im.server.rest.ApplicationListRest;
+import org.instantplaces.im.server.rest.ApplicationRest;
 import org.instantplaces.im.server.rest.RestConverter;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -92,15 +92,15 @@ public class ApplicationResource extends GenericResource {
 		 * We put the ArrayList into a custom WidgetArrayListREST because I
 		 * couldn't make JAXB work otherwise... :(
 		 */
-		ApplicationArrayListREST aalRest = RestConverter.applicationArrayListFromDSO(applications);
-				
+		ApplicationListRest aalRest = RestConverter.applicationArrayListFromDSO(applications);
+		aalRest.setPlaceId(this.placeId);
 		
 		/*
 		 * Filter the app list, based on the active parameter
 		 */
-		Iterator<ApplicationREST> it = aalRest.applications.iterator();
+		Iterator<ApplicationRest> it = aalRest.getApplications().iterator();
 		while (it.hasNext()) {
-			ApplicationREST app = it.next();
+			ApplicationRest app = it.next();
 
 			/*
 			 * We only want inactive apps

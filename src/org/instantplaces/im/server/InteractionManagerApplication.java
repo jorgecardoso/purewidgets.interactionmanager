@@ -5,6 +5,7 @@ import org.instantplaces.im.server.resource.CronCheckTasksResource;
 import org.instantplaces.im.server.resource.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.resource.CronDeleteVolatileResource;
 import org.instantplaces.im.server.resource.CronRebuildCodesResource;
+import org.instantplaces.im.server.resource.PlaceResource;
 import org.instantplaces.im.server.resource.TaskFetchInputResource;
 import org.instantplaces.im.server.resource.TestResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
@@ -54,6 +55,10 @@ public class InteractionManagerApplication extends Application {
         //router.attach("/place/{placeid}/application/{appid}", WidgetResource.class);
         router.attach("/place/{placeid}/application", ApplicationResource.class);
               
+        /*
+         * Place
+         */
+        router.attach("/place", PlaceResource.class);
         
         /*
          * Cron

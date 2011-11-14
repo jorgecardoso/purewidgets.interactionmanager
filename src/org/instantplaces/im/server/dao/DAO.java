@@ -213,6 +213,18 @@ public class Dao extends DAOBase {
 
 	}
 
+	public static List<PlaceDao> getPlaces() {
+		/*
+		 * We can't get all root entities inside a transaction, do don't use the
+		 * static ofy
+		 */
+		Objectify ofy_ = ObjectifyService.begin();
+		Query<PlaceDao> q = ofy_.query(PlaceDao.class);
+
+		return q.list();
+
+	}
+	
 	public static ReferenceCodeGeneratorDAO getReferenceCodeGenerator(
 			Key<PlaceDao> placeKey) {
 		Query<ReferenceCodeGeneratorDAO> q = ofy.query(
