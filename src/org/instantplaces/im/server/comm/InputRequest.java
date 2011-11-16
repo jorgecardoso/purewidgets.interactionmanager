@@ -187,14 +187,17 @@ public class InputRequest {
 
 		String name = resolveIdentity(identity);
 
-		WidgetOptionDao widgetOption = null; 
+		
 		
 		
 		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 		
-		Dao.beginTransaction();
+		
 		
 		for ( Key<PlaceDao> placeKey : placeKeys ) {
+			Dao.beginTransaction();
+			WidgetOptionDao widgetOption = null; 
+			
 			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey.getName());
 			
 			for ( WidgetOptionDao option : options ) {
@@ -203,8 +206,20 @@ public class InputRequest {
 					break;
 				}
 			}
-			if ( null != widgetOption ) {
-				break;
+			
+			
+			
+			if (widgetOption == null) {
+				Log.get().debug("No widgets are using this reference code.");
+			} else {
+				Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
+
+				WidgetInputDao input = new WidgetInputDao(widgetOption, System.currentTimeMillis(), parameters, name );
+				Dao.put(input);
+			}
+			
+			if ( !Dao.commitOrRollbackTransaction() ) {
+				Log.get().error("Could not save input to datastore");
 			}
 		}
 
@@ -212,20 +227,9 @@ public class InputRequest {
 
 		// TODO: save statistics in PlaceDSO here. Save input to existing
 		// widgets and to non-existing widgets
-		if (widgetOption == null) {
-			Log.get().debug("No widgets are using this reference code.");
-		} else {
-			Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
-
-			WidgetInputDao input = new WidgetInputDao(widgetOption, System.currentTimeMillis(), parameters, name );
-			Dao.put(input);
-			
-			
-		}
 		
-		if ( !Dao.commitOrRollbackTransaction() ) {
-			Log.get().error("Could not save input to datastore");
-		}
+		
+		
 
 	}
 

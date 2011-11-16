@@ -33,17 +33,20 @@ public class CronDeleteVolatileResource extends ServerResource {
 	public Representation runCron() {
 		long current = System.currentTimeMillis();
 
-		Dao.beginTransaction();
+		
 
 		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
-		ArrayList<WidgetDao> widgetsToDelete = new ArrayList<WidgetDao>();
-		ArrayList<Key<WidgetOptionDao>> widgetOptionsToDelete = new ArrayList<Key<WidgetOptionDao>>();
-		ArrayList<Key<WidgetInputDao>> widgetInputsToDelete = new ArrayList<Key<WidgetInputDao>>();
+		
 
 		for (Key<PlaceDao> placeKey : placeKeys) {
+			Dao.beginTransaction();
 			List<ApplicationDao> applications = Dao.getApplications(placeKey);
 
+			ArrayList<WidgetDao> widgetsToDelete = new ArrayList<WidgetDao>();
+			ArrayList<Key<WidgetOptionDao>> widgetOptionsToDelete = new ArrayList<Key<WidgetOptionDao>>();
+			ArrayList<Key<WidgetInputDao>> widgetInputsToDelete = new ArrayList<Key<WidgetInputDao>>();
+			
 			for (ApplicationDao app : applications) {
 				Log.get().debug("Deleting widgets from application: " + app.getApplicationId());
 				if ((current - app.getLastRequestTimestamp()) > INACTIVE) {
@@ -62,12 +65,13 @@ public class CronDeleteVolatileResource extends ServerResource {
 
 				}
 			}
-		}
-		Dao.delete(widgetsToDelete);
-		Dao.delete(widgetOptionsToDelete);
-		Dao.delete(widgetInputsToDelete);
+			Dao.delete(widgetsToDelete);
+			Dao.delete(widgetOptionsToDelete);
+			Dao.delete(widgetInputsToDelete);
 
-		Dao.commitOrRollbackTransaction();
+			Dao.commitOrRollbackTransaction();
+		}
+		
 		return null;
 
 	}

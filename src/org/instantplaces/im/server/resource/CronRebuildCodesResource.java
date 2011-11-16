@@ -30,11 +30,12 @@ public class CronRebuildCodesResource extends ServerResource {
 	@Get
 	public Representation runCron() {
 
-		Dao.beginTransaction();
+		
 		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
 		for (Key<PlaceDao> placeKey : placeKeys) {
-
+			Dao.beginTransaction();
+			
 			ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(placeKey);
 
 			rcg.rebuild();
@@ -44,9 +45,11 @@ public class CronRebuildCodesResource extends ServerResource {
 				rcg.remove(option.getReferenceCode());
 				Log.get().debug("Removing used code: " + option.getReferenceCode());
 			}
+			
+			Dao.commitOrRollbackTransaction();
 		}
 
-		Dao.commitOrRollbackTransaction();
+		
 
 		return null;
 	}
