@@ -35,11 +35,12 @@ public class CronDeleteOldAppsResource extends ServerResource {
 	public Representation runCron() {
 		long current = System.currentTimeMillis();
 
-		Dao.beginTransaction();
+		
 
 		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
 		for (Key<PlaceDao> placeKey : placeKeys) {
+			Dao.beginTransaction();
 			List<ApplicationDao> applications = Dao.getApplications(placeKey);
 
 			for (ApplicationDao app : applications) {
@@ -52,8 +53,9 @@ public class CronDeleteOldAppsResource extends ServerResource {
 					Dao.delete(Dao.getWidgetInputsKeys(app.getKey()));
 				}
 			}
+			Dao.commitOrRollbackTransaction();
 		}
-		Dao.commitOrRollbackTransaction();
+		
 
 		return null;
 	}
