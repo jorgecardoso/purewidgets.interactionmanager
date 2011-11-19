@@ -8,8 +8,8 @@ import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.rest.RestConverter;
-import org.instantplaces.im.server.rest.WidgetInputArrayListREST;
-import org.instantplaces.im.server.rest.WidgetInputREST;
+import org.instantplaces.im.server.rest.WidgetInputListRest;
+import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
@@ -44,7 +44,7 @@ public class WidgetInputResource extends GenericResource {
 	}
 
 	
-	private WidgetInputArrayListREST getInputForAllWidgets(long from) {
+	private WidgetInputListRest getInputForAllWidgets(long from) {
 		/*
 		 * Return input newer than from
 		 */
@@ -58,7 +58,7 @@ public class WidgetInputResource extends GenericResource {
 					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
 			Dao.commitOrRollbackTransaction();
 			
-			return RestConverter.widgetInputArrayListFromDso(widgetInputs);
+			return RestConverter.getWidgetInputList(widgetInputs);
 		/*
 		 * Return the last input to every widget
 		 */
@@ -76,13 +76,13 @@ public class WidgetInputResource extends GenericResource {
 				}
 			}
 			Dao.commitOrRollbackTransaction();
-			return RestConverter.widgetInputArrayListFromDso(inputs);
+			return RestConverter.getWidgetInputList(inputs);
 		}
 	}
 	
 	@Override
 	protected Object doGet() {
-		WidgetInputArrayListREST toReturn = new WidgetInputArrayListREST();
+		WidgetInputListRest toReturn = new WidgetInputListRest();
 		
 		
 		//InputRequest.getPresences();
@@ -107,7 +107,7 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Class getResourceClass() {
-		return WidgetInputREST.class;
+		return WidgetInputRest.class;
 	}
 
 

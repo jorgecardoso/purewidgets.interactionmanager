@@ -137,41 +137,40 @@ public class RestConverter {
 		return applicationArrayList;
 	}
 	
-	public static WidgetInputArrayListREST widgetInputArrayListFromDso(List<WidgetInputDao> widgetInputDSOList) {
+	public static WidgetInputListRest getWidgetInputList(List<WidgetInputDao> widgetInputDaoList) {
 		
-		ArrayList<WidgetInputREST> widgetListREST = new ArrayList<WidgetInputREST>();
-		for ( WidgetInputDao aDSO : widgetInputDSOList ) {
-			WidgetInputREST aREST = widgetInputFromDSO(aDSO);
-			widgetListREST.add(aREST);
+		ArrayList<WidgetInputRest> widgetListRest = new ArrayList<WidgetInputRest>();
+		for ( WidgetInputDao widgetInputDao : widgetInputDaoList ) {
+			widgetListRest.add( getWidgetInput(widgetInputDao) );
 		}
 		
-		WidgetInputArrayListREST widgetInputArrayList= new WidgetInputArrayListREST();
-		widgetInputArrayList.inputs = widgetListREST;
+		WidgetInputListRest widgetInputArrayList= new WidgetInputListRest(widgetListRest);
+	
 		return widgetInputArrayList;
 	}
 
 
-	public static WidgetInputREST widgetInputFromDSO(WidgetInputDao wiDso) {
+	public static WidgetInputRest getWidgetInput(WidgetInputDao widgetInputDao) {
 		
 		
-		WidgetInputREST  w = new WidgetInputREST();
+		WidgetInputRest  widgetInputRest = new WidgetInputRest();
 	
 		
-		w.setWidgetOptionId( wiDso.getWidgetOptionKey().getName() );
-		w.setWidgetId( wiDso.getWidgetOptionKey().getParent().getName() );
+		widgetInputRest.setWidgetOptionId( widgetInputDao.getWidgetOptionKey().getName() );
+		widgetInputRest.setWidgetId( widgetInputDao.getWidgetOptionKey().getParent().getName() );
 		
-		if ( null == wiDso.getParameters() ) {
-			w.setParameters(new String[0]);
+		if ( null == widgetInputDao.getParameters() ) {
+			widgetInputRest.setParameters(new String[0]);
 		} else {
-			w.setParameters(wiDso.getParameters());
+			widgetInputRest.setParameters(widgetInputDao.getParameters());
 		}
-		w.setPersona(wiDso.getPersona());
-		w.setTimeStamp(""+wiDso.getTimeStamp());
-		w.setInputMechanism(wiDso.getInputMechanism());
-		w.setDelivered(wiDso.isDelivered());
-		
+		widgetInputRest.setPersona(widgetInputDao.getPersona());
+		widgetInputRest.setTimeStamp(""+widgetInputDao.getTimeStamp());
+		widgetInputRest.setInputMechanism(widgetInputDao.getInputMechanism());
+		widgetInputRest.setDelivered(widgetInputDao.isDelivered());
+		widgetInputRest.setAge(System.currentTimeMillis()-widgetInputDao.getTimeStamp());
 	
-		return w; 
+		return widgetInputRest; 
 	}
 
 }
