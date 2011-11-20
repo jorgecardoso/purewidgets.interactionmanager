@@ -41,7 +41,10 @@ public class WidgetInputRest implements WidgetInput{
 	 */
 	private boolean delivered;
 	
-	private long age;
+	/**
+	 * The age of this input in milliseconds.
+	 */
+	private int age;
 	
 	
 	public WidgetInputRest() {
@@ -129,14 +132,14 @@ public class WidgetInputRest implements WidgetInput{
 	/**
 	 * @return the age
 	 */
-	public long getAge() {
+	public int getAge() {
 		return age;
 	}
 
 	/**
 	 * @param age the age to set
 	 */
-	public void setAge(long age) {
+	public void setAge(int age) {
 		this.age = age;
 	}
 }

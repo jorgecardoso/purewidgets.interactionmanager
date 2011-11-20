@@ -168,7 +168,7 @@ public class RestConverter {
 		widgetInputRest.setTimeStamp(""+widgetInputDao.getTimeStamp());
 		widgetInputRest.setInputMechanism(widgetInputDao.getInputMechanism());
 		widgetInputRest.setDelivered(widgetInputDao.isDelivered());
-		widgetInputRest.setAge(System.currentTimeMillis()-widgetInputDao.getTimeStamp());
+		widgetInputRest.setAge( (int)(System.currentTimeMillis()-widgetInputDao.getTimeStamp()) );
 	
 		return widgetInputRest; 
 	}
