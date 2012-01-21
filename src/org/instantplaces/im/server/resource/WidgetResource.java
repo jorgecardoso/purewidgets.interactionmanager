@@ -1,5 +1,7 @@
 package org.instantplaces.im.server.resource;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -328,6 +330,12 @@ public class WidgetResource extends GenericResource {
 
 				Log.get().debug("Deleting widgets: " + widgetsToDeleteParam);
 				for (String widgetId : widgetsToDeleteParam.split(",")) {
+					try {
+						widgetId = URLDecoder.decode(widgetId, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						Log.get().warn("Could not decode widgetId passed in URL parameter. " + e.getMessage());
+						e.printStackTrace();
+					}
 					Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, this.placeId);
 					Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
 							ApplicationDao.class, this.appId);
