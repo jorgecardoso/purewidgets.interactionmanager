@@ -6,4 +6,6 @@ public class Log {
 	public static Logger get() {
 		return Logger.getLogger("IM");
 	}
+	
+	
 }

@@ -156,14 +156,29 @@ public abstract class GenericResource extends ServerResource {
 	public Representation delete() {
 		Object object = doDelete();
 		
-		return this.representAsJSON(object);
+		Representation toReturn = representAsJSON(object);
+		try {
+			Log.get().debug(toReturn.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 
 	
 	@Get
 	public Representation returnAsJSON() {
 		Object object = doGet();
-		return this.representAsJSON(object);
+		
+		Representation toReturn = representAsJSON(object);
+		try {
+			Log.get().debug(toReturn.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 	
 	
@@ -177,7 +192,14 @@ public abstract class GenericResource extends ServerResource {
 		if (toClient instanceof ErrorREST) {
 			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
 		}
-		return representAsJSON(toClient);
+		Representation toReturn = representAsJSON(toClient);
+		try {
+			Log.get().debug(toReturn.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 	
 	// POST Methods
@@ -190,7 +212,15 @@ public abstract class GenericResource extends ServerResource {
 		if (toClient instanceof ErrorREST) {
 			this.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE);
 		}
-		return representAsJSON(toClient);
+		
+		Representation toReturn = representAsJSON(toClient);
+		try {
+			Log.get().debug(toReturn.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 	
 	
@@ -231,7 +261,7 @@ public abstract class GenericResource extends ServerResource {
 	
 
 	public Representation representAsJSON(Object object) {
-		Log.get().info("Returning JSON representation of resource");
+		Log.get().debug("Returning JSON representation of resource");
 		
 		JacksonRepresentation jr = new JacksonRepresentation(object);
 		

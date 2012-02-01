@@ -41,6 +41,7 @@ public class WidgetResource extends GenericResource {
 	protected Object doPost(Object in) {
 		long start = System.currentTimeMillis();
 		Log.get().debug("Responding to Post request.");
+		
 		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 		syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", null);
 		
