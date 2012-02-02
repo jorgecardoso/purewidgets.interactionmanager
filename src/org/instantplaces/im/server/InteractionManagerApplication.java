@@ -1,15 +1,15 @@
 package org.instantplaces.im.server;
 
 import org.instantplaces.im.server.resource.ApplicationResource;
-import org.instantplaces.im.server.resource.CronCheckTasksResource;
-import org.instantplaces.im.server.resource.CronDeleteOldAppsResource;
-import org.instantplaces.im.server.resource.CronDeleteVolatileResource;
-import org.instantplaces.im.server.resource.CronRebuildCodesResource;
 import org.instantplaces.im.server.resource.PlaceResource;
-import org.instantplaces.im.server.resource.TaskFetchInputResource;
 import org.instantplaces.im.server.resource.TestResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
+import org.instantplaces.im.server.resource.cron.CronCheckTasksResource;
+import org.instantplaces.im.server.resource.cron.CronDeleteOldAppsResource;
+import org.instantplaces.im.server.resource.cron.CronDeleteVolatileResource;
+import org.instantplaces.im.server.resource.cron.CronRebuildCodesResource;
+import org.instantplaces.im.server.resource.task.TaskFetchInputResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;

@@ -188,11 +188,7 @@ public class InputRequest {
 		String name = resolveIdentity(identity);
 
 		
-		
-		
 		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
-		
-		
 		
 		for ( Key<PlaceDao> placeKey : placeKeys ) {
 			Dao.beginTransaction();
@@ -207,8 +203,7 @@ public class InputRequest {
 				}
 			}
 			
-			
-			
+				
 			if (widgetOption == null) {
 				Log.get().debug("No widgets are using this reference code.");
 			} else {

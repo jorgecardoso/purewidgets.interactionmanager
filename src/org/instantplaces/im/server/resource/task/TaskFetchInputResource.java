@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.instantplaces.im.server.resource;
+package org.instantplaces.im.server.resource.task;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.comm.InputRequest;

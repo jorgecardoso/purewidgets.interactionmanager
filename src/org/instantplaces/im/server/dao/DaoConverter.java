@@ -1,10 +1,30 @@
 package org.instantplaces.im.server.dao;
 
+import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.instantplaces.im.server.rest.WidgetOptionRest;
 import org.instantplaces.im.server.rest.WidgetRest;
 
 public class DaoConverter {
 
+	
+	public static WidgetInputDao getWidgetInputDao(WidgetOptionDao parent, WidgetInputRest widgetInputRest) {
+		
+		long timeStamp = 0;
+		try {
+			timeStamp = Long.parseLong(widgetInputRest.getTimeStamp());
+		} catch (NumberFormatException nfe) {
+			Log.get().warn("Could not parse timestamp: " + widgetInputRest.getTimeStamp());
+		}
+		
+		WidgetInputDao widgetInputDao = new WidgetInputDao(parent, timeStamp, widgetInputRest.getParameters(), widgetInputRest.getPersona());
+		widgetInputDao.setInputMechanism(widgetInputRest.getInputMechanism());
+		widgetInputDao.setInputMechanism(widgetInputRest.getInputMechanism());
+		
+		return widgetInputDao;
+	}
+ 	
+	
 	public static WidgetOptionDao getWidgetOptionDao(WidgetDao parent, WidgetOptionRest widgetOptionRest) {
 		WidgetOptionDao widgetOptionDao = new WidgetOptionDao(parent, widgetOptionRest.getWidgetOptionId());
 

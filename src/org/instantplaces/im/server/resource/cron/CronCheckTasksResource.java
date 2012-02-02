@@ -1,4 +1,4 @@
-package org.instantplaces.im.server.resource;
+package org.instantplaces.im.server.resource.cron;
 
 import org.instantplaces.im.server.Log;
 import org.restlet.representation.Representation;

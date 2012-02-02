@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.instantplaces.im.server.resource;
+package org.instantplaces.im.server.resource.cron;
 
 import java.util.List;
 

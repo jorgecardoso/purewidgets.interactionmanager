@@ -5,13 +5,19 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoConverter;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetInputListRest;
 import org.instantplaces.im.server.rest.WidgetInputRest;
+import org.instantplaces.im.server.rest.WidgetListRest;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+
+import com.googlecode.objectify.Key;
 
 public class WidgetInputResource extends GenericResource {
 
@@ -27,12 +33,23 @@ public class WidgetInputResource extends GenericResource {
 	
 	@Override
 	protected Object doPost(Object incoming) {
-		String errorMessage =  "Post not allowed. Sorry, only GET  methods allowed for this resource.";
+		WidgetInputRest receivedWidgetInputRest = (WidgetInputRest) incoming;
 		
-		Log.get().error(errorMessage);
-
-		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
+		Dao.beginTransaction();
+		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(this.placeId, this.appId, this.widgetId, receivedWidgetInputRest.getWidgetOptionId());
+		
+		WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
+	
+		widgetInputDao.setTimeStamp(System.currentTimeMillis());
+		Dao.put(widgetInputDao);
+		
+		Dao.commitOrRollbackTransaction();
+		
+		//TODO: Input Statistics
+		return null;
 	}
+	
+
 
 	@Override
 	protected Object doPut(Object incoming) {
