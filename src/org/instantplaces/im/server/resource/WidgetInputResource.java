@@ -35,6 +35,7 @@ public class WidgetInputResource extends GenericResource {
 	protected Object doPost(Object incoming) {
 		WidgetInputRest receivedWidgetInputRest = (WidgetInputRest) incoming;
 		
+		//TODO: Check if widget exists
 		Dao.beginTransaction();
 		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(this.placeId, this.appId, this.widgetId, receivedWidgetInputRest.getWidgetOptionId());
 		

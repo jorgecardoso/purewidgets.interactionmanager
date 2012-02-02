@@ -1,6 +1,8 @@
 package org.instantplaces.im.server.resource;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.logging.Logger;
 
 import org.codehaus.jackson.JsonParseException;
@@ -127,9 +129,16 @@ public abstract class GenericResource extends ServerResource {
 		
 		
 		this.placeId = (String)this.getRequestAttributes().get("placeid");
+		
 		this.appId = (String)getRequestAttributes().get("appid");
 		this.widgetId = (String)getRequestAttributes().get("widgetid");
-		
+		if ( null != this.widgetId ) {
+			try {
+				this.widgetId =  URLDecoder.decode(this.widgetId, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				Log.get().warn("Could not URL decode widgetId" + this.widgetId);
+			}
+		}
 		
 		Log.get().debug("Client request query parameters: placeid: " + placeId + " appid: " + appId + " widgetId: " + widgetId);
 	}
