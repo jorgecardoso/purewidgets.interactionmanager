@@ -93,6 +93,13 @@ public class WidgetResource extends GenericResource {
 
 			if (null != widget) {
 				//TODO: merge the other fields of the widget
+				widget.setShortDescription(receivedWidget.getShortDescription());
+				widget.setLongDescription(receivedWidget.getLongDescription());
+				widget.setContentUrl(receivedWidget.getContentUrl());
+				widget.setControlType(receivedWidget.getControlType());
+				widget.setUserResponse(receivedWidget.getUserResponse());
+				widget.setVolatileWidget(receivedWidget.isVolatileWidget());
+				
 				
 				/*
 				 * The widget already exists, so fetch its options
@@ -127,6 +134,12 @@ public class WidgetResource extends GenericResource {
 				 * Assign reference codes to the new options
 				 */
 				widget.assignReferenceCodes(rcg);
+				
+				
+				/*
+				 * Save the widget
+				 */
+				Dao.put(widget);
 				
 				/*
 				 * And save the options
