@@ -25,14 +25,26 @@ public class ApplicationDao  {
 	@Unindexed
 	private long lastRequestTimestamp;
 	
+	@Unindexed
+	private String iconBaseUrl;
+	
+	/**
+	 * The place this application belongs to
+	 */
 	@NotSaved
 	private PlaceDao place;
 	
+	/**
+	 * The parent key
+	 */
 	@Parent
 	private Key<PlaceDao> placeKey;
 	
-	@NotSaved
-	private ArrayList<WidgetDao> widgets;
+	/**
+	 * The list of widgets in use by this app
+	 */
+//	@NotSaved
+//	private ArrayList<WidgetDao> widgets;
 	
 	public ApplicationDao(PlaceDao place, String applicationId) {
 		this.applicationId = applicationId;
@@ -76,9 +88,9 @@ public class ApplicationDao  {
 	/**
 	 * @return the widgets
 	 */
-	public ArrayList<WidgetDao> getWidgets() {
-		return widgets;
-	}	
+//	public ArrayList<WidgetDao> getWidgets() {
+//		return widgets;
+//	}	
 
 	
 
@@ -113,9 +125,9 @@ public class ApplicationDao  {
 	 * @param widgets
 	 *            the widgets to set
 	 */
-	public void setWidgets(ArrayList<WidgetDao> widgets) {
-		this.widgets = widgets;
-	}
+//	public void setWidgets(ArrayList<WidgetDao> widgets) {
+//		this.widgets = widgets;
+//	}
 
 	public String toDebugString() {
 		return this.toString();
@@ -124,5 +136,19 @@ public class ApplicationDao  {
 	@Override
 	public String toString() {
 		return "Application: " + this.applicationId;
+	}
+
+	/**
+	 * @return the iconBaseUrl
+	 */
+	public String getIconBaseUrl() {
+		return iconBaseUrl;
+	}
+
+	/**
+	 * @param iconBaseUrl the iconBaseUrl to set
+	 */
+	public void setIconBaseUrl(String iconBaseUrl) {
+		this.iconBaseUrl = iconBaseUrl;
 	}
 }

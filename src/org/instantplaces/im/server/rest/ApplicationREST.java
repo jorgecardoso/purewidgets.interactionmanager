@@ -25,8 +25,9 @@ public class ApplicationRest {
 
 	private	String placeId;
 
-	
 	private String applicationId;
+	
+	private String iconBaseUrl;
 	
 	/**
 	 * The timestamp of the last request made by this app.
@@ -97,6 +98,22 @@ public class ApplicationRest {
 
 	public boolean isActive() {
 		return (System.currentTimeMillis()-this.lastRequestTimestamp) < ApplicationDao.MAXIMUM_ACTIVITY_INTERVAL;
+	}
+
+
+	/**
+	 * @return the iconBaseUrl
+	 */
+	public String getIconBaseUrl() {
+		return iconBaseUrl;
+	}
+
+
+	/**
+	 * @param iconBaseUrl the iconBaseUrl to set
+	 */
+	public void setIconBaseUrl(String iconBaseUrl) {
+		this.iconBaseUrl = iconBaseUrl;
 	}
 	
 }

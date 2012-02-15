@@ -1,6 +1,7 @@
 package org.instantplaces.im.server.dao;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.rest.ApplicationRest;
 import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.instantplaces.im.server.rest.WidgetOptionRest;
 import org.instantplaces.im.server.rest.WidgetRest;
@@ -54,6 +55,21 @@ public class DaoConverter {
 		}
 		
 		return widgetDao;
+	}
+
+	/**
+	 * Converts a WidgetREST object to a WidgetDSO object.
+	 * 
+	 * @param widgetRest
+	 * @return
+	 */
+	public static ApplicationDao getApplicationDao(PlaceDao parent, ApplicationRest applicationRest) {
+		ApplicationDao applicationDao = new ApplicationDao(parent, applicationRest.getApplicationId());
+		
+		applicationDao.setIconBaseUrl(applicationRest.getIconBaseUrl());
+		applicationDao.setLastRequestTimestamp(applicationRest.getLastRequestTimestamp());
+		
+		return applicationDao;
 	}
 
 }
