@@ -90,68 +90,93 @@ public class ApplicationResource extends GenericResource {
 	@Override
 	protected Object doGet() {
 
-		String activeParameter = this.getRequest().getOriginalRef()
-				.getQueryAsForm().getFirstValue("active", "");
-		
-		int active = -1; // by default, we list all apps
-
-		if (!activeParameter.equals("")) { // if something was specified in the
-											// query try to parse it
-			if (activeParameter.equalsIgnoreCase("true")) {
-				active = 1;
-			} else if (activeParameter.equalsIgnoreCase("false")) {
-				active = 0;
-			} else {
-				String errorMessage = "Sorry, 'active' query parameter must be, 'true', or 'false'.";
-
-				Log.get().error(errorMessage);
-
-				throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-						errorMessage);
-			}
-		}
-
-		
-		Dao.beginTransaction();
 		/*
-		 * Return the list of applications
+		 * If the request is for a specific app return it
 		 */
-		List<ApplicationDao> applications = Dao.getApplications(this.placeId);
-		
-		Dao.commitOrRollbackTransaction();
-		
-		
-
-		/*
-		 * We put the ArrayList into a custom WidgetArrayListREST because I
-		 * couldn't make JAXB work otherwise... :(
-		 */
-		ApplicationListRest aalRest = RestConverter.applicationArrayListFromDSO(applications);
-		aalRest.setPlaceId(this.placeId);
-		
-		/*
-		 * Filter the app list, based on the active parameter
-		 */
-		Iterator<ApplicationRest> it = aalRest.getApplications().iterator();
-		while (it.hasNext()) {
-			ApplicationRest app = it.next();
-
+		if ( null != this.appId ) {
+			Dao.beginTransaction();
 			/*
-			 * We only want inactive apps
+			 * Return the list of applications
 			 */
-			if (app.isActive() && active == 0) {
-				it.remove();
-				/*
-				 * We only want active apps
-				 */
-			} else if ( !app.isActive() && active == 1) {
-				it.remove();
+		    ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
+			
+			Dao.commitOrRollbackTransaction();
+			
+			if ( null != applicationDao ) {
+				ApplicationRest applicationRest= RestConverter.applicationFromDSO(applicationDao);
+			
+				return applicationRest; 
+			} else {
+				return null;
 			}
-		}
+			
+			/*
+			 * Else return the list of apps for this place
+			 */
+		} else {
 		
-		return aalRest;
+			String activeParameter = this.getRequest().getOriginalRef()
+					.getQueryAsForm().getFirstValue("active", "");
+			
+			int active = -1; // by default, we list all apps
 	
-
+			if (!activeParameter.equals("")) { // if something was specified in the active parameter 
+												// query try to parse it
+				if (activeParameter.equalsIgnoreCase("true")) {
+					active = 1;
+				} else if (activeParameter.equalsIgnoreCase("false")) {
+					active = 0;
+				} else {
+					String errorMessage = "Sorry, 'active' query parameter must be, 'true', or 'false'.";
+	
+					Log.get().error(errorMessage);
+	
+					throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+							errorMessage);
+				}
+			}
+	
+			
+			Dao.beginTransaction();
+			/*
+			 * Return the list of applications
+			 */
+			List<ApplicationDao> applications = Dao.getApplications(this.placeId);
+			
+			Dao.commitOrRollbackTransaction();
+			
+			
+	
+			/*
+			 * We put the ArrayList into a custom WidgetArrayListREST because I
+			 * couldn't make JAXB work otherwise... :(
+			 */
+			ApplicationListRest aalRest = RestConverter.applicationArrayListFromDSO(applications);
+			aalRest.setPlaceId(this.placeId);
+			
+			/*
+			 * Filter the app list, based on the active parameter
+			 */
+			Iterator<ApplicationRest> it = aalRest.getApplications().iterator();
+			while (it.hasNext()) {
+				ApplicationRest app = it.next();
+	
+				/*
+				 * We only want inactive apps
+				 */
+				if (app.isActive() && active == 0) {
+					it.remove();
+					/*
+					 * We only want active apps
+					 */
+				} else if ( !app.isActive() && active == 1) {
+					it.remove();
+				}
+			}
+			
+			return aalRest;
+	
+		}
 	}
 
 	/*
