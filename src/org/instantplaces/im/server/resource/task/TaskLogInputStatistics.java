@@ -50,44 +50,8 @@ public class TaskLogInputStatistics extends ServerResource {
 			Log.get().error("IO Error: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
-		
-		
+
+		// TODO: Log the widget input to the google spreadsheet
 		return null;
 	}
-
-	/**
-	 * Deserializes JSON objects using JacksonRepresentation. 
-	 * This ignores any unknown object properties. It determines
-	 * the target object class by calling getResourceClass().
-	 * @param <T>
-	 * 
-	 * @param entity The object to be deserialized.
-	 * @return 
-	 * @return A Java Object with the deserialized JSON object.
-	 */
-	private <T> T deserializeJSON(Representation entity, Class<T> c) {
-		JacksonRepresentation<T> jr = new JacksonRepresentation<T>(entity, c);
-		jr.getObjectMapper().getDeserializationConfig().addHandler(new DeserializationProblemHandler() {
-			@Override
-			public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer, java.lang.Object bean, java.lang.String propertyName) {
-				if (propertyName.equalsIgnoreCase("__gwt_ObjectId")) {
-					//Log.get().debug("Ignoring __gwt_ObjectId property.");
-				} else {
-					Log.get().warn("Ignoring : " + propertyName);
-				}
-				try {
-					ctxt.getParser().skipChildren();
-				} catch (JsonParseException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return true;
-			}
-		});
-		
-		return jr.getObject();
-	}
-
 }
