@@ -1,5 +1,8 @@
 package org.instantplaces.im.server.resource;
 
+import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +18,13 @@ import org.instantplaces.im.server.rest.WidgetInputListRest;
 import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.instantplaces.im.server.rest.WidgetListRest;
 import org.restlet.data.Status;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskAlreadyExistsException;
+import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.googlecode.objectify.Key;
 
 public class WidgetInputResource extends GenericResource {
@@ -35,22 +43,45 @@ public class WidgetInputResource extends GenericResource {
 	protected Object doPost(Object incoming) {
 		WidgetInputRest receivedWidgetInputRest = (WidgetInputRest) incoming;
 		
-		//TODO: Check if widget exists
 		Dao.beginTransaction();
 		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(this.placeId, this.appId, this.widgetId, receivedWidgetInputRest.getWidgetOptionId());
 		
-		WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
+		
+		if ( null != widgetOptionDao ) {
+			WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
 	
-		widgetInputDao.setTimeStamp(System.currentTimeMillis());
-		Dao.put(widgetInputDao);
-		
+			widgetInputDao.setTimeStamp(System.currentTimeMillis());
+			Dao.put(widgetInputDao);
+			
+			/*
+			 * Log the input to get statistics
+			 */
+			this.logInputStatistics(widgetInputDao);
+		} else {
+			Log.get().warn("WidgetOption does not exist.");
+		}
 		Dao.commitOrRollbackTransaction();
-		
-		//TODO: Input Statistics
 		return null;
 	}
 	
-
+	/**
+	 * Logs the interaction by creating a task that will log the data to a spreadsheet.
+	 */
+	private void logInputStatistics(WidgetInputDao widgetInputDao) {
+		WidgetInputRest widgetInputRest = RestConverter.getWidgetInput(widgetInputDao);
+		Representation representation = representAsJSON(widgetInputRest);
+		
+		try {
+			Queue queue = QueueFactory.getQueue("statistics");
+			queue.add(withUrl("/task/log-input-statistics").countdownMillis(500).method(Method.POST).payload( representation.getText() ));
+			
+		} catch (TaskAlreadyExistsException taee) {
+			Log.get().warn("Task already exists: " + taee.getMessage());
+		} catch (Exception e) {
+			Log.get().error("Could not submit task: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	protected Object doPut(Object incoming) {

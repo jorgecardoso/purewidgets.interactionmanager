@@ -214,6 +214,8 @@ public abstract class GenericResource extends ServerResource {
 	// POST Methods
 	@Post
 	public Representation acceptItem(Representation entity) { 
+		
+		
 		Object object = deserializeJSON(entity);
 		
 		Object toClient = doPost(object);
