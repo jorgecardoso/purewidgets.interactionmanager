@@ -26,7 +26,7 @@ public class DaoConverter {
  	
 	
 	public static WidgetOptionDao getWidgetOptionDao(WidgetDao parent, WidgetOptionRest widgetOptionRest) {
-		WidgetOptionDao widgetOptionDao = new WidgetOptionDao(parent, widgetOptionRest.getWidgetOptionId());
+		WidgetOptionDao widgetOptionDao = new WidgetOptionDao(parent.getKey(), widgetOptionRest.getWidgetOptionId());
 
 		widgetOptionDao.setSuggestedReferenceCode(widgetOptionRest.getSuggestedReferenceCode());
 		widgetOptionDao.setReferenceCode(widgetOptionRest.getReferenceCode());

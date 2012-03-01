@@ -5,12 +5,10 @@ import java.io.Serializable;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.NotSaved;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
 public class WidgetOptionDao implements Serializable {
-
 	/**
 	 * 
 	 */
@@ -28,8 +26,8 @@ public class WidgetOptionDao implements Serializable {
 	@Unindexed
 	private String suggestedReferenceCode;
 
-	@NotSaved
-	private WidgetDao widget;
+//	@NotSaved
+//	private WidgetDao widget;
 
 	@Parent
 	private Key<WidgetDao> widgetKey;
@@ -37,17 +35,16 @@ public class WidgetOptionDao implements Serializable {
 	@Id
 	private String widgetOptionId;
 
-	public WidgetOptionDao(WidgetDao widget, String widgetOptionId) {
-		this(widget, widgetOptionId, null, null);
+	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId) {
+		this(parentKey, widgetOptionId, null, null);
 	}
 
-	public WidgetOptionDao(WidgetDao widget, String widgetOptionId, String suggestedReferenceCode,
+	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId, String suggestedReferenceCode,
 			String referenceCode) {
 		this.widgetOptionId = widgetOptionId;
 		this.suggestedReferenceCode = suggestedReferenceCode;
 		this.referenceCode = referenceCode;
-
-		this.setWidget(widget);
+		this.widgetKey = parentKey;
 	}
 
 	@SuppressWarnings("unused")
@@ -80,9 +77,9 @@ public class WidgetOptionDao implements Serializable {
 		return this.suggestedReferenceCode;
 	}
 
-	public WidgetDao getWidget() {
-		return this.widget;
-	}
+//	public WidgetDao getWidget() {
+//		return this.widget;
+//	}
 
 	/**
 	 * @return the widgetKey
@@ -119,13 +116,13 @@ public class WidgetOptionDao implements Serializable {
 		this.suggestedReferenceCode = suggestedReferenceCode;
 	}
 
-	public void setWidget(WidgetDao w) {
-		this.widget = w;
-		if (null != w) {
-			this.widgetKey = new Key<WidgetDao>(w.getApplicationKey(), WidgetDao.class,
-					w.getWidgetId());
-		}
-	}
+//	public void setWidget(WidgetDao w) {
+//		this.widget = w;
+//		if (null != w) {
+//			this.widgetKey = new Key<WidgetDao>(w.getApplicationKey(), WidgetDao.class,
+//					w.getWidgetId());
+//		}
+//	}
 
 	/**
 	 * @param widgetKey
