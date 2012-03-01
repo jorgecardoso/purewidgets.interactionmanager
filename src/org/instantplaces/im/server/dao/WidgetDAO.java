@@ -20,8 +20,8 @@ public class WidgetDao implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@NotSaved
-	private ApplicationDao application;
+//	@NotSaved
+//	private ApplicationDao application;
 
 	@Parent
 	private Key<ApplicationDao> applicationKey;
@@ -65,19 +65,19 @@ public class WidgetDao implements Serializable {
 	@NotSaved
 	private ArrayList<WidgetOptionDao> widgetOptions;
 
-	public WidgetDao(ApplicationDao application) {
-		this(application, null, null, null, null);
+	public WidgetDao(Key<ApplicationDao> applicationKey) {
+		this(applicationKey, null, null, null, null);
 	}
 
-	public WidgetDao(ApplicationDao application, String widgetId, String controlType,
+	public WidgetDao(Key<ApplicationDao> applicationKey, String widgetId, String controlType,
 			String shortDescription, String longDescription) {
 		this.widgetId = widgetId;
 		this.controlType = controlType;
 		this.shortDescription = shortDescription;
 		this.longDescription = longDescription;
 		this.volatileWidget = true;
-
-		this.setApplication(application);
+		this.applicationKey = applicationKey;
+		//this.setApplication(application);
 	}
 
 	@SuppressWarnings("unused")
@@ -104,12 +104,12 @@ public class WidgetDao implements Serializable {
 		}
 	}
 
-	/**
-	 * @return the application
-	 */
-	public ApplicationDao getApplication() {
-		return application;
-	}
+//	/**
+//	 * @return the application
+//	 */
+//	public ApplicationDao getApplication() {
+//		return application;
+//	}
 
 	/**
 	 * @return the applicationKey
@@ -217,15 +217,15 @@ public class WidgetDao implements Serializable {
 		return toDelete;
 	}
 
-	public void setApplication(ApplicationDao a) {
-		this.application = a;
-		if (null != a) {
-			this.application = a;
-
-			this.applicationKey = new Key<ApplicationDao>(a.getPlaceKey(), ApplicationDao.class,
-					a.getApplicationId());
-		}
-	}
+//	public void setApplication(ApplicationDao a) {
+//		this.application = a;
+//		if (null != a) {
+//			this.application = a;
+//
+//			this.applicationKey = new Key<ApplicationDao>(a.getPlaceKey(), ApplicationDao.class,
+//					a.getApplicationId());
+//		}
+//	}
 
 	/**
 	 * @param applicationKey

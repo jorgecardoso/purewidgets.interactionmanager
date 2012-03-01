@@ -43,7 +43,7 @@ public class DaoConverter {
 	 * @return
 	 */
 	public static WidgetDao getWidgetDao(ApplicationDao parent, WidgetRest widgetRest) {
-		WidgetDao widgetDao = new WidgetDao(parent, widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
+		WidgetDao widgetDao = new WidgetDao(parent.getKey(), widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
 		
 		widgetDao.setVolatileWidget(widgetRest.isVolatileWidget());
 		widgetDao.setContentUrl(widgetRest.getContentUrl());
