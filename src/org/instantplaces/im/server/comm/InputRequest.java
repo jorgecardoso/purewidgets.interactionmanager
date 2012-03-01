@@ -209,7 +209,7 @@ public class InputRequest {
 			} else {
 				Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
-				WidgetInputDao input = new WidgetInputDao(widgetOption, System.currentTimeMillis(), parameters, name );
+				WidgetInputDao input = new WidgetInputDao(widgetOption.getKey(), System.currentTimeMillis(), parameters, name );
 				Dao.put(input);
 			}
 			

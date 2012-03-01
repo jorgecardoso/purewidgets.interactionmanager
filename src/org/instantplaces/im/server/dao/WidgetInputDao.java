@@ -37,21 +37,30 @@ public class WidgetInputDao {
 	@Id
 	private Long widgetInputId;
 
-	@NotSaved
-	private WidgetOptionDao widgetOption;
+//	@NotSaved
+//	private WidgetOptionDao widgetOption;
 
 	@Parent
 	private Key<WidgetOptionDao> widgetOptionKey;
 
-	public WidgetInputDao(WidgetOptionDao widgetOptionDso, long timeStamp, String[] parameters,
+	public WidgetInputDao(Key<WidgetOptionDao> parent, long timeStamp, String[] parameters,
 			String persona) {
 		this.timeStamp = timeStamp;
 		this.parameters = parameters;
 		this.persona = persona;
 		this.delivered = false;
-		this.setWidgetOptionDSO(widgetOptionDso);
+		this.widgetOptionKey = parent;
 	}
 
+//	public void setWidgetOptionDSO(WidgetOptionDao widgetOption) {
+//		this.widgetOption = widgetOption;
+//		if (null != widgetOption) {
+//
+//			this.widgetOptionKey = new Key<WidgetOptionDao>(widgetOption.getWidgetKey(),
+//					WidgetOptionDao.class, widgetOption.getWidgetOptionId());
+//		}
+//	}
+	
 	@SuppressWarnings("unused")
 	private WidgetInputDao() {
 
@@ -83,9 +92,9 @@ public class WidgetInputDao {
 		return widgetInputId;
 	}
 
-	public WidgetOptionDao getWidgetOptionDSO() {
-		return this.widgetOption;
-	}
+//	public WidgetOptionDao getWidgetOptionDSO() {
+//		return this.widgetOption;
+//	}
 
 	/**
 	 * @return the widgetOptionKey
@@ -137,14 +146,7 @@ public class WidgetInputDao {
 		this.widgetInputId = widgetInputId;
 	}
 
-	public void setWidgetOptionDSO(WidgetOptionDao widgetOption) {
-		this.widgetOption = widgetOption;
-		if (null != widgetOption) {
-
-			this.widgetOptionKey = new Key<WidgetOptionDao>(widgetOption.getWidgetKey(),
-					WidgetOptionDao.class, widgetOption.getWidgetOptionId());
-		}
-	}
+	
 
 	/**
 	 * @param widgetOptionKey

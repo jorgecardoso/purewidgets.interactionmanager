@@ -18,7 +18,7 @@ public class DaoConverter {
 			Log.get().warn("Could not parse timestamp: " + widgetInputRest.getTimeStamp());
 		}
 		
-		WidgetInputDao widgetInputDao = new WidgetInputDao(parent, timeStamp, widgetInputRest.getParameters(), widgetInputRest.getPersona());
+		WidgetInputDao widgetInputDao = new WidgetInputDao(parent.getKey(), timeStamp, widgetInputRest.getParameters(), widgetInputRest.getPersona());
 		widgetInputDao.setInputMechanism(widgetInputRest.getInputMechanism());
 		
 		return widgetInputDao;
