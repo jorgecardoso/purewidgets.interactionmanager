@@ -156,9 +156,12 @@ public class RestConverter {
 		
 		WidgetInputRest  widgetInputRest = new WidgetInputRest();
 	
+		widgetInputRest.setPlaceId(widgetInputDao.getWidgetOptionKey().getParent().getParent().getParent().getName());
+		widgetInputRest.setApplicationId(widgetInputDao.getWidgetOptionKey().getParent().getParent().getName());
+		widgetInputRest.setWidgetId( widgetInputDao.getWidgetOptionKey().getParent().getName() );
 		
 		widgetInputRest.setWidgetOptionId( widgetInputDao.getWidgetOptionKey().getName() );
-		widgetInputRest.setWidgetId( widgetInputDao.getWidgetOptionKey().getParent().getName() );
+		
 		
 		if ( null == widgetInputDao.getParameters() ) {
 			widgetInputRest.setParameters(new String[0]);
@@ -170,7 +173,7 @@ public class RestConverter {
 		widgetInputRest.setInputMechanism(widgetInputDao.getInputMechanism());
 		widgetInputRest.setDelivered(widgetInputDao.isDelivered());
 		widgetInputRest.setAge( (int)(System.currentTimeMillis()-widgetInputDao.getTimeStamp()) );
-	
+		//widgetInputRest.getReferenceCode(widgetInputDao.ge
 		return widgetInputRest; 
 	}
 
