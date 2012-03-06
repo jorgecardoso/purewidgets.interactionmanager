@@ -15,6 +15,9 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.WidgetDao;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
@@ -66,8 +69,11 @@ public class TaskLogInputStatistics extends ServerResource {
 			e.printStackTrace();
 		}
 		
+		Dao.beginTransaction();
+		WidgetDao widgetDao = Dao.getWidget(wir.getPlaceId(), wir.getApplicationId(), wir.getWidgetId());
+		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
+		Dao.commitOrRollbackTransaction();
 		
-
 		// TODO: Log the widget input to the google spreadsheet
 		SpreadsheetService service = new SpreadsheetService("Interaction Manager");
 		try {
@@ -87,7 +93,10 @@ public class TaskLogInputStatistics extends ServerResource {
 			entry.getCustomElements().setValueLocal("place", wir.getPlaceId());
 			entry.getCustomElements().setValueLocal("application", wir.getApplicationId());
 			entry.getCustomElements().setValueLocal("widget", wir.getWidgetId());
+			entry.getCustomElements().setValueLocal("widgettype", widgetDao != null ? widgetDao.getControlType() : "");
 			entry.getCustomElements().setValueLocal("option", wir.getWidgetOptionId());
+			entry.getCustomElements().setValueLocal("referencecode", widgetOptionDao != null ? widgetOptionDao.getReferenceCode() : "");
+			
 			entry.getCustomElements().setValueLocal("inputmechanism", wir.getInputMechanism());
 			entry.getCustomElements().setValueLocal("timestamp", wir.getTimeStamp());
 			entry.getCustomElements().setValueLocal("data", Arrays.toString(wir.getParameters()));
