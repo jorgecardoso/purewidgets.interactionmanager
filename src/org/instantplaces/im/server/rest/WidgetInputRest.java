@@ -30,7 +30,8 @@ public class WidgetInputRest implements WidgetInput{
 
 	private String[] parameters;
 	
-
+	private String userIdentifier;
+	
 	private String persona;	
 	
 	/**
@@ -187,5 +188,19 @@ public class WidgetInputRest implements WidgetInput{
 	 */
 	public void setReferenceCode(String referenceCode) {
 		this.referenceCode = referenceCode;
+	}
+
+	/**
+	 * @return the userIdentifier
+	 */
+	public String getUserIdentifier() {
+		return userIdentifier;
+	}
+
+	/**
+	 * @param userIdentifier the userIdentifier to set
+	 */
+	public void setUserIdentifier(String userIdentifier) {
+		this.userIdentifier = userIdentifier;
 	}
 }

@@ -20,7 +20,7 @@ public class DaoConverter {
 		
 		WidgetInputDao widgetInputDao = new WidgetInputDao(parent.getKey(), timeStamp, widgetInputRest.getParameters(), widgetInputRest.getPersona());
 		widgetInputDao.setInputMechanism(widgetInputRest.getInputMechanism());
-		
+		widgetInputDao.setUserIdentifier(widgetInputRest.getUserIdentifier());
 		return widgetInputDao;
 	}
  	

@@ -168,6 +168,7 @@ public class RestConverter {
 		} else {
 			widgetInputRest.setParameters(widgetInputDao.getParameters());
 		}
+		widgetInputRest.setUserIdentifier(widgetInputDao.getUserIdentifier());
 		widgetInputRest.setPersona(widgetInputDao.getPersona());
 		widgetInputRest.setTimeStamp(""+widgetInputDao.getTimeStamp());
 		widgetInputRest.setInputMechanism(widgetInputDao.getInputMechanism());

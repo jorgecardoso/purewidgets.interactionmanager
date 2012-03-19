@@ -29,7 +29,12 @@ public class WidgetInputDao {
 	private String[] parameters;
 
 	@Unindexed
+	private String userIdentifier;
+
+
+	@Unindexed
 	private String persona;
+
 
 	@Indexed
 	private long timeStamp;
@@ -161,6 +166,20 @@ public class WidgetInputDao {
 
 		return "WidgetInput: " + "persona: " + this.persona + "; parameters "
 				+ Arrays.toString(this.parameters) + ")";
+	}
+
+	/**
+	 * @return the userIdentifier
+	 */
+	public String getUserIdentifier() {
+		return userIdentifier;
+	}
+
+	/**
+	 * @param userIdentifier the userIdentifier to set
+	 */
+	public void setUserIdentifier(String userIdentifier) {
+		this.userIdentifier = userIdentifier;
 	}
 
 }
