@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
-  <cron>
-    <url>/cron/check-tasks</url>
-    <description>Creates four tasks to fetch input during the next minute</description>
-    <schedule>every 1 minutes</schedule>
-  </cron>
+<!--   <cron> -->
+<!--     <url>/cron/check-tasks</url> -->
+<!--     <description>Creates four tasks to fetch input during the next minute</description> -->
+<!--     <schedule>every 1 minutes</schedule> -->
+<!--   </cron> -->
   
   <cron>
     <url>/cron/delete-volatile</url>

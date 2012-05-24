@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application>im-instantplaces</application>
-  <version>3</version>
+  <application>pw-interactionmanager</application>
+  <version>1</version>
 
   <!-- Configure serving/caching of GWT files -->
   <static-files>
@@ -21,5 +21,5 @@
      -->
     <property name="log4j.configuration" value="file:WEB-INF/classes/log4j.properties" /> 
   </system-properties>
-
+ <threadsafe>false</threadsafe>
 </appengine-web-app>
