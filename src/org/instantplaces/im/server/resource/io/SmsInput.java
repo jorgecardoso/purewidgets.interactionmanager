@@ -58,7 +58,7 @@ public class SmsInput extends ServerResource {
 	    
 	    String locationPlusReferenceCode = null;
 	    if ( matcher.find() ) {
-	    	locationPlusReferenceCode = matcher.group();
+	    	locationPlusReferenceCode = matcher.group().toLowerCase();
 	    	Log.get().debug("Location.Reference: " + locationPlusReferenceCode);
 	    	/*
 	    	 * Keep only the rest of the string for the next processing phase
@@ -97,13 +97,13 @@ public class SmsInput extends ServerResource {
 	    }
 	    
 	    
-	    this.saveInput(originator, referenceCode, parameters.toArray(new String[] {}));
+	    this.saveInput(location, originator, referenceCode, parameters.toArray(new String[] {}));
 		return "";
 
 	}
 	
 	
-	private  void saveInput(String identity, String refCode,
+	private  void saveInput(String placeReferenceCode, String identity, String refCode,
 			String[] parameters) {
 
 		String name = identity;
@@ -111,48 +111,45 @@ public class SmsInput extends ServerResource {
 		/*
 		 * TODO: verify place based on location extracted from sms
 		 */
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+		List<PlaceDao> places = Dao.getPlaces();
 		
-		for ( Key<PlaceDao> placeKey : placeKeys ) {
-			Dao.beginTransaction();
-			WidgetOptionDao widgetOption = null; 
-			
-			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey.getName());
-			
-			for ( WidgetOptionDao option : options ) {
-				if ( option.getReferenceCode().equals(refCode)) {
-					widgetOption = option;
-					break;
+		for ( PlaceDao place : places ) {
+			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
+				Dao.beginTransaction();
+				WidgetOptionDao widgetOption = null; 
+				
+				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
+				
+				for ( WidgetOptionDao option : options ) {
+					if ( option.getReferenceCode().equals(refCode)) {
+						widgetOption = option;
+						break;
+					}
+				}
+				
+					
+				if (widgetOption == null) {
+					Log.get().debug("No widgets are using this reference code.");
+				} else {
+					Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
+
+					WidgetInputDao input = new WidgetInputDao(widgetOption.getKey(), System.currentTimeMillis(), parameters, name );
+					input.setInputMechanism("SMS");
+					Dao.put(input);
+					/*
+					 * Log the input to get statistics
+					 */
+					WidgetInputResource.logInputStatistics(input);
+				}
+				
+				if ( !Dao.commitOrRollbackTransaction() ) {
+					Log.get().error("Could not save input to datastore");
 				}
 			}
 			
-				
-			if (widgetOption == null) {
-				Log.get().debug("No widgets are using this reference code.");
-			} else {
-				Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
-
-				WidgetInputDao input = new WidgetInputDao(widgetOption.getKey(), System.currentTimeMillis(), parameters, name );
-				input.setInputMechanism("SMS");
-				Dao.put(input);
-				/*
-				 * Log the input to get statistics
-				 */
-				WidgetInputResource.logInputStatistics(input);
-			}
-			
-			if ( !Dao.commitOrRollbackTransaction() ) {
-				Log.get().error("Could not save input to datastore");
-			}
 		}
 
-		//= DsoFetcher.getWidgetOptionDSOByReferenceCode(pm, refCode);
 
-		// TODO: save statistics in PlaceDSO here. Save input to existing
-		// widgets and to non-existing widgets
-		
-		
-		
 
 	}
 }

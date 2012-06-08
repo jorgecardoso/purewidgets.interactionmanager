@@ -11,8 +11,20 @@ public class PlaceDao {
     private String placeId;
 	
     
+    /*
+     * The reference code used for text-based interactions
+     */
+    private String placeReferenceCode;
+    
+    
+    
 	public PlaceDao(String id) {
 		this.placeId = id;
+		
+		/*
+		 * By default we set the place reference code to a lower case version of the id.
+		 */
+		this.placeReferenceCode = id.toLowerCase();
 	}
 	
 	@SuppressWarnings("unused")
@@ -45,6 +57,20 @@ public class PlaceDao {
 	@Override
 	public String toString() {
 		return "Place: " + this.placeId;
+	}
+
+	/**
+	 * @return the placeReferenceCode
+	 */
+	public String getPlaceReferenceCode() {
+		return placeReferenceCode;
+	}
+
+	/**
+	 * @param placeReferenceCode the placeReferenceCode to set
+	 */
+	public void setPlaceReferenceCode(String placeReferenceCode) {
+		this.placeReferenceCode = placeReferenceCode;
 	}
 
 }
