@@ -56,7 +56,7 @@ public class WidgetInputResource extends GenericResource {
 			/*
 			 * Log the input to get statistics
 			 */
-			this.logInputStatistics(widgetInputDao);
+			WidgetInputResource.logInputStatistics(widgetInputDao);
 		} else {
 			Log.get().warn("WidgetOption does not exist.");
 		}
@@ -67,7 +67,7 @@ public class WidgetInputResource extends GenericResource {
 	/**
 	 * Logs the interaction by creating a task that will log the data to a spreadsheet.
 	 */
-	private void logInputStatistics(WidgetInputDao widgetInputDao) {
+	public static void logInputStatistics(WidgetInputDao widgetInputDao) {
 		WidgetInputRest widgetInputRest = RestConverter.getWidgetInput(widgetInputDao);
 		Representation representation = representAsJSON(widgetInputRest);
 		

@@ -271,7 +271,7 @@ public abstract class GenericResource extends ServerResource {
 	}
 	
 
-	public Representation representAsJSON(Object object) {
+	public static Representation representAsJSON(Object object) {
 		Log.get().debug("Returning JSON representation of resource");
 		
 		JacksonRepresentation jr = new JacksonRepresentation(object);

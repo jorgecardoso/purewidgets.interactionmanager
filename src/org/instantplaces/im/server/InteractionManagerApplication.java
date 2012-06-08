@@ -9,6 +9,7 @@ import org.instantplaces.im.server.resource.cron.CronCheckTasksResource;
 import org.instantplaces.im.server.resource.cron.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.resource.cron.CronDeleteVolatileResource;
 import org.instantplaces.im.server.resource.cron.CronRebuildCodesResource;
+import org.instantplaces.im.server.resource.io.SmsInput;
 import org.instantplaces.im.server.resource.task.TaskFetchInputResource;
 import org.instantplaces.im.server.resource.task.TaskLogInputStatistics;
 import org.restlet.Application;
@@ -78,9 +79,9 @@ public class InteractionManagerApplication extends Application {
         
         
         /*
-         * Tst
+         * IO modules
          */
-        router.attach("/test", TestResource.class);
+        router.attach("/io/sms", SmsInput.class);
         
         
         return router;
