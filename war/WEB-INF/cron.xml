@@ -15,12 +15,20 @@
     <cron>
     <url>/cron/rebuild-codes</url>
     <description>Cron rebuild reference codes</description>
-    <schedule>every 60 minutes</schedule>
+	<timezone>Europe/Lisbon</timezone>
+    <schedule>every day 23:05</schedule>
   </cron>
   
       <cron>
     <url>/cron/delete-old-apps</url>
     <description>Cron delete old apps that dont communicate for 1 day</description>
+    <timezone>Europe/Lisbon</timezone>
+    <schedule>every day 21:05</schedule>
+  </cron>
+  
+            <cron>
+    <url>/cron/delete-old-input</url>
+    <description>Cron delete old input</description>
     <timezone>Europe/Lisbon</timezone>
     <schedule>every day 21:05</schedule>
   </cron>

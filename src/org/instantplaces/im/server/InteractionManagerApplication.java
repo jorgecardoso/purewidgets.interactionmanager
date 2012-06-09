@@ -7,6 +7,7 @@ import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
 import org.instantplaces.im.server.resource.cron.CronCheckTasksResource;
 import org.instantplaces.im.server.resource.cron.CronDeleteOldAppsResource;
+import org.instantplaces.im.server.resource.cron.CronDeleteOldInput;
 import org.instantplaces.im.server.resource.cron.CronDeleteVolatileResource;
 import org.instantplaces.im.server.resource.cron.CronRebuildCodesResource;
 import org.instantplaces.im.server.resource.io.SmsInput;
@@ -69,6 +70,7 @@ public class InteractionManagerApplication extends Application {
         router.attach("/cron/rebuild-codes", CronRebuildCodesResource.class);
         router.attach("/cron/delete-old-apps", CronDeleteOldAppsResource.class);
         router.attach("/cron/check-tasks", CronCheckTasksResource.class);
+        router.attach("/cron/delete-old-input", CronDeleteOldInput.class);
         
         /*
          * Tasks
