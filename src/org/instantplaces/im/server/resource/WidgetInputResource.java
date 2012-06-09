@@ -21,6 +21,8 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskAlreadyExistsException;
@@ -52,6 +54,9 @@ public class WidgetInputResource extends GenericResource {
 	
 			widgetInputDao.setTimeStamp(System.currentTimeMillis());
 			Dao.put(widgetInputDao);
+			
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
 			
 			/*
 			 * Log the input to get statistics
@@ -107,6 +112,19 @@ public class WidgetInputResource extends GenericResource {
 					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
 			Dao.commitOrRollbackTransaction();
 			
+			/*
+			 * Put the last timestamp in Memcache, 
+			 */
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			long largestTimestamp = 0;
+			for ( WidgetInputDao widgetInputDao : widgetInputs ) {
+				if ( widgetInputDao.getTimeStamp() > largestTimestamp ) {
+					largestTimestamp = widgetInputDao.getTimeStamp();
+				}
+			}
+			syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp", largestTimestamp);
+			
+			
 			return RestConverter.getWidgetInputList(widgetInputs);
 		/*
 		 * Return the last input to every widget
@@ -149,6 +167,14 @@ public class WidgetInputResource extends GenericResource {
 			}
 		} 
 		
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		Long lastTimeStamp = (Long)syncCache.get("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp");
+		
+		if ( null != lastTimeStamp ) {
+			if (from >= lastTimeStamp.longValue() ) {
+				return RestConverter.getWidgetInputList(new ArrayList<WidgetInputDao>());
+			}
+		}
 		
 		return 	getInputForAllWidgets(from);
 
