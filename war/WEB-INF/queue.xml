@@ -17,5 +17,14 @@
     <retry-parameters>
       <task-retry-limit>1</task-retry-limit>
     </retry-parameters>
-  </queue>  
+  </queue> 
+  
+    <queue>
+    <name>datastore</name>
+    <rate>1/s</rate>
+    <max-concurrent-requests>1</max-concurrent-requests>
+    <retry-parameters>
+      <task-retry-limit>1</task-retry-limit>
+    </retry-parameters>
+  </queue>   
 </queue-entries>

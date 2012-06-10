@@ -22,4 +22,9 @@
     <property name="log4j.configuration" value="file:WEB-INF/classes/log4j.properties" /> 
   </system-properties>
  <threadsafe>false</threadsafe>
+ 
+  <inbound-services>
+    <service>channel_presence</service>
+  </inbound-services>
+  
 </appengine-web-app>

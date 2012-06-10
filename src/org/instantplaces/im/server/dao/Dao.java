@@ -28,7 +28,7 @@ public class Dao extends DAOBase {
 		ObjectifyService.register(WidgetDao.class);
 		ObjectifyService.register(WidgetOptionDao.class);
 		ObjectifyService.register(WidgetInputDao.class);
-
+		ObjectifyService.register(ChannelMapDao.class);
 	}
 
 	public static void beginTransaction() {
@@ -201,6 +201,15 @@ public class Dao extends DAOBase {
 		return ofy.find(PlaceDao.class, placeId);
 	}
 
+	
+	public static ChannelMapDao getChannelMap(String placeId, String applicationId) {
+		return getChannelMap(placeId+applicationId);
+	}
+	
+	public static ChannelMapDao getChannelMap(String placeApplicationId) {
+		return ofy.find(ChannelMapDao.class, placeApplicationId);
+	}
+	
 	public static List<Key<PlaceDao>> getPlaceKeys() {
 		/*
 		 * We can't get all root entities inside a transaction, so don't use the

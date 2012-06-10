@@ -5,14 +5,36 @@
 
 <web-app>
   
-<servlet>
+ 
+ 	<servlet>
+        <servlet-name>ChannelConnected</servlet-name>
+        <servlet-class>org.instantplaces.im.server.servlets.ChannelConnected</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChannelConnected</servlet-name>
+        <url-pattern>/_ah/channel/connected/</url-pattern>
+    </servlet-mapping>
+    
+  	<servlet>
+        <servlet-name>ChannelDisconnected</servlet-name>
+        <servlet-class>org.instantplaces.im.server.servlets.ChannelDisconnected</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChannelDisconnected</servlet-name>
+        <url-pattern>/_ah/channel/disconnected/</url-pattern>
+    </servlet-mapping>
+    
+    
+    
+	<servlet>
            <servlet-name>RestletServlet</servlet-name>
-                 <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
-                 <init-param>
-                         <param-name>org.restlet.application</param-name>
-                         <param-value>org.instantplaces.im.server.InteractionManagerApplication</param-value>
-                 </init-param>
-         </servlet>
+           <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+           <init-param>
+    	       <param-name>org.restlet.application</param-name>
+               <param-value>org.instantplaces.im.server.InteractionManagerApplication</param-value>
+           </init-param>
+     </servlet>
+ 
  <!-- Catch all requests -->
  <servlet-mapping>
   <servlet-name>RestletServlet</servlet-name>
@@ -20,6 +42,7 @@
  </servlet-mapping>
 
 
+       
 
 
 <filter>
@@ -35,7 +58,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     
-<servlet>
+	<servlet>
         <servlet-name>appstats</servlet-name>
         <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
     </servlet>

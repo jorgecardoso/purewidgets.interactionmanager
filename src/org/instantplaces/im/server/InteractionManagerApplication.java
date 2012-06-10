@@ -5,6 +5,7 @@ import org.instantplaces.im.server.resource.PlaceResource;
 import org.instantplaces.im.server.resource.TestResource;
 import org.instantplaces.im.server.resource.WidgetInputResource;
 import org.instantplaces.im.server.resource.WidgetResource;
+import org.instantplaces.im.server.resource.channel.ChannelResource;
 import org.instantplaces.im.server.resource.cron.CronCheckTasksResource;
 import org.instantplaces.im.server.resource.cron.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.resource.cron.CronDeleteOldInput;
@@ -13,6 +14,8 @@ import org.instantplaces.im.server.resource.cron.CronRebuildCodesResource;
 import org.instantplaces.im.server.resource.io.SmsInput;
 import org.instantplaces.im.server.resource.task.TaskFetchInputResource;
 import org.instantplaces.im.server.resource.task.TaskLogInputStatistics;
+import org.instantplaces.im.server.resource.task.TaskRemoveChannelClientId;
+import org.instantplaces.im.server.resource.task.TaskStoreChannelClientId;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
@@ -79,12 +82,17 @@ public class InteractionManagerApplication extends Application {
         
         router.attach("/task/log-input-statistics", TaskLogInputStatistics.class);
         
-        
+        router.attach("/task/store-channel-clientid", TaskStoreChannelClientId.class);
+        router.attach("/task/remove-channel-clientid", TaskRemoveChannelClientId.class);
         /*
          * IO modules
          */
         router.attach("/io/sms", SmsInput.class);
         
+        /*
+         * Channel
+         */
+        router.attach("/place/{placeid}/application/{appid}/channel", ChannelResource.class);
         
         return router;
 	}    

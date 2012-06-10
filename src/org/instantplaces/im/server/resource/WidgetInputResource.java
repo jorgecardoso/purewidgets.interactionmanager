@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
 import org.instantplaces.im.server.dao.PlaceDao;
@@ -21,6 +22,9 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 
+import com.google.appengine.api.channel.ChannelMessage;
+import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
@@ -58,6 +62,7 @@ public class WidgetInputResource extends GenericResource {
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
 			
+			this.sendInputThroughChannel(widgetInputDao);
 			/*
 			 * Log the input to get statistics
 			 */
@@ -145,6 +150,38 @@ public class WidgetInputResource extends GenericResource {
 			Dao.commitOrRollbackTransaction();
 			return RestConverter.getWidgetInputList(inputs);
 		}
+	}
+	
+	private void sendInputThroughChannel(WidgetInputDao widgetInputDao) {
+		Dao.beginTransaction();
+		
+		ChannelMapDao channelMap = Dao.getChannelMap(this.placeId, this.appId);
+		
+		if ( null == channelMap ) {
+			return;
+		}
+		
+		if ( null != channelMap.getClientIds() ) {
+			
+			WidgetInputRest widgetInput = RestConverter.getWidgetInput(widgetInputDao);
+			String json = null;
+			try {
+				json = GenericResource.representAsJSON(widgetInput).getText();
+				Log.get().debug("Sending json to client: " + json);
+			} catch (IOException e) {
+				Log.get().error("Could not get json representation for widgetinput" + widgetInput);
+				e.printStackTrace();
+			}
+			
+			for ( String clientId : channelMap.getClientIds() ) {
+				Log.get().debug("Sending input to " + clientId);
+				ChannelService channelService = ChannelServiceFactory.getChannelService();
+			     
+				 
+			    channelService.sendMessage(new ChannelMessage(clientId, json));
+			}
+		}
+		
 	}
 	
 	@Override
