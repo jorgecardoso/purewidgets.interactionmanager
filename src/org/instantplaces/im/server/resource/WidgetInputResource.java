@@ -59,6 +59,8 @@ public class WidgetInputResource extends GenericResource {
 			widgetInputDao.setTimeStamp(System.currentTimeMillis());
 			Dao.put(widgetInputDao);
 			
+			Dao.commitOrRollbackTransaction();
+			
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 			syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
 			
@@ -69,8 +71,9 @@ public class WidgetInputResource extends GenericResource {
 			WidgetInputResource.logInputStatistics(widgetInputDao);
 		} else {
 			Log.get().warn("WidgetOption does not exist.");
+			Dao.commitOrRollbackTransaction();
 		}
-		Dao.commitOrRollbackTransaction();
+		
 		return null;
 	}
 	
@@ -153,9 +156,15 @@ public class WidgetInputResource extends GenericResource {
 	}
 	
 	private void sendInputThroughChannel(WidgetInputDao widgetInputDao) {
+		sendInputThroughChannel(widgetInputDao, this.placeId, this.appId);
+	}
+	
+	public static void sendInputThroughChannel(WidgetInputDao widgetInputDao, String placeId, String appId) {
 		Dao.beginTransaction();
 		
-		ChannelMapDao channelMap = Dao.getChannelMap(this.placeId, this.appId);
+		ChannelMapDao channelMap = Dao.getChannelMap(placeId, appId);
+		
+		Dao.commitOrRollbackTransaction();
 		
 		if ( null == channelMap ) {
 			return;
@@ -163,13 +172,17 @@ public class WidgetInputResource extends GenericResource {
 		
 		if ( null != channelMap.getClientIds() ) {
 			
-			WidgetInputRest widgetInput = RestConverter.getWidgetInput(widgetInputDao);
+			WidgetInputListRest widgetInputListRest = new WidgetInputListRest();
+			ArrayList<WidgetInputRest> widgetInputList = new ArrayList<WidgetInputRest>();
+			widgetInputList.add(RestConverter.getWidgetInput(widgetInputDao));
+			widgetInputListRest.setInputs(widgetInputList);
+			
 			String json = null;
 			try {
-				json = GenericResource.representAsJSON(widgetInput).getText();
+				json = GenericResource.representAsJSON(widgetInputListRest).getText();
 				Log.get().debug("Sending json to client: " + json);
 			} catch (IOException e) {
-				Log.get().error("Could not get json representation for widgetinput" + widgetInput);
+				Log.get().error("Could not get json representation for widgetinput" + widgetInputListRest);
 				e.printStackTrace();
 			}
 			

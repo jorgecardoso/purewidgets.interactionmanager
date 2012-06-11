@@ -102,6 +102,9 @@ public class SmsInput extends ServerResource {
 
 	}
 	
+/*
+ * TODO: this code should be refactored to use the widgetinputresource instead of duplicating
+ */
 	
 	private  void saveInput(String placeReferenceCode, String identity, String refCode,
 			String[] parameters) {
@@ -109,7 +112,7 @@ public class SmsInput extends ServerResource {
 		String name = identity;
 
 		/*
-		 * TODO: verify place based on location extracted from sms
+		 * TODO: if reference code is not provided, try to find the application anyway
 		 */
 		List<PlaceDao> places = Dao.getPlaces();
 		
@@ -130,21 +133,30 @@ public class SmsInput extends ServerResource {
 					
 				if (widgetOption == null) {
 					Log.get().debug("No widgets are using this reference code.");
+					Dao.commitOrRollbackTransaction();
 				} else {
 					Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
 
 					WidgetInputDao input = new WidgetInputDao(widgetOption.getKey(), System.currentTimeMillis(), parameters, name );
 					input.setInputMechanism("SMS");
 					Dao.put(input);
+					
+					if ( !Dao.commitOrRollbackTransaction() ) {
+						Log.get().error("Could not save input to datastore");
+					}
+					
+					/*
+					 * Send the input via the app channel, if possible
+					 */
+					WidgetInputResource.sendInputThroughChannel(input, place.getPlaceId(), widgetOption.getWidgetKey().getParent().getName());
+					
 					/*
 					 * Log the input to get statistics
 					 */
 					WidgetInputResource.logInputStatistics(input);
 				}
 				
-				if ( !Dao.commitOrRollbackTransaction() ) {
-					Log.get().error("Could not save input to datastore");
-				}
+				
 			}
 			
 		}

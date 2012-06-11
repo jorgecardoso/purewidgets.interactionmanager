@@ -33,9 +33,11 @@ public class Dao extends DAOBase {
 
 	public static void beginTransaction() {
 		ofy = ObjectifyService.beginTransaction();
+		Log.get().debug("Started transaction: " + ofy.getTxn().getId() );
 	}
 
 	public static boolean commitOrRollbackTransaction() {
+		Log.get().debug("Commiting transaction: " + ofy.getTxn().getId() );
 		boolean success = false;
 		try {
 			ofy.getTxn().commit();
