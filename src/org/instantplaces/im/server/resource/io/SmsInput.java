@@ -107,10 +107,10 @@ public class SmsInput extends ServerResource {
  * TODO: this code should be refactored to use the widgetinputresource instead of duplicating
  */
 	
-	private  void saveInput(String placeReferenceCode, String identity, String refCode,
+	private  void saveInput(String placeReferenceCode, String phoneNumber, String refCode,
 			String[] parameters) {
 
-		String name = identity;
+
 
 		/*
 		 * TODO: if reference code is not provided, try to find the application anyway
@@ -137,6 +137,16 @@ public class SmsInput extends ServerResource {
 					Dao.commitOrRollbackTransaction();
 				} else {
 					/*
+					 * Obfuscate the phone number
+					 */
+					String userIdentity = phoneNumber.hashCode()+"";
+					String name = phoneNumber;
+					if ( phoneNumber.length() > 9 ) {
+						name = phoneNumber.substring(3);
+					}
+					name = name.substring(0, 2) + "..." + name.substring(5);
+					
+					/*
 					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
 					 */
 					WidgetInputRest widgetInputRest = new WidgetInputRest();
@@ -148,7 +158,7 @@ public class SmsInput extends ServerResource {
 					widgetInputRest.setInputMechanism("SMS");
 					widgetInputRest.setPersona(name);
 					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
-					widgetInputRest.setUserIdentifier(name);
+					widgetInputRest.setUserIdentifier(userIdentity);
 					widgetInputRest.setParameters(parameters);
 					
 					
