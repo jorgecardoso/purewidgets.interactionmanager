@@ -49,8 +49,14 @@ public class WidgetInputResource extends GenericResource {
 	protected Object doPost(Object incoming) {
 		WidgetInputRest receivedWidgetInputRest = (WidgetInputRest) incoming;
 		
+		handleInput(receivedWidgetInputRest, this.placeId, this.appId, this.widgetId);
+		
+		return null;
+	}
+	
+	public static void handleInput(WidgetInputRest receivedWidgetInputRest, String placeId, String appId, String widgetId) {
 		Dao.beginTransaction();
-		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(this.placeId, this.appId, this.widgetId, receivedWidgetInputRest.getWidgetOptionId());
+		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(placeId, appId, widgetId, receivedWidgetInputRest.getWidgetOptionId());
 		
 		
 		if ( null != widgetOptionDao ) {
@@ -58,13 +64,17 @@ public class WidgetInputResource extends GenericResource {
 	
 			widgetInputDao.setTimeStamp(System.currentTimeMillis());
 			Dao.put(widgetInputDao);
-			
 			Dao.commitOrRollbackTransaction();
 			
 			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
+			syncCache.put("place/"+placeId+"/application/"+appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
 			
-			this.sendInputThroughChannel(widgetInputDao);
+			
+			/*
+			 * Try to send the input through the channel to the application (client)
+			 */
+			sendInputThroughChannel(widgetInputDao, placeId, appId);
+			
 			/*
 			 * Log the input to get statistics
 			 */
@@ -73,8 +83,6 @@ public class WidgetInputResource extends GenericResource {
 			Log.get().warn("WidgetOption does not exist.");
 			Dao.commitOrRollbackTransaction();
 		}
-		
-		return null;
 	}
 	
 	/**

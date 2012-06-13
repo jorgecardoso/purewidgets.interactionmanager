@@ -11,6 +11,7 @@ import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.resource.WidgetInputResource;
+import org.instantplaces.im.server.rest.WidgetInputRest;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
@@ -135,25 +136,27 @@ public class SmsInput extends ServerResource {
 					Log.get().debug("No widgets are using this reference code.");
 					Dao.commitOrRollbackTransaction();
 				} else {
-					Log.get().debug("Saving input for " + widgetOption.getWidgetOptionId());
-
-					WidgetInputDao input = new WidgetInputDao(widgetOption.getKey(), System.currentTimeMillis(), parameters, name );
-					input.setInputMechanism("SMS");
-					Dao.put(input);
+					/*
+					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
+					 */
+					WidgetInputRest widgetInputRest = new WidgetInputRest();
+					
+					widgetInputRest.setPlaceId(place.getPlaceId());
+					widgetInputRest.setApplicationId(widgetOption.getWidgetKey().getParent().getName());
+					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
+					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
+					widgetInputRest.setInputMechanism("SMS");
+					widgetInputRest.setPersona(name);
+					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
+					widgetInputRest.setUserIdentifier(name);
+					widgetInputRest.setParameters(parameters);
+					
 					
 					if ( !Dao.commitOrRollbackTransaction() ) {
 						Log.get().error("Could not save input to datastore");
 					}
 					
-					/*
-					 * Send the input via the app channel, if possible
-					 */
-					WidgetInputResource.sendInputThroughChannel(input, place.getPlaceId(), widgetOption.getWidgetKey().getParent().getName());
-					
-					/*
-					 * Log the input to get statistics
-					 */
-					WidgetInputResource.logInputStatistics(input);
+					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
 				}
 				
 				
