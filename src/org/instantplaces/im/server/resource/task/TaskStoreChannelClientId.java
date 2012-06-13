@@ -27,8 +27,9 @@ public class TaskStoreChannelClientId  extends ServerResource {
 			Log.get().warn("Could not retrieve channel map from datastore, creating new...");
 			channelMap = new ChannelMapDao(placeApplication);
 		}
-
-		channelMap.add(clientId);
+		if ( !channelMap.contains(clientId) ) {
+			channelMap.add(clientId);
+		}
 		Dao.put(channelMap);
 		
 		if ( !Dao.commitOrRollbackTransaction() ) {

@@ -71,6 +71,13 @@ public class ChannelMapDao {
 	public void setClientIds(ArrayList<String> clientIds) {
 		this.clientIds = clientIds;
 	}
+
+	public boolean contains(String clientId) {
+		if ( null == this.clientIds ) {
+    		return false;
+    	}
+    	return this.clientIds.contains(clientId);
+	}
     
     
 }
