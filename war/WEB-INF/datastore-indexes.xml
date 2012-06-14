@@ -2,4 +2,7 @@
     <datastore-index kind="WidgetInputDao" ancestor="true" >
         <property name="timeStamp" direction="asc"/>
     </datastore-index>
+        <datastore-index kind="WidgetOptionDao" ancestor="true" >
+        <property name="referenceCode" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>

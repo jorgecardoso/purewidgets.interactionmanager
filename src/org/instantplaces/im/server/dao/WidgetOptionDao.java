@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
@@ -17,7 +18,7 @@ public class WidgetOptionDao implements Serializable {
 	@Unindexed
 	private String longDescripton;
 
-	@Unindexed
+	@Indexed
 	private String referenceCode;
 
 	@Unindexed
@@ -25,6 +26,13 @@ public class WidgetOptionDao implements Serializable {
 
 	@Unindexed
 	private String suggestedReferenceCode;
+	
+	/**
+	 * Was the reference code assigned from the pool of unique codes?
+	 * Default is yes.
+	 */
+	@Unindexed 
+	private boolean recyclable;
 
 //	@NotSaved
 //	private WidgetDao widget;
@@ -45,6 +53,7 @@ public class WidgetOptionDao implements Serializable {
 		this.suggestedReferenceCode = suggestedReferenceCode;
 		this.referenceCode = referenceCode;
 		this.widgetKey = parentKey;
+		this.recyclable = true;
 	}
 
 	@SuppressWarnings("unused")
@@ -157,6 +166,20 @@ public class WidgetOptionDao implements Serializable {
 		} else if (!widgetOptionId.equals(other.widgetOptionId))
 			return false;
 		return true;
+	}
+
+	/**
+	 * @return the recyclable
+	 */
+	public boolean isRecyclable() {
+		return recyclable;
+	}
+
+	/**
+	 * @param recyclable the recyclable to set
+	 */
+	public void setRecyclable(boolean recyclable) {
+		this.recyclable = recyclable;
 	}
 
 }

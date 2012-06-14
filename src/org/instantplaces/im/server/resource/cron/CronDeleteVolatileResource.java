@@ -26,7 +26,7 @@ public class CronDeleteVolatileResource extends ServerResource {
 
 	@Override
 	public void doInit() {
-		Log.get().debug("Cron: deleting widgets from inactive applications.");
+		Log.get().debug("Cron: deleting volatile widgets from inactive applications.");
 	}
 
 	@Get
@@ -49,7 +49,7 @@ public class CronDeleteVolatileResource extends ServerResource {
 			
 			for (ApplicationDao app : applications) {
 				Log.get().debug("Deleting widgets from application: " + app.getApplicationId());
-				if ((current - app.getLastRequestTimestamp()) > INACTIVE) {
+				if ( (current - app.getLastRequestTimestamp()) > INACTIVE ) {
 
 					List<WidgetDao> widgets = Dao.getWidgets(placeKey, app.getApplicationId());
 

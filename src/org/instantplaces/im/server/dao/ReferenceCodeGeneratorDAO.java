@@ -182,11 +182,12 @@ public class ReferenceCodeGeneratorDAO {
 	 * finally { // query.closeAll(); } }
 	 */
 
-	public void recycleCode(String code) {
-
-			
-			if ( !this.codes.contains(code) ) {
-				this.codes.add(code);
+	public void recycleCode(WidgetOptionDao widgetOption) {
+		if ( !widgetOption.isRecyclable() ) {
+			return;
+		}
+		if ( !this.codes.contains(widgetOption.getReferenceCode()) ) {
+				this.codes.add(widgetOption.getReferenceCode());
 			}
 
 	}

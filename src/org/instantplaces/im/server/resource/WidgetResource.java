@@ -120,7 +120,7 @@ public class WidgetResource extends GenericResource {
 				 * with each option that not longer exists in the widget
 				 */
 				for (WidgetOptionDao option : optionsToDelete) {
-					rcg.recycleCode(option.getReferenceCode());
+					rcg.recycleCode(option);
 					Dao.delete(Dao.getWidgetInputsKeys(this.placeId, this.appId,
 							widget.getWidgetId(), option.getWidgetOptionId()));
 				}
@@ -263,7 +263,7 @@ public class WidgetResource extends GenericResource {
 					widget.getWidgetId());
 
 			for (WidgetOptionDao option : widgetOptions) {
-				rcg.recycleCode(option.getReferenceCode());
+				rcg.recycleCode(option);
 
 				/*
 				 * Add the option to the list of options that are going to be

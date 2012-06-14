@@ -94,10 +94,18 @@ public class WidgetDao implements Serializable {
 
 	public void assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
 
+		if ( this.controlType.equalsIgnoreCase("presence") ) {
+			WidgetOptionDao option = this.getWidgetOptions().get(0);
+			option.setReferenceCode("checkin");
+			option.setRecyclable(false);
+			return;
+		}
+		
 		String code;
-		for (WidgetOptionDao option : this.widgetOptions) {
-			if (null == option.getReferenceCode()) {
+		for ( WidgetOptionDao option : this.widgetOptions ) {
+			if ( null == option.getReferenceCode() ) {
 				code = rcg.getNextCodeAsString();
+				
 				Log.get().debug("Assigning reference code: " + code + " to " + this.toString());
 				option.setReferenceCode(code);
 			}

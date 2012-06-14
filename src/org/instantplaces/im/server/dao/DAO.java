@@ -286,6 +286,7 @@ public class Dao extends DAOBase {
 
 		return getWidget(widgetKey);
 	}
+	
 
 	public static List<WidgetInputDao> getWidgetInputs(
 			Key<?> widgetOrApplicationKey) {
@@ -299,6 +300,18 @@ public class Dao extends DAOBase {
 			Key<?> widgetOrApplicationKey, long from) {
 		Query<WidgetInputDao> q = ofy.query(WidgetInputDao.class)
 				.ancestor(widgetOrApplicationKey).filter("timeStamp > ", from);
+
+		return q.list();
+	}
+	
+	public static List<WidgetOptionDao> getWidgetOptionsByReferenceCode(
+			String placeId, String referenceCode) {
+		
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		
+		Log.get().debug("Searching for widget options on place + " + placeId + ", with reference code " + referenceCode);
+		Query<WidgetOptionDao> q = ofy.query(WidgetOptionDao.class)
+				.ancestor(placeKey).filter("referenceCode =", referenceCode.trim());
 
 		return q.list();
 	}

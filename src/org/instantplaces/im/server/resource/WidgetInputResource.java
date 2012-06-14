@@ -10,14 +10,12 @@ import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.RestConverter;
 import org.instantplaces.im.server.rest.WidgetInputListRest;
 import org.instantplaces.im.server.rest.WidgetInputRest;
-import org.instantplaces.im.server.rest.WidgetListRest;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -31,7 +29,6 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskAlreadyExistsException;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
-import com.googlecode.objectify.Key;
 
 public class WidgetInputResource extends GenericResource {
 
@@ -54,31 +51,56 @@ public class WidgetInputResource extends GenericResource {
 		return null;
 	}
 	
-	public static void handleInput(WidgetInputRest receivedWidgetInputRest, String placeId, String appId, String widgetId) {
-		Dao.beginTransaction();
-		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(placeId, appId, widgetId, receivedWidgetInputRest.getWidgetOptionId());
-		
-		
-		if ( null != widgetOptionDao ) {
-			WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
 	
-			widgetInputDao.setTimeStamp(System.currentTimeMillis());
-			Dao.put(widgetInputDao);
+	public static void handleInput(WidgetInputRest receivedWidgetInputRest, String placeId, String appId, String widgetId) {
+		
+		String referenceCode = receivedWidgetInputRest.getReferenceCode();
+		
+		
+		if ( null == referenceCode ) {
+			Log.get().warn("Could not get a valid reference code.");
+			return;
+		}
+		
+		Dao.beginTransaction();
+		List<WidgetOptionDao> widgetOptionDaoList = Dao.getWidgetOptionsByReferenceCode(placeId, referenceCode);
+		
+		
+		if ( null != widgetOptionDaoList ) {
+			
+			ArrayList<WidgetInputDao> inputList = new ArrayList<WidgetInputDao>();
+			
+			Log.get().debug("Forwarding input to " + widgetOptionDaoList.size() + " widget options");
+			for ( WidgetOptionDao widgetOptionDao : widgetOptionDaoList ) {
+			
+				WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
+	
+				widgetInputDao.setTimeStamp( System.currentTimeMillis() );
+				Dao.put( widgetInputDao );
+				
+				inputList.add(widgetInputDao);
+			
+				MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+				syncCache.put("place/"+placeId+"/application/"+widgetOptionDao.getWidgetKey().getParent().getName()+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
+			
+				
+				/*
+				 * Log the input to get statistics
+				 */
+				WidgetInputResource.logInputStatistics(widgetInputDao);
+			}
 			Dao.commitOrRollbackTransaction();
 			
-			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-			syncCache.put("place/"+placeId+"/application/"+appId+"/lastinputtimestamp", widgetInputDao.getTimeStamp());
-			
-			
 			/*
-			 * Try to send the input through the channel to the application (client)
+			 * Send the input through the channel for each app
 			 */
-			sendInputThroughChannel(widgetInputDao, placeId, appId);
+			for ( WidgetInputDao widgetInputDao : inputList ) {
+				/*
+				 * Try to send the input through the channel to the application (client)
+				 */
+				sendInputThroughChannel(widgetInputDao, placeId, widgetInputDao.getWidgetOptionKey().getParent().getParent().getName());
+			}
 			
-			/*
-			 * Log the input to get statistics
-			 */
-			WidgetInputResource.logInputStatistics(widgetInputDao);
 		} else {
 			Log.get().warn("WidgetOption does not exist.");
 			Dao.commitOrRollbackTransaction();
