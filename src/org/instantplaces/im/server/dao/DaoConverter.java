@@ -1,10 +1,10 @@
 package org.instantplaces.im.server.dao;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.rest.ApplicationRest;
-import org.instantplaces.im.server.rest.WidgetInputRest;
-import org.instantplaces.im.server.rest.WidgetOptionRest;
-import org.instantplaces.im.server.rest.WidgetRest;
+import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetOptionRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetRest;
 
 public class DaoConverter {
 

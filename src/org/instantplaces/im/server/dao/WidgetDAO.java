@@ -104,8 +104,11 @@ public class WidgetDao implements Serializable {
 		String code;
 		for ( WidgetOptionDao option : this.widgetOptions ) {
 			if ( null == option.getReferenceCode() ) {
-				code = rcg.getNextCodeAsString();
-				
+				if ( null != option.getSuggestedReferenceCode() && option.getSuggestedReferenceCode().length() > 1 ) {
+					code = option.getSuggestedReferenceCode();
+				} else {
+					code = rcg.getNextCodeAsString();
+				}
 				Log.get().debug("Assigning reference code: " + code + " to " + this.toString());
 				option.setReferenceCode(code);
 			}
