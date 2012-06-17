@@ -90,7 +90,6 @@ public class WidgetResource extends GenericResource {
 
 			WidgetDao widget = Dao
 					.getWidget(this.placeId, this.appId, receivedWidget.getWidgetId());
-
 			
 			/*
 			 * The widget already exists, so merge with the received one

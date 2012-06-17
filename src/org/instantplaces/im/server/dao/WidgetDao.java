@@ -172,6 +172,10 @@ public class WidgetDao implements Serializable {
 	public ArrayList<WidgetOptionDao> mergeOptionsToAdd(WidgetDao that) {
 		
 		ArrayList<WidgetOptionDao> toAdd = new ArrayList<WidgetOptionDao>();
+		
+		/*
+		 * If we have no options, add all
+		 */
 		if (null == this.widgetOptions) {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
 			this.widgetOptions.addAll(that.getWidgetOptions());

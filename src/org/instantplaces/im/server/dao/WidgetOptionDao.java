@@ -161,10 +161,16 @@ public class WidgetOptionDao implements Serializable {
 			return false;
 		WidgetOptionDao other = (WidgetOptionDao) obj;
 		if (widgetOptionId == null) {
-			if (other.widgetOptionId != null)
+			if (other.widgetOptionId != null) {
 				return false;
-		} else if (!widgetOptionId.equals(other.widgetOptionId))
+			}
+		} else if (!widgetOptionId.equals(other.widgetOptionId)) {
 			return false;
+		} else if ( null == this.suggestedReferenceCode && other.getSuggestedReferenceCode() != null ) {
+			return false;
+		} else if ( null != this.suggestedReferenceCode && !this.suggestedReferenceCode.equals(other.getSuggestedReferenceCode()) ) {
+			return false;
+		}
 		return true;
 	}
 
