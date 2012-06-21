@@ -15,8 +15,6 @@ public interface Widget {
 	public void setWidgetId(String widgetId);
 	public String getWidgetId();
 	
-	public boolean isVolatileWidget(); 
-	public void setVolatileWidget(boolean isVolatileWidget); 
 	
 	public WidgetOption[] getWidgetOptions();
 	public void addWidgetOption(WidgetOption widgetOption);

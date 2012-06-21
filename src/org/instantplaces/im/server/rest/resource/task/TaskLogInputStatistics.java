@@ -89,8 +89,8 @@ public class TaskLogInputStatistics extends ServerResource {
 			
 			ListEntry entry = new ListEntry();
 			
-			entry.getCustomElements().setValueLocal("userid", wir.getUserIdentifier() == null? "" : wir.getUserIdentifier());
-			entry.getCustomElements().setValueLocal("username", wir.getPersona());
+			entry.getCustomElements().setValueLocal("userid", wir.getUserId() == null? "" : wir.getUserId());
+			entry.getCustomElements().setValueLocal("username", wir.getNickname());
 			entry.getCustomElements().setValueLocal("place", wir.getPlaceId());
 			entry.getCustomElements().setValueLocal("application", wir.getApplicationId());
 			entry.getCustomElements().setValueLocal("widget", wir.getWidgetId());

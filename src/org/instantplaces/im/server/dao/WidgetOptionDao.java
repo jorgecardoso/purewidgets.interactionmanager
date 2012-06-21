@@ -168,7 +168,7 @@ public class WidgetOptionDao implements Serializable {
 			return false;
 		} else if ( null == this.suggestedReferenceCode && other.getSuggestedReferenceCode() != null ) {
 			return false;
-		} else if ( null != this.suggestedReferenceCode && !this.suggestedReferenceCode.equals(other.getSuggestedReferenceCode()) ) {
+		} else if ( null != this.suggestedReferenceCode && null != other.getSuggestedReferenceCode() && !this.suggestedReferenceCode.equals(other.getSuggestedReferenceCode()) ) {
 			return false;
 		}
 		return true;

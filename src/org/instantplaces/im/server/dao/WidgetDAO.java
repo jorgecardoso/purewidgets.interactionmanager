@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
+import javax.persistence.Embedded;
 import javax.persistence.Id;
 
 import org.instantplaces.im.server.Log;
@@ -12,6 +14,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.NotSaved;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
+
 
 public class WidgetDao implements Serializable {
 
@@ -45,23 +48,14 @@ public class WidgetDao implements Serializable {
 	private String shortDescription;
 	
 	
-	@Unindexed 
-	private String userResponse;
-	
-	
-	/**
-	 * For download widgets, specifies the URL of the content to send to the user
-	 */
-	@Unindexed
-	private String contentUrl;
-	
-
-	@Unindexed
-	private boolean volatileWidget;
 
 	@Id
 	private String widgetId;
-
+	
+	@Unindexed
+	@Embedded
+	private ArrayList<WidgetParameterDao> widgetParameters;
+	
 	@NotSaved
 	private ArrayList<WidgetOptionDao> widgetOptions;
 
@@ -75,7 +69,6 @@ public class WidgetDao implements Serializable {
 		this.controlType = controlType;
 		this.shortDescription = shortDescription;
 		this.longDescription = longDescription;
-		this.volatileWidget = true;
 		this.applicationKey = applicationKey;
 		//this.setApplication(application);
 	}
@@ -90,6 +83,14 @@ public class WidgetDao implements Serializable {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
 		}
 		this.widgetOptions.add(widgetOption);
+	}
+	
+
+	public void addWidgetParameter(WidgetParameterDao widgetParameter) {
+		if (null == this.widgetParameters) {
+			this.widgetParameters = new ArrayList<WidgetParameterDao>();
+		}
+		this.widgetParameters.add(widgetParameter);
 	}
 
 	public void assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
@@ -165,9 +166,6 @@ public class WidgetDao implements Serializable {
 		return widgetOptions;
 	}
 
-	public boolean isVolatileWidget() {
-		return volatileWidget;
-	}
 
 	public ArrayList<WidgetOptionDao> mergeOptionsToAdd(WidgetDao that) {
 		
@@ -274,9 +272,7 @@ public class WidgetDao implements Serializable {
 		this.shortDescription = shortDescription;
 	}
 
-	public void setVolatileWidget(boolean volatileWidget) {
-		this.volatileWidget = volatileWidget;
-	}
+
 
 	public void setWidgetId(String id) {
 		this.widgetId = id;
@@ -297,31 +293,19 @@ public class WidgetDao implements Serializable {
 		return "Widget: " + this.widgetId;
 	}
 
+	
+
 	/**
-	 * @return the userResponse
+	 * @return the widgetParameters
 	 */
-	public String getUserResponse() {
-		return userResponse;
+	public ArrayList<WidgetParameterDao> getWidgetParameters() {
+		return widgetParameters;
 	}
 
 	/**
-	 * @param userResponse the userResponse to set
+	 * @param widgetParameters the widgetParameters to set
 	 */
-	public void setUserResponse(String userResponse) {
-		this.userResponse = userResponse;
-	}
-
-	/**
-	 * @return the contentUrl
-	 */
-	public String getContentUrl() {
-		return contentUrl;
-	}
-
-	/**
-	 * @param contentUrl the contentUrl to set
-	 */
-	public void setContentUrl(String contentUrl) {
-		this.contentUrl = contentUrl;
+	public void setWidgetParameters(ArrayList<WidgetParameterDao> widgetParameters) {
+		this.widgetParameters = widgetParameters;
 	}
 }

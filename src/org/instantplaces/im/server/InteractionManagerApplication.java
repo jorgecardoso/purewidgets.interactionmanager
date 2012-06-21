@@ -2,7 +2,6 @@ package org.instantplaces.im.server;
 
 import org.instantplaces.im.server.rest.resource.ApplicationResource;
 import org.instantplaces.im.server.rest.resource.PlaceResource;
-import org.instantplaces.im.server.rest.resource.TestResource;
 import org.instantplaces.im.server.rest.resource.WidgetInputResource;
 import org.instantplaces.im.server.rest.resource.WidgetResource;
 import org.instantplaces.im.server.rest.resource.channel.ChannelResource;
@@ -12,7 +11,6 @@ import org.instantplaces.im.server.rest.resource.cron.CronDeleteOldInput;
 import org.instantplaces.im.server.rest.resource.cron.CronDeleteVolatileResource;
 import org.instantplaces.im.server.rest.resource.cron.CronRebuildCodesResource;
 import org.instantplaces.im.server.rest.resource.io.SmsInput;
-import org.instantplaces.im.server.rest.resource.task.TaskFetchInputResource;
 import org.instantplaces.im.server.rest.resource.task.TaskLogInputStatistics;
 import org.instantplaces.im.server.rest.resource.task.TaskRemoveChannelClientId;
 import org.instantplaces.im.server.rest.resource.task.TaskStoreChannelClientId;
@@ -78,7 +76,7 @@ public class InteractionManagerApplication extends Application {
         /*
          * Tasks
          */
-        router.attach("/task/fetch-input", TaskFetchInputResource.class);
+        
         
         router.attach("/task/log-input-statistics", TaskLogInputStatistics.class);
         

@@ -12,6 +12,7 @@ import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
+import org.instantplaces.im.server.dao.WidgetParameterDao;
 
 /**
  * @author "Jorge C. S. Cardoso"
@@ -69,19 +70,38 @@ public class RestConverter {
 			}
 		}
 		
+		if ( null != widgetDao.getWidgetParameters() ) {
+			for (WidgetParameterDao parameter : widgetDao.getWidgetParameters()) {
+				widgetRest.addWidgetParameter( RestConverter.widgetParameterFromDSO(parameter) );
+			}
+		}
+		
 		widgetRest.setPlaceId (widgetDao.getApplicationKey().getParent().getName() );
 		widgetRest.setApplicationId( widgetDao.getApplicationKey().getName() );
 		widgetRest.setWidgetId(widgetDao.getWidgetId());
 		widgetRest.setControlType(widgetDao.getControlType());
-		widgetRest.setVolatileWidget(widgetDao.isVolatileWidget());
+		
 		widgetRest.setShortDescription(widgetDao.getShortDescription());
 		widgetRest.setLongDescription(widgetDao.getLongDescription());
-		widgetRest.setContentUrl(widgetDao.getContentUrl());
-		widgetRest.setUserResponse(widgetDao.getUserResponse());
+		
 		
 		return widgetRest; 
 	}
-
+	/**
+	 * Converts a WidgetParameterDSO object to a WidgetParameterREST object
+	 * 
+	 * @param widgetOptionDSO
+	 * @return
+	 */
+	public static WidgetParameterRest widgetParameterFromDSO(WidgetParameterDao widgetParameterDSO) {
+		WidgetParameterRest wpREST = new WidgetParameterRest();
+		wpREST.setName(widgetParameterDSO.getName());
+		wpREST.setValue(widgetParameterDSO.getValue());
+		
+		
+		return wpREST;
+	}
+	
 	/**
 	 * Converts a WidgetOptionDSO object to a WidgetOptionREST object
 	 * 
@@ -168,8 +188,8 @@ public class RestConverter {
 		} else {
 			widgetInputRest.setParameters(widgetInputDao.getParameters());
 		}
-		widgetInputRest.setUserIdentifier(widgetInputDao.getUserIdentifier());
-		widgetInputRest.setPersona(widgetInputDao.getPersona());
+		widgetInputRest.setUserId(widgetInputDao.getUserId());
+		widgetInputRest.setNickname(widgetInputDao.getNickname());
 		widgetInputRest.setTimeStamp(""+widgetInputDao.getTimeStamp());
 		widgetInputRest.setInputMechanism(widgetInputDao.getInputMechanism());
 		widgetInputRest.setDelivered(widgetInputDao.isDelivered());

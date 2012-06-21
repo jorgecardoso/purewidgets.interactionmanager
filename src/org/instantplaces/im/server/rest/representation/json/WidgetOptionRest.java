@@ -1,9 +1,12 @@
 package org.instantplaces.im.server.rest.representation.json;
 
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.instantplaces.im.shared.WidgetOption;
 
 
+@JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
 public class WidgetOptionRest implements WidgetOption {
 	
 

@@ -1,9 +1,12 @@
 package org.instantplaces.im.server.dao;
 
+import java.util.ArrayList;
+
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetOptionRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetParameterRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetRest;
 
 public class DaoConverter {
@@ -18,9 +21,9 @@ public class DaoConverter {
 			Log.get().warn("Could not parse timestamp: " + widgetInputRest.getTimeStamp());
 		}
 		
-		WidgetInputDao widgetInputDao = new WidgetInputDao(parent.getKey(), timeStamp, widgetInputRest.getParameters(), widgetInputRest.getPersona());
+		WidgetInputDao widgetInputDao = new WidgetInputDao(parent.getKey(), timeStamp, widgetInputRest.getParameters(), widgetInputRest.getUserId(), widgetInputRest.getNickname());
 		widgetInputDao.setInputMechanism(widgetInputRest.getInputMechanism());
-		widgetInputDao.setUserIdentifier(widgetInputRest.getUserIdentifier());
+		
 		return widgetInputDao;
 	}
  	
@@ -35,6 +38,23 @@ public class DaoConverter {
 		
 		return widgetOptionDao;
 	}
+	
+	
+	public static ArrayList<WidgetParameterDao> getWidgetParameterDao(ArrayList<WidgetParameterRest> widgetParameterRest) {
+		ArrayList<WidgetParameterDao> parameters = new ArrayList<WidgetParameterDao>();
+		
+		for ( WidgetParameterRest parameterRest : widgetParameterRest ) {
+			parameters.add( DaoConverter.getWidgetParameterDao(parameterRest) );
+		}
+			
+		return parameters;
+	}
+	
+	public static WidgetParameterDao getWidgetParameterDao(WidgetParameterRest widgetParameterRest) {
+		WidgetParameterDao widgetParameterDao = new WidgetParameterDao(widgetParameterRest.getName(), widgetParameterRest.getValue());
+		
+		return widgetParameterDao;
+	}
 
 	/**
 	 * Converts a WidgetREST object to a WidgetDSO object.
@@ -45,12 +65,14 @@ public class DaoConverter {
 	public static WidgetDao getWidgetDao(ApplicationDao parent, WidgetRest widgetRest) {
 		WidgetDao widgetDao = new WidgetDao(parent.getKey(), widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
 		
-		widgetDao.setVolatileWidget(widgetRest.isVolatileWidget());
-		widgetDao.setContentUrl(widgetRest.getContentUrl());
-		widgetDao.setUserResponse(widgetRest.getUserResponse());
+	
 		
 		for (WidgetOptionRest woRest : widgetRest.getWidgetOptions()) {
 			widgetDao.addWidgetOption(DaoConverter.getWidgetOptionDao(widgetDao, woRest));
+		}
+		
+		for (WidgetParameterRest wpRest : widgetRest.getWidgetParameters()) {
+			widgetDao.addWidgetParameter(DaoConverter.getWidgetParameterDao(wpRest));
 		}
 		
 		return widgetDao;

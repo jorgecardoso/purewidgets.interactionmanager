@@ -156,9 +156,9 @@ public class SmsInput extends ServerResource {
 					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
 					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
 					widgetInputRest.setInputMechanism("SMS");
-					widgetInputRest.setPersona(name);
+					widgetInputRest.setNickname(name);
 					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
-					widgetInputRest.setUserIdentifier(userIdentity);
+					widgetInputRest.setUserId(userIdentity);
 					widgetInputRest.setParameters(parameters);
 					
 					

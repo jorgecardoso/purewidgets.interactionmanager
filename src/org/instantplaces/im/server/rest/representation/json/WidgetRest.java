@@ -2,10 +2,13 @@ package org.instantplaces.im.server.rest.representation.json;
 
 import java.util.ArrayList;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.instantplaces.im.shared.Widget;
 import org.instantplaces.im.shared.WidgetOption;
 
 
+@JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
 public class WidgetRest implements Widget {
 
 	private	String placeId;
@@ -21,13 +24,9 @@ public class WidgetRest implements Widget {
 
 
 	private ArrayList<WidgetOptionRest>widgetOptions;
-
-
-	private boolean volatileWidget;
 	
-	private String userResponse;
-	
-	private String contentUrl;
+	private ArrayList<WidgetParameterRest>widgetParameters;
+
 	
 	/**
 	 * A short description (label) for the widget. The descriptions
@@ -44,7 +43,8 @@ public class WidgetRest implements Widget {
 	
 	public WidgetRest() {
 		this.widgetOptions = new ArrayList<WidgetOptionRest>();
-		this.volatileWidget = false;
+		this.widgetParameters = new ArrayList<WidgetParameterRest>();
+		
 	}	
 	
 	@Override
@@ -100,6 +100,12 @@ public class WidgetRest implements Widget {
 		
 	}
 
+
+	public void addWidgetParameter(WidgetParameterRest widgetParameterFromDSO) {
+		this.widgetParameters.add(widgetParameterFromDSO);
+		
+	}
+	
 	/*
 	 * Needed so that Jackson can deserialize JSON correctly
 	 */
@@ -128,15 +134,7 @@ public class WidgetRest implements Widget {
 		return sb.toString();
 	}
 
-	@Override
-	public boolean isVolatileWidget() {
-		return volatileWidget;
-	}
-
-	@Override
-	public void setVolatileWidget(boolean volatileWidget) {
-		this.volatileWidget = volatileWidget;
-	}
+	
 
 	/**
 	 * @return the shortDescription
@@ -180,33 +178,23 @@ public class WidgetRest implements Widget {
 		this.controlType = controlType;
 	}
 
+	
+
+
 	/**
-	 * @return the userResponse
+	 * @return the widgetParameters
 	 */
-	public String getUserResponse() {
-		return userResponse;
+	public ArrayList<WidgetParameterRest> getWidgetParameters() {
+		return widgetParameters;
 	}
 
 	/**
-	 * @param userResponse the userResponse to set
+	 * @param widgetParameters the widgetParameters to set
 	 */
-	public void setUserResponse(String userResponse) {
-		this.userResponse = userResponse;
+	public void setWidgetParameters(ArrayList<WidgetParameterRest> widgetParameters) {
+		this.widgetParameters = widgetParameters;
 	}
 
-	/**
-	 * @return the contentUrl
-	 */
-	public String getContentUrl() {
-		return contentUrl;
-	}
-
-	/**
-	 * @param contentUrl the contentUrl to set
-	 */
-	public void setContentUrl(String contentUrl) {
-		this.contentUrl = contentUrl;
-	}
 
 
 

@@ -12,7 +12,7 @@ import org.instantplaces.im.shared.WidgetInput;
  *
  */
 @JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
-public class WidgetInputRest implements WidgetInput{
+public class WidgetInputRest {
 	
 	private String placeId;
 	
@@ -30,9 +30,9 @@ public class WidgetInputRest implements WidgetInput{
 
 	private String[] parameters;
 	
-	private String userIdentifier;
+	private String userId;
 	
-	private String persona;	
+	private String nickname;	
 	
 	/**
 	 * The input mechanism that was used to generate this input
@@ -56,56 +56,46 @@ public class WidgetInputRest implements WidgetInput{
 		this.delivered = false;
 	}
 
-	@Override
+	
 	public void setWidgetId(String widgetId) {
 		this.widgetId = widgetId;
 	}
 
-	@Override
+
 	public String getWidgetId() {
 		return this.widgetId;
 	}
 
-	@Override
+
 	public void setWidgetOptionId(String widgetOptionId) {
 		this.widgetOptionId = widgetOptionId;
 	}
 
-	@Override
+
 	public String getWidgetOptionId() {
 		return this.widgetOptionId;
 	}
 
-	@Override
 	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	@Override
+
 	public String getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	@Override
+
 	public void setParameters(String[] parameters) {
 		this.parameters = parameters;
 	}
 
-	@Override
+
 	public String[] getParameters() {
 		return this.parameters;
 	}
 
-	@Override
-	public void setPersona(String persona) {
-		this.persona = persona;
-	}
-
-	@Override
-	public String getPersona() {
-		return this.persona;
-	}
-
+	
 	/**
 	 * @return the inputMechanism
 	 */
@@ -191,16 +181,32 @@ public class WidgetInputRest implements WidgetInput{
 	}
 
 	/**
-	 * @return the userIdentifier
+	 * @return the userId
 	 */
-	public String getUserIdentifier() {
-		return userIdentifier;
+	public String getUserId() {
+		return userId;
 	}
 
 	/**
-	 * @param userIdentifier the userIdentifier to set
+	 * @param userId the userId to set
 	 */
-	public void setUserIdentifier(String userIdentifier) {
-		this.userIdentifier = userIdentifier;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
+
+	/**
+	 * @return the nickname
+	 */
+	public String getNickname() {
+		return nickname;
+	}
+
+	/**
+	 * @param nickname the nickname to set
+	 */
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	
 }

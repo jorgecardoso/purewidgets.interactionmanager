@@ -35,43 +35,43 @@ public class CronDeleteVolatileResource extends ServerResource {
 
 		
 
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
-
-		
-
-		for (Key<PlaceDao> placeKey : placeKeys) {
-			Dao.beginTransaction();
-			List<ApplicationDao> applications = Dao.getApplications(placeKey);
-
-			ArrayList<WidgetDao> widgetsToDelete = new ArrayList<WidgetDao>();
-			ArrayList<Key<WidgetOptionDao>> widgetOptionsToDelete = new ArrayList<Key<WidgetOptionDao>>();
-			ArrayList<Key<WidgetInputDao>> widgetInputsToDelete = new ArrayList<Key<WidgetInputDao>>();
-			
-			for (ApplicationDao app : applications) {
-				Log.get().debug("Deleting widgets from application: " + app.getApplicationId());
-				if ( (current - app.getLastRequestTimestamp()) > INACTIVE ) {
-
-					List<WidgetDao> widgets = Dao.getWidgets(placeKey, app.getApplicationId());
-
-					for (WidgetDao widget : widgets) {
-						if (widget.isVolatileWidget()) {
-							widgetsToDelete.add(widget);
-
-							widgetOptionsToDelete.addAll(Dao.getWidgetOptionsKeys(widget.getKey()));
-
-							widgetInputsToDelete.addAll(Dao.getWidgetInputsKeys(widget.getKey()));
-						}
-					}
-
-				}
-			}
-			Dao.delete(widgetsToDelete);
-			Dao.delete(widgetOptionsToDelete);
-			Dao.delete(widgetInputsToDelete);
-
-			Dao.commitOrRollbackTransaction();
-		}
-		
+//		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+//
+//		
+//
+//		for (Key<PlaceDao> placeKey : placeKeys) {
+//			Dao.beginTransaction();
+//			List<ApplicationDao> applications = Dao.getApplications(placeKey);
+//
+//			ArrayList<WidgetDao> widgetsToDelete = new ArrayList<WidgetDao>();
+//			ArrayList<Key<WidgetOptionDao>> widgetOptionsToDelete = new ArrayList<Key<WidgetOptionDao>>();
+//			ArrayList<Key<WidgetInputDao>> widgetInputsToDelete = new ArrayList<Key<WidgetInputDao>>();
+//			
+//			for (ApplicationDao app : applications) {
+//				Log.get().debug("Deleting widgets from application: " + app.getApplicationId());
+//				if ( (current - app.getLastRequestTimestamp()) > INACTIVE ) {
+//
+//					List<WidgetDao> widgets = Dao.getWidgets(placeKey, app.getApplicationId());
+//
+//					for (WidgetDao widget : widgets) {
+//						if (widget.isVolatileWidget()) {
+//							widgetsToDelete.add(widget);
+//
+//							widgetOptionsToDelete.addAll(Dao.getWidgetOptionsKeys(widget.getKey()));
+//
+//							widgetInputsToDelete.addAll(Dao.getWidgetInputsKeys(widget.getKey()));
+//						}
+//					}
+//
+//				}
+//			}
+//			Dao.delete(widgetsToDelete);
+//			Dao.delete(widgetOptionsToDelete);
+//			Dao.delete(widgetInputsToDelete);
+//
+//			Dao.commitOrRollbackTransaction();
+//		}
+//		
 		return null;
 
 	}

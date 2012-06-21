@@ -98,10 +98,11 @@ public class WidgetResource extends GenericResource {
 				//TODO: merge the other fields of the widget
 				widget.setShortDescription(receivedWidget.getShortDescription());
 				widget.setLongDescription(receivedWidget.getLongDescription());
-				widget.setContentUrl(receivedWidget.getContentUrl());
+				
 				widget.setControlType(receivedWidget.getControlType());
-				widget.setUserResponse(receivedWidget.getUserResponse());
-				widget.setVolatileWidget(receivedWidget.isVolatileWidget());
+				
+				
+				widget.setWidgetParameters(DaoConverter.getWidgetParameterDao( receivedWidget.getWidgetParameters()) );
 				
 				
 				/*
@@ -253,11 +254,11 @@ public class WidgetResource extends GenericResource {
 
 		while (iterator.hasNext()) {
 			WidgetDao widget = iterator.next();
-
-			if (volatileOnly && !widget.isVolatileWidget()) {
-				iterator.remove();
-				continue;
-			}
+// TODO: remove this volatile optiion
+//			if (volatileOnly && !widget.isVolatileWidget()) {
+//				iterator.remove();
+//				continue;
+//			}
 
 			/*
 			 * Recycle the reference codes

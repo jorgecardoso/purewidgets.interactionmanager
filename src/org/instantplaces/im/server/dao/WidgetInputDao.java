@@ -29,11 +29,11 @@ public class WidgetInputDao {
 	private String[] parameters;
 
 	@Unindexed
-	private String userIdentifier;
+	private String userId;
 
 
 	@Unindexed
-	private String persona;
+	private String nickname;
 
 
 	@Indexed
@@ -49,10 +49,11 @@ public class WidgetInputDao {
 	private Key<WidgetOptionDao> widgetOptionKey;
 
 	public WidgetInputDao(Key<WidgetOptionDao> parent, long timeStamp, String[] parameters,
-			String persona) {
+			String userId, String nickname) {
 		this.timeStamp = timeStamp;
 		this.parameters = parameters;
-		this.persona = persona;
+		this.userId = userId;
+		this.nickname = nickname;
 		this.delivered = false;
 		this.widgetOptionKey = parent;
 	}
@@ -82,9 +83,6 @@ public class WidgetInputDao {
 		return parameters;
 	}
 
-	public String getPersona() {
-		return persona;
-	}
 
 	public long getTimeStamp() {
 		return timeStamp;
@@ -135,9 +133,6 @@ public class WidgetInputDao {
 		this.parameters = parameters;
 	}
 
-	public void setPersona(String persona) {
-		this.persona = persona;
-	}
 
 	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
@@ -164,22 +159,36 @@ public class WidgetInputDao {
 	@Override
 	public String toString() {
 
-		return "WidgetInput: " + "persona: " + this.persona + "; parameters "
+		return "WidgetInput: " + "nickname: " + this.nickname + "; parameters "
 				+ Arrays.toString(this.parameters) + ")";
 	}
 
 	/**
-	 * @return the userIdentifier
+	 * @return the userId
 	 */
-	public String getUserIdentifier() {
-		return userIdentifier;
+	public String getUserId() {
+		return userId;
 	}
 
 	/**
-	 * @param userIdentifier the userIdentifier to set
+	 * @param userId the userId to set
 	 */
-	public void setUserIdentifier(String userIdentifier) {
-		this.userIdentifier = userIdentifier;
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the nickname
+	 */
+	public String getNickname() {
+		return nickname;
+	}
+
+	/**
+	 * @param nickname the nickname to set
+	 */
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 }
