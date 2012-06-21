@@ -132,7 +132,7 @@ public class RestConverter {
 	
 		a.setPlaceId( applicationDSO.getPlaceKey().getName() );
 		a.setApplicationId( applicationDSO.getApplicationId() );
-		a.setIconBaseUrl(applicationDSO.getIconBaseUrl());
+		a.setApplicationBaseUrl(applicationDSO.getApplicationBaseUrl());
 		
 		
 		/*for ( WidgetDSO widget : applicationDSO.getWidgets() ) {

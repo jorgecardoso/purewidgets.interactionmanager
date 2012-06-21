@@ -27,7 +27,7 @@ public class ApplicationRest {
 
 	private String applicationId;
 	
-	private String iconBaseUrl;
+	private String applicationBaseUrl;
 	
 	/**
 	 * The timestamp of the last request made by this app.
@@ -102,18 +102,18 @@ public class ApplicationRest {
 
 
 	/**
-	 * @return the iconBaseUrl
+	 * @return the applicationBaseUrl
 	 */
-	public String getIconBaseUrl() {
-		return iconBaseUrl;
+	public String getApplicationBaseUrl() {
+		return applicationBaseUrl;
 	}
 
 
 	/**
-	 * @param iconBaseUrl the iconBaseUrl to set
+	 * @param applicationBaseUrl the applicationBaseUrl to set
 	 */
-	public void setIconBaseUrl(String iconBaseUrl) {
-		this.iconBaseUrl = iconBaseUrl;
+	public void setApplicationBaseUrl(String applicationBaseUrl) {
+		this.applicationBaseUrl = applicationBaseUrl;
 	}
 	
 }

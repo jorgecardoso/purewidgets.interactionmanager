@@ -87,7 +87,7 @@ public class DaoConverter {
 	public static ApplicationDao getApplicationDao(PlaceDao parent, ApplicationRest applicationRest) {
 		ApplicationDao applicationDao = new ApplicationDao(parent, applicationRest.getApplicationId());
 		
-		applicationDao.setIconBaseUrl(applicationRest.getIconBaseUrl());
+		applicationDao.setApplicationBaseUrl(applicationRest.getApplicationBaseUrl());
 		applicationDao.setLastRequestTimestamp(applicationRest.getLastRequestTimestamp());
 		
 		return applicationDao;

@@ -26,7 +26,7 @@ public class ApplicationDao  {
 	private long lastRequestTimestamp;
 	
 	@Unindexed
-	private String iconBaseUrl;
+	private String applicationBaseUrl;
 	
 	/**
 	 * The place this application belongs to
@@ -139,16 +139,18 @@ public class ApplicationDao  {
 	}
 
 	/**
-	 * @return the iconBaseUrl
+	 * @return the applicationBaseUrl
 	 */
-	public String getIconBaseUrl() {
-		return iconBaseUrl;
+	public String getApplicationBaseUrl() {
+		return applicationBaseUrl;
 	}
 
 	/**
-	 * @param iconBaseUrl the iconBaseUrl to set
+	 * @param applicationBaseUrl the applicationBaseUrl to set
 	 */
-	public void setIconBaseUrl(String iconBaseUrl) {
-		this.iconBaseUrl = iconBaseUrl;
+	public void setApplicationBaseUrl(String applicationBaseUrl) {
+		this.applicationBaseUrl = applicationBaseUrl;
 	}
+
+	
 }
