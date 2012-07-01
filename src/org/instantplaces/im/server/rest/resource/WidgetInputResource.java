@@ -95,6 +95,7 @@ public class WidgetInputResource extends GenericResource {
 			 * Send the input through the channel for each app
 			 */
 			for ( WidgetInputDao widgetInputDao : inputList ) {
+				notifyServerApp(placeId, appId);
 				/*
 				 * Try to send the input through the channel to the application (client)
 				 */
@@ -106,6 +107,21 @@ public class WidgetInputResource extends GenericResource {
 			Dao.commitOrRollbackTransaction();
 		}
 	}
+	
+	
+	private static void notifyServerApp(String placeId, String applicationId) {
+		try {
+			Queue queue = QueueFactory.getQueue("input");
+			queue.add(withUrl("/task/notify-server-app?placeid="+placeId+"&appid="+applicationId).countdownMillis(5000).method(Method.GET));
+			
+		} catch (TaskAlreadyExistsException taee) {
+			Log.get().warn("Task already exists: " + taee.getMessage());
+		} catch (Exception e) {
+			Log.get().error("Could not submit task: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
 	
 	/**
 	 * Logs the interaction by creating a task that will log the data to a spreadsheet.
@@ -147,7 +163,7 @@ public class WidgetInputResource extends GenericResource {
 			 */
 			Dao.beginTransaction();
 			List<WidgetInputDao> widgetInputs = Dao.getWidgetInputs(this.placeId, this.appId, from); 
-					//DsoFetcher.getWidgetInputFromDSO(this.pm, this.placeId, this.appId, from);
+					
 			Dao.commitOrRollbackTransaction();
 			
 			/*

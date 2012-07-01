@@ -12,6 +12,7 @@ import org.instantplaces.im.server.rest.resource.cron.CronDeleteVolatileResource
 import org.instantplaces.im.server.rest.resource.cron.CronRebuildCodesResource;
 import org.instantplaces.im.server.rest.resource.io.SmsInput;
 import org.instantplaces.im.server.rest.resource.task.TaskLogInputStatistics;
+import org.instantplaces.im.server.rest.resource.task.TaskNotifyServerApp;
 import org.instantplaces.im.server.rest.resource.task.TaskRemoveChannelClientId;
 import org.instantplaces.im.server.rest.resource.task.TaskStoreChannelClientId;
 import org.restlet.Application;
@@ -76,9 +77,9 @@ public class InteractionManagerApplication extends Application {
         /*
          * Tasks
          */
-        
-        
+           
         router.attach("/task/log-input-statistics", TaskLogInputStatistics.class);
+        router.attach("/task/notify-server-app", TaskNotifyServerApp.class);
         
         router.attach("/task/store-channel-clientid", TaskStoreChannelClientId.class);
         router.attach("/task/remove-channel-clientid", TaskRemoveChannelClientId.class);
