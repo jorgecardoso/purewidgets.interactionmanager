@@ -28,6 +28,13 @@ public class ApplicationDao  {
 	@Unindexed
 	private String applicationBaseUrl;
 	
+	
+	/** The address to notify when new input is available
+	 * 
+	 */
+	@Unindexed
+	private String applicationServerNotificationUrl;
+	
 	/**
 	 * The place this application belongs to
 	 */
@@ -150,6 +157,20 @@ public class ApplicationDao  {
 	 */
 	public void setApplicationBaseUrl(String applicationBaseUrl) {
 		this.applicationBaseUrl = applicationBaseUrl;
+	}
+
+	/**
+	 * @return the applicationServerNotificationUrl
+	 */
+	public String getApplicationServerNotificationUrl() {
+		return applicationServerNotificationUrl;
+	}
+
+	/**
+	 * @param applicationServerNotificationUrl the applicationServerNotificationUrl to set
+	 */
+	public void setApplicationServerNotificationUrl(String applicationServerNotificationUrl) {
+		this.applicationServerNotificationUrl = applicationServerNotificationUrl;
 	}
 
 	

@@ -8,7 +8,6 @@ import org.instantplaces.im.server.rest.resource.channel.ChannelResource;
 import org.instantplaces.im.server.rest.resource.cron.CronCheckTasksResource;
 import org.instantplaces.im.server.rest.resource.cron.CronDeleteOldAppsResource;
 import org.instantplaces.im.server.rest.resource.cron.CronDeleteOldInput;
-import org.instantplaces.im.server.rest.resource.cron.CronDeleteVolatileResource;
 import org.instantplaces.im.server.rest.resource.cron.CronRebuildCodesResource;
 import org.instantplaces.im.server.rest.resource.io.SmsInput;
 import org.instantplaces.im.server.rest.resource.task.TaskLogInputStatistics;
@@ -68,7 +67,6 @@ public class InteractionManagerApplication extends Application {
         /*
          * Cron
          */
-        router.attach("/cron/delete-volatile", CronDeleteVolatileResource.class);
         router.attach("/cron/rebuild-codes", CronRebuildCodesResource.class);
         router.attach("/cron/delete-old-apps", CronDeleteOldAppsResource.class);
         router.attach("/cron/check-tasks", CronCheckTasksResource.class);

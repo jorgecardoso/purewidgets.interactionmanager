@@ -1,7 +1,5 @@
 package org.instantplaces.im.server.rest.resource.task;
 
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -29,13 +27,9 @@ public class TaskNotifyServerApp extends ServerResource {
 		Dao.beginTransaction();
 		ApplicationDao applicationDao = Dao.getApplication(placeId, applicationId);
 		
-		String baseUrl = applicationDao.getApplicationBaseUrl();
+		String baseUrl = applicationDao.getApplicationServerNotificationUrl();
 		if ( null !=  baseUrl && baseUrl.length() > 0 ) {
-			if ( !baseUrl.endsWith("/") ) {
-				baseUrl += "/application";
-			} else {
-				baseUrl +="application";
-			}
+			
 			baseUrl +="?placeid=" + placeId  + "&appid="+applicationId;
 			this.doMethod("GET", null, baseUrl);
 		} else {

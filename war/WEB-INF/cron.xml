@@ -6,11 +6,6 @@
 <!--     <schedule>every 1 minutes</schedule> -->
 <!--   </cron> -->
   
-  <cron>
-    <url>/cron/delete-volatile</url>
-    <description>Cron delete volatile widgets from inactive apps</description>
-    <schedule>every 10 minutes</schedule>
-  </cron>
   
     <cron>
     <url>/cron/rebuild-codes</url>
