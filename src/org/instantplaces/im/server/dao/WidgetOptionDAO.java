@@ -15,6 +15,12 @@ public class WidgetOptionDao implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Parent
+	private Key<WidgetDao> widgetKey;
+
+	@Id
+	private String widgetOptionId;
+	
 	@Unindexed
 	private String longDescripton;
 
@@ -25,6 +31,9 @@ public class WidgetOptionDao implements Serializable {
 	private String shortDescription;
 
 	@Unindexed
+	private String iconUrl;
+	
+	@Unindexed
 	private String suggestedReferenceCode;
 	
 	/**
@@ -34,14 +43,8 @@ public class WidgetOptionDao implements Serializable {
 	@Unindexed 
 	private boolean recyclable;
 
-//	@NotSaved
-//	private WidgetDao widget;
 
-	@Parent
-	private Key<WidgetDao> widgetKey;
 
-	@Id
-	private String widgetOptionId;
 
 	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId) {
 		this(parentKey, widgetOptionId, null, null);
@@ -186,6 +189,20 @@ public class WidgetOptionDao implements Serializable {
 	 */
 	public void setRecyclable(boolean recyclable) {
 		this.recyclable = recyclable;
+	}
+
+	/**
+	 * @return the iconUrl
+	 */
+	public String getIconUrl() {
+		return iconUrl;
+	}
+
+	/**
+	 * @param iconUrl the iconUrl to set
+	 */
+	public void setIconUrl(String iconUrl) {
+		this.iconUrl = iconUrl;
 	}
 
 }

@@ -107,6 +107,7 @@ public class WidgetDao implements Serializable {
 			if ( null == option.getReferenceCode() ) {
 				if ( null != option.getSuggestedReferenceCode() && option.getSuggestedReferenceCode().length() > 1 ) {
 					code = option.getSuggestedReferenceCode();
+					option.setRecyclable(false);
 				} else {
 					code = rcg.getNextCodeAsString();
 				}

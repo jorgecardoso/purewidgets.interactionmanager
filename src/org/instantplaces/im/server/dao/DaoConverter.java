@@ -35,6 +35,7 @@ public class DaoConverter {
 		widgetOptionDao.setReferenceCode(widgetOptionRest.getReferenceCode());
 		widgetOptionDao.setLongDescripton(widgetOptionRest.getLongDescription());
 		widgetOptionDao.setShortDescription(widgetOptionRest.getShortDescription());
+		widgetOptionDao.setIconUrl(widgetOptionRest.getIconUrl());
 		
 		return widgetOptionDao;
 	}

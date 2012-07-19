@@ -115,7 +115,7 @@ public class RestConverter {
 		woREST.setSuggestedReferenceCode(widgetOptionDSO.getSuggestedReferenceCode());
 		woREST.setLongDescription(widgetOptionDSO.getLongDescripton());
 		woREST.setShortDescription(widgetOptionDSO.getShortDescription());
-		
+		woREST.setIconUrl(widgetOptionDSO.getIconUrl());
 		
 		return woREST;
 	}

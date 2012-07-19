@@ -24,6 +24,7 @@ public class WidgetOptionRest implements WidgetOption {
 
 	private String longDescription;
 	
+	private String iconUrl;
 	
 	public WidgetOptionRest() {
 		
@@ -106,6 +107,22 @@ public class WidgetOptionRest implements WidgetOption {
 		sb.append(")");
 		return sb.toString();
 		
+	}
+
+
+	/**
+	 * @return the iconUrl
+	 */
+	public String getIconUrl() {
+		return iconUrl;
+	}
+
+
+	/**
+	 * @param iconUrl the iconUrl to set
+	 */
+	public void setIconUrl(String iconUrl) {
+		this.iconUrl = iconUrl;
 	}
 
 
