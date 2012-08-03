@@ -43,7 +43,7 @@ public class WidgetOptionDao implements Serializable {
 	@Unindexed 
 	private boolean recyclable;
 
-
+	private boolean changedFlag;
 
 
 	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId) {
@@ -109,10 +109,15 @@ public class WidgetOptionDao implements Serializable {
 	 *            the longDescripton to set
 	 */
 	public void setLongDescripton(String longDescripton) {
+		this.changedFlag = !(this.longDescripton == null ? longDescripton == null : this.longDescripton.equals(longDescripton) );
+
 		this.longDescripton = longDescripton;
 	}
 
 	public void setReferenceCode(String referenceCode) {
+		this.changedFlag = !(this.referenceCode == null ? referenceCode == null : this.referenceCode.equals(referenceCode) );
+		
+
 		this.referenceCode = referenceCode;
 	}
 
@@ -121,10 +126,14 @@ public class WidgetOptionDao implements Serializable {
 	 *            the shortDescription to set
 	 */
 	public void setShortDescription(String shortDescription) {
+		this.changedFlag = !(this.shortDescription == null ? shortDescription == null : this.shortDescription.equals(shortDescription) );
+		
 		this.shortDescription = shortDescription;
 	}
 
 	public void setSuggestedReferenceCode(String suggestedReferenceCode) {
+		this.changedFlag = !(this.suggestedReferenceCode == null ? suggestedReferenceCode == null : this.suggestedReferenceCode.equals(suggestedReferenceCode) );
+	
 		this.suggestedReferenceCode = suggestedReferenceCode;
 	}
 
@@ -141,10 +150,16 @@ public class WidgetOptionDao implements Serializable {
 	 *            the widgetKey to set
 	 */
 	public void setWidgetKey(Key<WidgetDao> widgetKey) {
+		if ( !this.widgetKey.equals(widgetKey) ) {
+			this.changedFlag = true;
+		}
 		this.widgetKey = widgetKey;
 	}
 
 	public void setWidgetOptionId(String id) {
+		if ( !this.widgetOptionId.equals(id) ) {
+			this.changedFlag = true;
+		}
 		this.widgetOptionId = id;
 
 	}
@@ -188,6 +203,9 @@ public class WidgetOptionDao implements Serializable {
 	 * @param recyclable the recyclable to set
 	 */
 	public void setRecyclable(boolean recyclable) {
+		if ( this.recyclable != recyclable ) {
+			this.changedFlag = true;
+		}
 		this.recyclable = recyclable;
 	}
 
@@ -202,7 +220,21 @@ public class WidgetOptionDao implements Serializable {
 	 * @param iconUrl the iconUrl to set
 	 */
 	public void setIconUrl(String iconUrl) {
+		this.changedFlag = !(this.iconUrl == null ? iconUrl == null : this.iconUrl.equals(iconUrl) );
+		
+
 		this.iconUrl = iconUrl;
+	}
+	
+	public void clearChangedFlag() {
+		this.changedFlag = false;
+	}
+	
+	/**
+	 * @return the changedFlag
+	 */
+	public boolean isChangedFlag() {
+		return changedFlag;
 	}
 
 }

@@ -47,7 +47,6 @@ public class WidgetDao implements Serializable {
 	@Unindexed
 	private String shortDescription;
 	
-	
 
 	@Id
 	private String widgetId;
@@ -59,6 +58,9 @@ public class WidgetDao implements Serializable {
 	@NotSaved
 	private ArrayList<WidgetOptionDao> widgetOptions;
 
+	@NotSaved
+	private boolean changedFlag;
+	
 	public WidgetDao(Key<ApplicationDao> applicationKey) {
 		this(applicationKey, null, null, null, null);
 	}
@@ -78,11 +80,16 @@ public class WidgetDao implements Serializable {
 
 	}
 
+	public void clearChangedFlag() {
+		this.changedFlag = false;
+	}
+	
 	public void addWidgetOption(WidgetOptionDao widgetOption) {
 		if (null == this.widgetOptions) {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
 		}
 		this.widgetOptions.add(widgetOption);
+		this.changedFlag = true;
 	}
 	
 
@@ -91,19 +98,27 @@ public class WidgetDao implements Serializable {
 			this.widgetParameters = new ArrayList<WidgetParameterDao>();
 		}
 		this.widgetParameters.add(widgetParameter);
+		this.changedFlag = true;
 	}
 
-	public void assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
-
+	public ArrayList<WidgetOptionDao> assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
+		ArrayList<WidgetOptionDao> assigned = new ArrayList<WidgetOptionDao>();
+		
 		if ( this.controlType.equalsIgnoreCase("presence") ) {
 			WidgetOptionDao option = this.getWidgetOptions().get(0);
+			option.clearChangedFlag();
 			option.setReferenceCode("checkin");
 			option.setRecyclable(false);
-			return;
+			if ( option.isChangedFlag() ) {
+				assigned.add(option);
+			}
+			return assigned;
 		}
 		
 		String code;
 		for ( WidgetOptionDao option : this.widgetOptions ) {
+			option.clearChangedFlag();
+			
 			if ( null == option.getReferenceCode() ) {
 				if ( null != option.getSuggestedReferenceCode() && option.getSuggestedReferenceCode().length() > 1 ) {
 					code = option.getSuggestedReferenceCode();
@@ -114,7 +129,11 @@ public class WidgetDao implements Serializable {
 				Log.get().debug("Assigning reference code: " + code + " to " + this.toString());
 				option.setReferenceCode(code);
 			}
+			if ( option.isChangedFlag() ) {
+				assigned.add(option);
+			}
 		}
+		return assigned;
 	}
 
 //	/**
@@ -179,6 +198,7 @@ public class WidgetDao implements Serializable {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
 			this.widgetOptions.addAll(that.getWidgetOptions());
 			toAdd.addAll(that.getWidgetOptions());
+			
 		} else {
 			Iterator<WidgetOptionDao> it = that.getWidgetOptions().iterator();
 			while (it.hasNext()) {
@@ -246,6 +266,9 @@ public class WidgetDao implements Serializable {
 	 *            the applicationKey to set
 	 */
 	public void setApplicationKey(Key<ApplicationDao> applicationKey) {
+		if ( !this.applicationKey.equals(applicationKey) ) {
+			this.changedFlag = true;
+		}
 		this.applicationKey = applicationKey;
 	}
 
@@ -254,6 +277,9 @@ public class WidgetDao implements Serializable {
 	 *            the controlType to set
 	 */
 	public void setControlType(String controlType) {
+		if ( !this.controlType.equals(controlType) ) {
+			this.changedFlag = true;
+		}
 		this.controlType = controlType;
 	}
 
@@ -262,6 +288,9 @@ public class WidgetDao implements Serializable {
 	 *            the longDescription to set
 	 */
 	public void setLongDescription(String longDescription) {
+		if ( !this.longDescription.equals(longDescription) ) {
+			this.changedFlag = true;
+		}
 		this.longDescription = longDescription;
 	}
 
@@ -270,12 +299,18 @@ public class WidgetDao implements Serializable {
 	 *            the shortDescription to set
 	 */
 	public void setShortDescription(String shortDescription) {
+		if ( !this.shortDescription.equals(shortDescription) ) {
+			this.changedFlag = true;
+		}
 		this.shortDescription = shortDescription;
 	}
 
 
 
 	public void setWidgetId(String id) {
+		if ( !this.widgetId.equals(id) ) {
+			this.changedFlag = true;
+		}
 		this.widgetId = id;
 
 	}
@@ -307,6 +342,15 @@ public class WidgetDao implements Serializable {
 	 * @param widgetParameters the widgetParameters to set
 	 */
 	public void setWidgetParameters(ArrayList<WidgetParameterDao> widgetParameters) {
+		this.changedFlag = !(this.widgetParameters==null ? widgetParameters==null : this.widgetParameters.equals(widgetParameters));
 		this.widgetParameters = widgetParameters;
 	}
+
+	/**
+	 * @return the changedFlag
+	 */
+	public boolean isChangedFlag() {
+		return changedFlag;
+	}
+
 }

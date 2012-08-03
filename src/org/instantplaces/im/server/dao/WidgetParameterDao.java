@@ -57,5 +57,14 @@ public class WidgetParameterDao implements Serializable {
 		this.value = value;
 	}
 
+	@Override
+	public boolean equals(Object widgetParameterDao) {
+		if ( !(widgetParameterDao instanceof WidgetParameterDao) ) {
+			return false;
+		}
+		
+		WidgetParameterDao w = (WidgetParameterDao)widgetParameterDao;
+		return this.name.equals(w.getName()) && this.value.equals(w.getValue());
+	}
 
 }

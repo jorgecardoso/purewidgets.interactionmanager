@@ -86,38 +86,40 @@ public class WidgetResource extends GenericResource {
 
 		ArrayList<WidgetDao> widgetsAdded = new ArrayList<WidgetDao>();
 
-		for (WidgetRest receivedWidget : receivedWidgetListREST.getWidgets()) {
+		for (WidgetRest receivedWidgetRest : receivedWidgetListREST.getWidgets()) {
 
-			WidgetDao widget = Dao
-					.getWidget(this.placeId, this.appId, receivedWidget.getWidgetId());
+			WidgetDao existingWidgetDao = Dao
+					.getWidget(this.placeId, this.appId, receivedWidgetRest.getWidgetId());
 			
 			/*
 			 * The widget already exists, so merge with the received one
 			 */
-			if (null != widget) {
+			if (null != existingWidgetDao) {
+				existingWidgetDao.clearChangedFlag();
+				
 				//TODO: merge the other fields of the widget
-				widget.setShortDescription(receivedWidget.getShortDescription());
-				widget.setLongDescription(receivedWidget.getLongDescription());
+				existingWidgetDao.setShortDescription(receivedWidgetRest.getShortDescription());
+				existingWidgetDao.setLongDescription(receivedWidgetRest.getLongDescription());
 				
-				widget.setControlType(receivedWidget.getControlType());
+				existingWidgetDao.setControlType(receivedWidgetRest.getControlType());
 				
 				
-				widget.setWidgetParameters(DaoConverter.getWidgetParameterDao( receivedWidget.getWidgetParameters()) );
+				existingWidgetDao.setWidgetParameters(DaoConverter.getWidgetParameterDao( receivedWidgetRest.getWidgetParameters()) );
 				
 				
 				/*
 				 * The widget already exists, so fetch its options
 				 */
-				ArrayList<WidgetOptionDao> optionsFromDataStore = new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(widget.getKey()));
-				widget.setWidgetOptions(optionsFromDataStore);
+				ArrayList<WidgetOptionDao> optionsFromDataStore = new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(existingWidgetDao.getKey()));
+				existingWidgetDao.setWidgetOptions(optionsFromDataStore);
 				
 				/*
 				 * And now merge with the received one
 				 */
-				WidgetDao wDSO = DaoConverter.getWidgetDao(existingApplicationDSO,
-						receivedWidget);
-				widget.mergeOptionsToAdd(wDSO);
-				ArrayList<WidgetOptionDao> optionsToDelete = widget.mergeOptionsToDelete(wDSO);
+				WidgetDao receivedWidgetDao = DaoConverter.getWidgetDao(existingApplicationDSO,
+						receivedWidgetRest);
+				ArrayList<WidgetOptionDao> optionsToAdd = existingWidgetDao.mergeOptionsToAdd(receivedWidgetDao);
+				ArrayList<WidgetOptionDao> optionsToDelete = existingWidgetDao.mergeOptionsToDelete(receivedWidgetDao);
 
 				/*
 				 * Recycle the reference codes and delete all input associated
@@ -126,7 +128,7 @@ public class WidgetResource extends GenericResource {
 				for (WidgetOptionDao option : optionsToDelete) {
 					rcg.recycleCode(option);
 					Dao.delete(Dao.getWidgetInputsKeys(this.placeId, this.appId,
-							widget.getWidgetId(), option.getWidgetOptionId()));
+							existingWidgetDao.getWidgetId(), option.getWidgetOptionId()));
 				}
 
 				/*
@@ -137,27 +139,35 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Assign reference codes to the new options
 				 */
-				widget.assignReferenceCodes(rcg);
+				ArrayList<WidgetOptionDao> optionsChanged =  existingWidgetDao.assignReferenceCodes(rcg);
 				
 				
 				/*
 				 * Save the widget
 				 */
-				Dao.put(widget);
+				if ( existingWidgetDao.isChangedFlag() ) {
+					Dao.put(existingWidgetDao);
+				} else {
+					Log.get().debug("Widget did not change, skipping datastore put.");
+				}
 				
 				/*
 				 * And save the options
 				 */
-				Dao.put(widget.getWidgetOptions());
-				
+				//Dao.put(existingWidgetDao.getWidgetOptions());
+				if ( optionsChanged.size() <= 0 && optionsToAdd.size() <= 0) {
+					Log.get().debug("No options changed...");
+				} 
+				Dao.put(optionsChanged);
+				Dao.put(optionsToAdd);
 
 			} else {
-				widget = DaoConverter.getWidgetDao(existingApplicationDSO, receivedWidget);
-				widget.assignReferenceCodes(rcg);
-				Dao.put(widget);
-				Dao.put(widget.getWidgetOptions());
+				existingWidgetDao = DaoConverter.getWidgetDao(existingApplicationDSO, receivedWidgetRest);
+				existingWidgetDao.assignReferenceCodes(rcg);
+				Dao.put(existingWidgetDao);
+				Dao.put(existingWidgetDao.getWidgetOptions());
 			}
-			widgetsAdded.add(widget);
+			widgetsAdded.add(existingWidgetDao);
 		}
 
 		/*
