@@ -6,7 +6,10 @@ package org.instantplaces.im.server.rest.resource.task;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationContext;
@@ -20,6 +23,7 @@ import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
@@ -74,7 +78,7 @@ public class TaskLogInputStatistics extends ServerResource {
 		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
 		Dao.commitOrRollbackTransaction();
 		
-		// TODO: Log the widget input to the google spreadsheet
+
 		SpreadsheetService service = new SpreadsheetService("Interaction Manager");
 		try {
 			service.setUserCredentials("jorgediablu@gmail.com", "ocpjvlucjbkbyddy");
@@ -88,7 +92,8 @@ public class TaskLogInputStatistics extends ServerResource {
 			URL url = factory.getListFeedUrl("0AkwLiKlm4gz1dEFmalRCTjVvYWY5dnFzV1VuakdBYmc", "1", "private", "full");
 			
 			ListEntry entry = new ListEntry();
-			
+		    
+		    entry.getCustomElements().setValueLocal("server", ServletUtils.getRequest(this.getRequest()).getServerName());
 			entry.getCustomElements().setValueLocal("userid", wir.getUserId() == null? "" : wir.getUserId());
 			entry.getCustomElements().setValueLocal("username", wir.getNickname());
 			entry.getCustomElements().setValueLocal("place", wir.getPlaceId());
@@ -102,7 +107,22 @@ public class TaskLogInputStatistics extends ServerResource {
 			entry.getCustomElements().setValueLocal("timestamp", wir.getTimeStamp());
 			entry.getCustomElements().setValueLocal("data", Arrays.toString(wir.getParameters()));
 			
-
+			long timeStamp = 0;
+			try {
+				timeStamp = Long.parseLong(wir.getTimeStamp());
+			} catch (Exception e) {
+				
+			}
+			Date date = new Date(timeStamp);
+			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Lisbon"));
+			calendar.setTime(date);
+			entry.getCustomElements().setValueLocal("year", calendar.get(Calendar.YEAR)+"");
+			entry.getCustomElements().setValueLocal("month", calendar.get(Calendar.MONTH)+"");
+			entry.getCustomElements().setValueLocal("day", calendar.get(Calendar.DAY_OF_MONTH)+"");
+			entry.getCustomElements().setValueLocal("dayofweek", calendar.get(Calendar.DAY_OF_WEEK)+"");
+			entry.getCustomElements().setValueLocal("hour", calendar.get(Calendar.HOUR_OF_DAY)+"");
+			entry.getCustomElements().setValueLocal("minute", calendar.get(Calendar.MINUTE)+"");
+			
 			service.insert(url, entry);
 		} catch (IOException e) {
 			Log.get().error("IO Exception: " + e.getMessage() );
