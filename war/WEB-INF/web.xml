@@ -4,7 +4,26 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-  
+ 	<!--  Mail servlets -->
+	<servlet>
+  		<servlet-name>mailhandler</servlet-name>
+  		<servlet-class>org.instantplaces.im.server.servlets.MailHandlerServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+  		<servlet-name>mailhandler</servlet-name>
+  		<url-pattern>/_ah/mail/*</url-pattern>
+	</servlet-mapping> 	
+    
+	<security-constraint>
+  		<web-resource-collection>
+    		<url-pattern>/_ah/mail/*</url-pattern>
+  		</web-resource-collection>
+  		<auth-constraint>
+    		<role-name>admin</role-name>
+  		</auth-constraint>
+</security-constraint>	
+    
+    <!-- Channel servlets -->
  
  	<servlet>
         <servlet-name>ChannelConnected</servlet-name>
@@ -25,7 +44,7 @@
     </servlet-mapping>
     
     
-    
+    <!-- Restlet -->
 	<servlet>
            <servlet-name>RestletServlet</servlet-name>
            <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
@@ -35,11 +54,11 @@
            </init-param>
      </servlet>
  
- <!-- Catch all requests -->
- <servlet-mapping>
-  <servlet-name>RestletServlet</servlet-name>
-  <url-pattern>/*</url-pattern>
- </servlet-mapping>
+ 	<!-- Catch all requests -->
+ 	<servlet-mapping>
+  		<servlet-name>RestletServlet</servlet-name>
+  		<url-pattern>/*</url-pattern>
+ 	</servlet-mapping>
 
 
        

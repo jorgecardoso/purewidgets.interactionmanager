@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+    
   <application>pw-interactionmanager-test</application>
   <version>1</version>
 
@@ -21,10 +22,13 @@
      -->
     <property name="log4j.configuration" value="file:WEB-INF/classes/log4j.properties" /> 
   </system-properties>
- <threadsafe>false</threadsafe>
+
+  
+  <threadsafe>false</threadsafe>
  
   <inbound-services>
     <service>channel_presence</service>
+    <service>mail</service>
   </inbound-services>
   
 </appengine-web-app>
