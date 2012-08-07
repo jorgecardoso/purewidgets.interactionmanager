@@ -11,11 +11,12 @@ import javax.persistence.Id;
 import org.instantplaces.im.server.Log;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.NotSaved;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
-
+@Cached
 public class WidgetDao implements Serializable {
 
 	/**

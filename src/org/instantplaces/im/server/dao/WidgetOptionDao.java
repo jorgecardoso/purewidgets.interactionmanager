@@ -5,10 +5,12 @@ import java.io.Serializable;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
+@Cached
 public class WidgetOptionDao implements Serializable {
 	/**
 	 * 

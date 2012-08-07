@@ -3,8 +3,10 @@ package org.instantplaces.im.server.dao;
 import java.io.Serializable;
 
 
+import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Unindexed;
 
+@Cached
 public class WidgetParameterDao implements Serializable {
 	/**
 	 * 

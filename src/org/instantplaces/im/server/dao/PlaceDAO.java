@@ -3,8 +3,9 @@ package org.instantplaces.im.server.dao;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
 
-
+@Cached
 public class PlaceDao {
 
     @Id 

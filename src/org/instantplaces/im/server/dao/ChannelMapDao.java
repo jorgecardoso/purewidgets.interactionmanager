@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import javax.persistence.Id;
 
+import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Unindexed;
 
+@Cached
 public class ChannelMapDao {
 	
 
