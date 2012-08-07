@@ -13,6 +13,9 @@ import org.instantplaces.im.server.dao.Dao;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+
 
 public class TaskNotifyServerApp extends ServerResource {
 
@@ -23,6 +26,12 @@ public class TaskNotifyServerApp extends ServerResource {
 				
 		String applicationId = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("appid", "");
 		
+		
+		String originalUrl = "/task/notify-server-app?placeid="+placeId+"&appid="+applicationId;
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.put(originalUrl, new Boolean(false));
+		
+		Log.get().debug("Executing task: " + originalUrl);
 		
 		Dao.beginTransaction();
 		ApplicationDao applicationDao = Dao.getApplication(placeId, applicationId);

@@ -112,7 +112,18 @@ public class WidgetInputResource extends GenericResource {
 	private static void notifyServerApp(String placeId, String applicationId) {
 		try {
 			Queue queue = QueueFactory.getQueue("input");
-			queue.add(withUrl("/task/notify-server-app?placeid="+placeId+"&appid="+applicationId).countdownMillis(5000).method(Method.GET));
+			
+			String url = "/task/notify-server-app?placeid="+placeId+"&appid="+applicationId;
+			
+			MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+			Boolean inQueue = ((Boolean) syncCache.get(url));
+			if ( null == inQueue || !inQueue.booleanValue() ) {
+				Log.get().debug("Adding task: " + url);
+				queue.add(withUrl(url).countdownMillis(30000).method(Method.GET));
+				syncCache.put(url, new Boolean(true));
+			} else {
+				Log.get().debug("Task already exists: " + url);
+			}
 			
 		} catch (TaskAlreadyExistsException taee) {
 			Log.get().warn("Task already exists: " + taee.getMessage());
