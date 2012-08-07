@@ -199,7 +199,7 @@ public class MailHandlerServlet extends HttpServlet {
 					widgetInputRest.setApplicationId(widgetOption.getWidgetKey().getParent().getName());
 					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
 					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
-					widgetInputRest.setInputMechanism("SMS");
+					widgetInputRest.setInputMechanism("Email");
 					widgetInputRest.setNickname(name);
 					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
 					widgetInputRest.setUserId(userIdentity);
