@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
@@ -51,6 +52,65 @@ public class WidgetInputResource extends GenericResource {
 		return null;
 	}
 	
+
+	
+	public static  void saveInput(String placeReferenceCode, String userId, String userName, String refCode,
+			String[] parameters, String interactionMechanism) {
+
+		/*
+		 * TODO: if place reference code is not provided, try to find the application anyway
+		 */
+		List<PlaceDao> places = Dao.getPlaces();
+		
+		for ( PlaceDao place : places ) {
+			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
+				Dao.beginTransaction();
+				WidgetOptionDao widgetOption = null; 
+				
+				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
+				
+				for ( WidgetOptionDao option : options ) {
+					if ( option.getReferenceCode().equals(refCode)) {
+						widgetOption = option;
+						break;
+					}
+				}
+				
+					
+				if (widgetOption == null) {
+					Log.debug(WidgetInputResource.class.getName(), "No widgets are using this reference code.");
+					Dao.commitOrRollbackTransaction();
+				} else {
+					
+					/*
+					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
+					 */
+					WidgetInputRest widgetInputRest = new WidgetInputRest();
+					
+					widgetInputRest.setPlaceId(place.getPlaceId());
+					widgetInputRest.setApplicationId(widgetOption.getWidgetKey().getParent().getName());
+					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
+					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
+					widgetInputRest.setInputMechanism(interactionMechanism);
+					widgetInputRest.setNickname(userName);
+					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
+					widgetInputRest.setUserId(userId);
+					widgetInputRest.setParameters(parameters);
+					
+					
+					Dao.commitOrRollbackTransaction();
+					
+					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
+				}
+				
+				
+			}
+			
+		}
+
+
+
+	}
 	
 	public static void handleInput(WidgetInputRest receivedWidgetInputRest, String placeId, String appId, String widgetId) {
 		

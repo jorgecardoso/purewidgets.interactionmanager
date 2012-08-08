@@ -184,7 +184,7 @@ public class MailHandlerServlet extends HttpServlet {
 				
 			}
 			
-			this.saveInput(placeId, userId, userId,  referenceCode, parameters.toArray(new String[] {}));
+			WidgetInputResource.saveInput(placeId, userId, obfuscate(userId),  referenceCode, parameters.toArray(new String[] {}), "Email");
 			
 		} catch (MessagingException e) {
 			Log.error(this, "Error reading message.", e);
@@ -207,9 +207,6 @@ public class MailHandlerServlet extends HttpServlet {
 		  boolean lock = true;
 		  FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
 
-//		  // Different standard Java ways of writing to the channel
-//		  // are possible. Here we use a PrintWriter:
-//		  Writer out = Channels.newWriter(writeChannel, "UTF8");
 		  
 		  InputStream is = part.getInputStream();
 		  byte []buffer = new byte[1024];
@@ -231,69 +228,23 @@ public class MailHandlerServlet extends HttpServlet {
 		}	
 		return null;
 	}
-/*
- * TODO: this code should be refactored to use the widgetinputresource instead of duplicating
- */
-	
-	private  void saveInput(String placeReferenceCode, String userId, String userName, String refCode,
-			String[] parameters) {
 
-		/*
-		 * TODO: if place reference code is not provided, try to find the application anyway
-		 */
-		List<PlaceDao> places = Dao.getPlaces();
-		
-		for ( PlaceDao place : places ) {
-			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
-				Dao.beginTransaction();
-				WidgetOptionDao widgetOption = null; 
-				
-				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
-				
-				for ( WidgetOptionDao option : options ) {
-					if ( option.getReferenceCode().equals(refCode)) {
-						widgetOption = option;
-						break;
-					}
-				}
-				
-					
-				if (widgetOption == null) {
-					Log.get().debug("No widgets are using this reference code.");
-					Dao.commitOrRollbackTransaction();
-				} else {
-					
-					/*
-					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
-					 */
-					WidgetInputRest widgetInputRest = new WidgetInputRest();
-					
-					widgetInputRest.setPlaceId(place.getPlaceId());
-					widgetInputRest.setApplicationId(widgetOption.getWidgetKey().getParent().getName());
-					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
-					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
-					widgetInputRest.setInputMechanism("Email");
-					widgetInputRest.setNickname(userName);
-					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
-					widgetInputRest.setUserId(userId);
-					widgetInputRest.setParameters(parameters);
-					
-					
-					if ( !Dao.commitOrRollbackTransaction() ) {
-						Log.error(this, "Could not save input to datastore");
-					}
-					
-					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
-				}
-				
-				
-			}
-			
+	private String obfuscate(String email) {
+		email = email.trim();
+		if ( null == email || email.length() < 4 ) {
+			return email;
 		}
-
-
-
+		int indexAt = email.indexOf("@");
+		String user = email.substring(0, indexAt);
+		
+		int toRemove = 1;
+		if ( user.length() > 5 ) {
+			toRemove = 3;
+		}
+		
+		return user.substring(0, user.length()-toRemove) + "..."+ email.substring(indexAt);
 	}
+	
 	
 	
 	/**
@@ -319,7 +270,7 @@ public class MailHandlerServlet extends HttpServlet {
 				    if ( matcher.find() && matcher.groupCount() > 0) {
 				    	sender = matcher.group(1);
 				    }
-				    Log.get().debug("Sender: " + sender);
+				    Log.debugFinest("Sender: " + sender);
 				    
 				    return sender;
 				    
@@ -331,55 +282,55 @@ public class MailHandlerServlet extends HttpServlet {
 		}
 		return null;
 	}
-
-	/**
-	 * @param message
-	 * @throws MessagingException
-	 */
-	private String getPlace(MimeMessage message) throws MessagingException {
-		
-		String place ="";
-		Address []recipients = message.getRecipients(Message.RecipientType.TO);
-		
-		Log.get().debug("Delivered to: " + message.getHeader("Delivered-To")); 
-		if ( null != recipients ) {
-			for ( Address recipientAddress : recipients ) {
-				if ( null != recipientAddress ) {
-					
-					String recipient = recipientAddress.toString();			
-				
-					Log.get().debug("Recipient start: " + recipient);
-					
-					String emailBetweenMinorGreater = "<(.+)>";
-					Pattern pattern = Pattern.compile(emailBetweenMinorGreater, Pattern.CASE_INSENSITIVE);
-					Matcher matcher = pattern.matcher(recipient);
-				   
-				    if ( matcher.find() && matcher.groupCount() > 0) {
-				    	recipient = matcher.group(1);
-				    }
-				    
-				    Log.get().debug("Recipient end: " + recipient);
-				    
-				    /*
-				     * Found our address
-				     */
-				    if ( recipient.contains(SERVER_ADDRESS) ) {
-				    	String userPattern = "(.*)@";
-						pattern = Pattern.compile(userPattern, Pattern.CASE_INSENSITIVE);
-						matcher = pattern.matcher(recipient);
-						if ( matcher.find() && matcher.groupCount() > 0 ) {
-					    	place = matcher.group(1);
-					    }
-				    } else {
-				    	Log.get().warn(recipient + " does not contain " + SERVER_ADDRESS);
-				    }
-				} else {
-					Log.get().warn("Null recipient!");
-				}
-			}
-		}
-		Log.get().debug("Found place: " + place);
-		
-		return place;
-	}
+//
+//	/**
+//	 * @param message
+//	 * @throws MessagingException
+//	 */
+//	private String getPlace(MimeMessage message) throws MessagingException {
+//		
+//		String place ="";
+//		Address []recipients = message.getRecipients(Message.RecipientType.TO);
+//		
+//		Log.get().debug("Delivered to: " + message.getHeader("Delivered-To")); 
+//		if ( null != recipients ) {
+//			for ( Address recipientAddress : recipients ) {
+//				if ( null != recipientAddress ) {
+//					
+//					String recipient = recipientAddress.toString();			
+//				
+//					Log.get().debug("Recipient start: " + recipient);
+//					
+//					String emailBetweenMinorGreater = "<(.+)>";
+//					Pattern pattern = Pattern.compile(emailBetweenMinorGreater, Pattern.CASE_INSENSITIVE);
+//					Matcher matcher = pattern.matcher(recipient);
+//				   
+//				    if ( matcher.find() && matcher.groupCount() > 0) {
+//				    	recipient = matcher.group(1);
+//				    }
+//				    
+//				    Log.get().debug("Recipient end: " + recipient);
+//				    
+//				    /*
+//				     * Found our address
+//				     */
+//				    if ( recipient.contains(SERVER_ADDRESS) ) {
+//				    	String userPattern = "(.*)@";
+//						pattern = Pattern.compile(userPattern, Pattern.CASE_INSENSITIVE);
+//						matcher = pattern.matcher(recipient);
+//						if ( matcher.find() && matcher.groupCount() > 0 ) {
+//					    	place = matcher.group(1);
+//					    }
+//				    } else {
+//				    	Log.get().warn(recipient + " does not contain " + SERVER_ADDRESS);
+//				    }
+//				} else {
+//					Log.get().warn("Null recipient!");
+//				}
+//			}
+//		}
+//		Log.get().debug("Found place: " + place);
+//		
+//		return place;
+//	}
 }

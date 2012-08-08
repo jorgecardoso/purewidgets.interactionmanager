@@ -98,83 +98,19 @@ public class SmsInput extends ServerResource {
 	    }
 	    
 	    
-	    this.saveInput(location, originator, referenceCode, parameters.toArray(new String[] {}));
+	    WidgetInputResource.saveInput(location, originator, obfuscate(originator), referenceCode, parameters.toArray(new String[] {}), "SMS");
 		return "";
 
 	}
 	
-/*
- * TODO: this code should be refactored to use the widgetinputresource instead of duplicating
- */
-	
-	private  void saveInput(String placeReferenceCode, String phoneNumber, String refCode,
-			String[] parameters) {
-
-
-
-		/*
-		 * TODO: if reference code is not provided, try to find the application anyway
-		 */
-		List<PlaceDao> places = Dao.getPlaces();
+	private String obfuscate(String phoneNumber) {
+		String name = phoneNumber;
 		
-		for ( PlaceDao place : places ) {
-			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
-				Dao.beginTransaction();
-				WidgetOptionDao widgetOption = null; 
-				
-				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
-				
-				for ( WidgetOptionDao option : options ) {
-					if ( option.getReferenceCode().equals(refCode)) {
-						widgetOption = option;
-						break;
-					}
-				}
-				
-					
-				if (widgetOption == null) {
-					Log.get().debug("No widgets are using this reference code.");
-					Dao.commitOrRollbackTransaction();
-				} else {
-					/*
-					 * Obfuscate the phone number
-					 */
-					String userIdentity = phoneNumber.hashCode()+"";
-					String name = phoneNumber;
-					if ( phoneNumber.length() > 9 ) {
-						name = phoneNumber.substring(3);
-					}
-					name = name.substring(0, 2) + "..." + name.substring(5);
-					
-					/*
-					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
-					 */
-					WidgetInputRest widgetInputRest = new WidgetInputRest();
-					
-					widgetInputRest.setPlaceId(place.getPlaceId());
-					widgetInputRest.setApplicationId(widgetOption.getWidgetKey().getParent().getName());
-					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
-					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
-					widgetInputRest.setInputMechanism("SMS");
-					widgetInputRest.setNickname(name);
-					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
-					widgetInputRest.setUserId(userIdentity);
-					widgetInputRest.setParameters(parameters);
-					
-					
-					if ( !Dao.commitOrRollbackTransaction() ) {
-						Log.get().error("Could not save input to datastore");
-					}
-					
-					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
-				}
-				
-				
-			}
-			
+		if ( phoneNumber.length() > 9 ) {
+			name = phoneNumber.substring(3);
 		}
-
-
-
+		name = name.substring(0, 2) + "..." + name.substring(5);
+		return name;
 	}
+	
 }

@@ -32,12 +32,14 @@ public class ChannelResource extends GenericResource {
 		 ChannelService channelService = ChannelServiceFactory.getChannelService();
 
 		 Dao.beginTransaction();
+		 Log.get().debug(" Retrieving Channel map for place: " + this.placeId + " app:" + this.appId);
 		 ChannelMapDao channelMap = Dao.getChannelMap(this.placeId, this.appId);
 		 
 		 if ( null == channelMap ) {
 			 Log.get().debug("Could not read channel map for " + this.placeId + "-" + this.appId + " from datastore, creating new...");
 			 channelMap = new ChannelMapDao(this.placeId, this.appId);
 		 }
+		 
 		 
 		 String clientId = channelMap.getNextClientId();
 		 String token = channelService.createChannel(clientId, 24*60-1);
