@@ -23,6 +23,18 @@
   		</auth-constraint>
 </security-constraint>	
     
+	
+ 
+ 	<servlet>
+        <servlet-name>ServeBlob</servlet-name>
+        <servlet-class>org.instantplaces.im.server.servlets.ServeBlob</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServeBlob</servlet-name>
+        <url-pattern>/serveblob/</url-pattern>
+    </servlet-mapping>
+    	
+	
     <!-- Channel servlets -->
  
  	<servlet>

@@ -1,6 +1,12 @@
 package org.instantplaces.im.server.servlets;
 
 import java.io.IOException; 
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties; 
@@ -16,12 +22,18 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage; 
 import javax.servlet.http.*; 
 
-import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
 import org.instantplaces.im.server.rest.resource.WidgetInputResource;
+
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.files.AppEngineFile;
+import com.google.appengine.api.files.FileService;
+import com.google.appengine.api.files.FileServiceFactory;
+import com.google.appengine.api.files.FileWriteChannel;
 
 public class MailHandlerServlet extends HttpServlet { 
 	
@@ -44,24 +56,44 @@ public class MailHandlerServlet extends HttpServlet {
 		Properties props = new Properties(); 
         Session session = Session.getDefaultInstance(props, null); 
         
+        /*
+         * Get destination address
+         */
+        String destAddress = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/")+1);
+        Log.debug(this, "Received email message to: " + destAddress);
         
+        
+        /*
+         * Extract the user part of the destination address
+         */
+		placeId = destAddress.substring(0, destAddress.indexOf("@"));
+		
+		Log.debugFinest(this, "Extracted user part/placeid: " + placeId);
+		
+        
+		/*
+		 * Read the contents
+		 */
         try {
 			MimeMessage message = new MimeMessage(session, req.getInputStream());
 				
-			Log.get().debug("Message ID: " + message.getMessageID() );
-			Log.get().debug("Message Sent: " + message.getSentDate().toString() );
+			Log.debug(this, "Message ID: " + message.getMessageID() );
+			Log.debug(this, "Message Sent: " + message.getSentDate().toString() );
 			
 		
 			userId = getSender(message);
-				
-			placeId = getPlace(message);
-				
+			Log.debug(this, "Sender: " + userId);	
+			
 
 			String subject = message.getSubject().trim();
-			Log.get().debug("Subject: " + subject);
+			Log.debug(this, "Subject: " + subject);
+			
 			
 			/*
 			 * Extract the location.referencecode pattern
+			 * 
+			 * Although we use the user part of the destination email address as the placeid,
+			 * we allow users to override this by using a placeid.refcode syntax in the email subject
 			 */
 			String locationPlusReferenceCodePattern = "^(\\w+)\\.(\\w+)\\s*";
 			Pattern pattern = Pattern.compile(locationPlusReferenceCodePattern, Pattern.CASE_INSENSITIVE);
@@ -70,7 +102,7 @@ public class MailHandlerServlet extends HttpServlet {
 		    String locationPlusReferenceCode = null;
 		    if ( matcher.find() && matcher.groupCount() > 1) {
 		    	locationPlusReferenceCode = matcher.group().toLowerCase();
-		    	Log.get().debug("Location.Reference: " + locationPlusReferenceCode);
+		    	Log.debugFinest(this, "Found location.referencecode in subject: " + locationPlusReferenceCode);
 		    	
 		    	placeId = matcher.group(1);
 		    	referenceCode = matcher.group(2);
@@ -85,7 +117,7 @@ public class MailHandlerServlet extends HttpServlet {
 			    matcher = pattern.matcher(subject);
 			    if ( matcher.find() && matcher.groupCount() > 0) {
 			    	referenceCode = matcher.group(1);
-			    	Log.get().debug("Reference: " + referenceCode);
+			    	Log.debug(this, "Found referencecode in subject: " + referenceCode);
 			    	/*
 			    	 * Keep only the rest of the string for the next processing phase
 			    	 */
@@ -93,8 +125,8 @@ public class MailHandlerServlet extends HttpServlet {
 			    }
 		    	
 		    }
-		    Log.get().debug("PlaceId: " + placeId);
-		    Log.get().debug("ReferenceCode: " + referenceCode);
+		    Log.debug(this, "Using placeid: " + placeId);
+		    Log.debug(this, "Using referencecode: " + referenceCode);
 		    
 		    /*
 		     * Extract the parameters
@@ -107,57 +139,107 @@ public class MailHandlerServlet extends HttpServlet {
 		    parameters = new ArrayList<String>();
 		    while ( matcher.find() ) {
 		    	parameters.add( matcher.group().trim() );
-		    	Log.get().debug("Parameter: " + matcher.group() );
+		    	Log.debugFinest("Found parameter in subject: " + matcher.group() );
 		    }
 		    
-		    this.saveInput(placeId, userId, referenceCode, parameters.toArray(new String[] {}));
 		    
-		    
+		    /*
+		     * Extract the attachments
+		     */
+			
+			Object content = message.getContent();
+			Log.debugFinest("Content: " + content);
 				
-				Object content = message.getContent();
-				Log.get().debug("Content: " + content);
+			Multipart mp = null;
+			try {
+				mp = (Multipart)message.getContent();
+			} catch (ClassCastException cce) {
+				Log.error(this, "Error casting message.", cce);
+			}
+			
+			if ( null != mp ) {
 				
-				
-				Multipart mp = (Multipart)message.getContent();
-				Log.get().debug("MultipartContent: " + mp);
+				Log.debugFinest(this, "MultipartContent: " + mp);
 				
 				for (int i=0, n=mp.getCount(); i<n; i++) {
 				  Part part = mp.getBodyPart(i);
-				  Log.get().debug("Part: " + part);
+				  Log.debugFinest(this, "Part: " + part);
 				  
 				  String disposition = part.getDisposition();
-				  Log.get().debug("Disposition: " + disposition);
+				  Log.debugFinest(this, "Disposition: " + disposition);
+				  
+				  String contentType = part.getContentType();
+				  Log.debugFinest(this, "ContentType: " + contentType);
 				  
 				  String filename = part.getFileName();
-				  Log.get().debug("Filename: " + filename);
-				  
-//				  if ( (disposition != null) ) {
-//				    saveFile(part.getFileName(), part.getInputStream());
-//				  }
+				  Log.debug(this, "Filename: " + filename);
+				  if ( null != filename ) {
+					 String url =  saveBlob(req, part );
+					 if ( null != url ) {
+						 parameters.add(url);
+					 }
+				  }
 				}
 				
 				
+			}
+			
+			this.saveInput(placeId, userId, userId,  referenceCode, parameters.toArray(new String[] {}));
 			
 		} catch (MessagingException e) {
-			Log.get().error("Error reading message.");
-			
-		} catch (ClassCastException cce) {
-			Log.get().error("Error casting message.");
-		}
+			Log.error(this, "Error reading message.", e);
+		} 
     }
 
 
+	private String saveBlob(HttpServletRequest req, Part part) {
+		try {
+		 // Get a file service
+		  FileService fileService = FileServiceFactory.getFileService();
+
+		  // Create a new Blob file with mime-type "text/plain"
+		  AppEngineFile file;
+		
+		  file = fileService.createNewBlobFile(part.getContentType(), part.getFileName());
+		  
+
+		  // Open a channel to write to it
+		  boolean lock = true;
+		  FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
+
+//		  // Different standard Java ways of writing to the channel
+//		  // are possible. Here we use a PrintWriter:
+//		  Writer out = Channels.newWriter(writeChannel, "UTF8");
+		  
+		  InputStream is = part.getInputStream();
+		  byte []buffer = new byte[1024];
+		  
+		  while ( is.read(buffer) > 0 ) {
+			  writeChannel.write(ByteBuffer.wrap(buffer));
+		  }
+		  
+		  writeChannel.closeFinally();
+		  
+		  BlobKey blobKey = fileService.getBlobKey(file);
+		  return "http://" + req.getServerName() + "/serveblob/?blob-key=" + blobKey.getKeyString();
+		} catch (IOException e) {
+			Log.error(this, "Could not write file: ", e);
+			
+		} catch (MessagingException me ) {
+			Log.error(this, "Could not write file: ", me);
+			
+		}	
+		return null;
+	}
 /*
  * TODO: this code should be refactored to use the widgetinputresource instead of duplicating
  */
 	
-	private  void saveInput(String placeReferenceCode, String userEmail, String refCode,
+	private  void saveInput(String placeReferenceCode, String userId, String userName, String refCode,
 			String[] parameters) {
 
-
-
 		/*
-		 * TODO: if reference code is not provided, try to find the application anyway
+		 * TODO: if place reference code is not provided, try to find the application anyway
 		 */
 		List<PlaceDao> places = Dao.getPlaces();
 		
@@ -180,15 +262,6 @@ public class MailHandlerServlet extends HttpServlet {
 					Log.get().debug("No widgets are using this reference code.");
 					Dao.commitOrRollbackTransaction();
 				} else {
-					/*
-					 * Obfuscate the email address
-					 */
-					String userIdentity = userEmail.hashCode()+"";
-					String name = userEmail;
-//					if ( userEmail.length() > 9 ) {
-//						name = userEmail.substring(3);
-//					}
-//					name = name.substring(0, 2) + "..." + name.substring(5);
 					
 					/*
 					 * Create the widgetinputrest representation to use the widgetinputresource to save and forward the input
@@ -200,14 +273,14 @@ public class MailHandlerServlet extends HttpServlet {
 					widgetInputRest.setWidgetId(widgetOption.getWidgetKey().getName());
 					widgetInputRest.setWidgetOptionId(widgetOption.getWidgetOptionId());
 					widgetInputRest.setInputMechanism("Email");
-					widgetInputRest.setNickname(name);
+					widgetInputRest.setNickname(userName);
 					widgetInputRest.setReferenceCode(widgetOption.getReferenceCode());
-					widgetInputRest.setUserId(userIdentity);
+					widgetInputRest.setUserId(userId);
 					widgetInputRest.setParameters(parameters);
 					
 					
 					if ( !Dao.commitOrRollbackTransaction() ) {
-						Log.get().error("Could not save input to datastore");
+						Log.error(this, "Could not save input to datastore");
 					}
 					
 					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
@@ -267,6 +340,8 @@ public class MailHandlerServlet extends HttpServlet {
 		
 		String place ="";
 		Address []recipients = message.getRecipients(Message.RecipientType.TO);
+		
+		Log.get().debug("Delivered to: " + message.getHeader("Delivered-To")); 
 		if ( null != recipients ) {
 			for ( Address recipientAddress : recipients ) {
 				if ( null != recipientAddress ) {
