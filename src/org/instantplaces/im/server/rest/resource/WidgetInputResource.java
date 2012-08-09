@@ -10,7 +10,7 @@ import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDaoTmp;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
@@ -60,9 +60,9 @@ public class WidgetInputResource extends GenericResource {
 		/*
 		 * TODO: if place reference code is not provided, try to find the application anyway
 		 */
-		List<PlaceDaoTmp> places = Dao.getPlaces();
+		List<PlaceDao> places = Dao.getPlaces();
 		
-		for ( PlaceDaoTmp place : places ) {
+		for ( PlaceDao place : places ) {
 			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
 				Dao.beginTransaction();
 				WidgetOptionDao widgetOption = null; 

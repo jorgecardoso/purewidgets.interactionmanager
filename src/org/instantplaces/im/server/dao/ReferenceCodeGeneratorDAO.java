@@ -26,17 +26,17 @@ public class ReferenceCodeGeneratorDAO {
 
 	
 	@NotSaved
-	private PlaceDaoTmp place;
+	private PlaceDao place;
 
 	@SuppressWarnings("unused")
 	@Parent
-	private Key<PlaceDaoTmp> placeKey;
+	private Key<PlaceDao> placeKey;
 
 	@SuppressWarnings("unused")
 	@Id
 	private Long referenceCodeGeneratorId;
 
-	public ReferenceCodeGeneratorDAO(PlaceDaoTmp place) {
+	public ReferenceCodeGeneratorDAO(PlaceDao place) {
 		codes = new ArrayList<String>(100);
 		this.rebuild();
 		// Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
@@ -69,7 +69,7 @@ public class ReferenceCodeGeneratorDAO {
 	/**
 	 * @return the place
 	 */
-	public PlaceDaoTmp getPlace() {
+	public PlaceDao getPlace() {
 		return place;
 	}
 
@@ -210,10 +210,10 @@ public class ReferenceCodeGeneratorDAO {
 	 * @param place
 	 *            the place to set
 	 */
-	public void setPlace(PlaceDaoTmp place) {
+	public void setPlace(PlaceDao place) {
 		this.place = place;
 		if (null != place) {
-			this.placeKey = new Key<PlaceDaoTmp>(PlaceDaoTmp.class, place.getPlaceId());
+			this.placeKey = new Key<PlaceDao>(PlaceDao.class, place.getPlaceId());
 		}
 	}
 }
