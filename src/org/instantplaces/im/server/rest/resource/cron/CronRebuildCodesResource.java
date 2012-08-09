@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.restlet.representation.Representation;
@@ -31,9 +31,9 @@ public class CronRebuildCodesResource extends ServerResource {
 	public Representation runCron() {
 
 		
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+		List<Key<PlaceDaoTmp>> placeKeys = Dao.getPlaceKeys();
 
-		for (Key<PlaceDao> placeKey : placeKeys) {
+		for (Key<PlaceDaoTmp> placeKey : placeKeys) {
 			Dao.beginTransaction();
 			
 			ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(placeKey);

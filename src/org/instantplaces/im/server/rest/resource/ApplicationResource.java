@@ -11,7 +11,7 @@ import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.rest.representation.json.ApplicationListRest;
 import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
@@ -35,7 +35,7 @@ public class ApplicationResource extends GenericResource {
 	 */
 	@Override
 	protected Object doPost(Object incoming) {
-		PlaceDao existingPlaceDSO = null;
+		PlaceDaoTmp existingPlaceDSO = null;
 		
 		ApplicationRest applicationRest = (ApplicationRest) incoming;
 
@@ -48,7 +48,7 @@ public class ApplicationResource extends GenericResource {
 		if (null == existingPlaceDSO) {
 			Log.get().info(
 					"The specified place " + this.placeId + " was not found. Creating new...");
-			existingPlaceDSO = new PlaceDao(this.placeId);
+			existingPlaceDSO = new PlaceDaoTmp(this.placeId);
 			Dao.put(existingPlaceDSO);
 
 			/*

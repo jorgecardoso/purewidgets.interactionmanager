@@ -8,7 +8,7 @@ import java.util.List;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;

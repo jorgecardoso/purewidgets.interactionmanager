@@ -9,7 +9,7 @@ import java.util.List;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.rest.representation.json.ApplicationListRest;
 import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
 import org.instantplaces.im.server.rest.representation.json.PlaceListRest;
@@ -46,16 +46,25 @@ public class PlaceResource extends GenericResource {
 	 */
 	@Override
 	protected Object doGet() {
-		/*
-		 * Return the list of applications
-		 */
-		List<PlaceDao> places = Dao.getPlaces();
-		
-		
-		PlaceListRest placeListRest = RestConverter.getPlaceListRest(places);
-				
-		
-		return placeListRest;
+		if ( null != this.placeId ) { 
+			/*
+			 * Return specified place
+			 */
+			Dao.beginTransaction();
+			PlaceDaoTmp placeDao = Dao.getPlace(this.placeId);
+			Dao.commitOrRollbackTransaction();
+			return RestConverter.getPlaceRest(placeDao);
+		} else {
+			
+			/*
+			 * Return the list of places
+			 */
+			List<PlaceDaoTmp> places = Dao.getPlaces();
+			
+			PlaceListRest placeListRest = RestConverter.getPlaceListRest(places);
+					
+			return placeListRest;
+		}
 	}
 
 	/* (non-Javadoc)

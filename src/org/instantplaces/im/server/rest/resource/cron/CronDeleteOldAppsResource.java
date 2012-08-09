@@ -8,7 +8,7 @@ import java.util.List;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -37,9 +37,9 @@ public class CronDeleteOldAppsResource extends ServerResource {
 
 		
 
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+		List<Key<PlaceDaoTmp>> placeKeys = Dao.getPlaceKeys();
 
-		for (Key<PlaceDao> placeKey : placeKeys) {
+		for (Key<PlaceDaoTmp> placeKey : placeKeys) {
 			Dao.beginTransaction();
 			List<ApplicationDao> applications = Dao.getApplications(placeKey);
 

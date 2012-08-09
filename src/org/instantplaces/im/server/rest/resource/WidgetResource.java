@@ -14,7 +14,7 @@ import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
@@ -45,7 +45,7 @@ public class WidgetResource extends GenericResource {
 		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 		syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", null);
 		
-		PlaceDao existingPlaceDSO = null;
+		PlaceDaoTmp existingPlaceDSO = null;
 		ReferenceCodeGeneratorDAO rcg = null;
 		ApplicationDao existingApplicationDSO = null;
 
@@ -59,7 +59,7 @@ public class WidgetResource extends GenericResource {
 		if (null == existingPlaceDSO) {
 			Log.get().info(
 					"The specified place " + this.placeId + " was not found. Creating new...");
-			existingPlaceDSO = new PlaceDao(this.placeId);
+			existingPlaceDSO = new PlaceDaoTmp(this.placeId);
 			Dao.put(existingPlaceDSO);
 
 			/*
@@ -340,7 +340,7 @@ public class WidgetResource extends GenericResource {
 
 		if (this.widgetId != null) { // Delete the specified widget
 
-			Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, this.placeId);
+			Key<PlaceDaoTmp> placeKey = new Key<PlaceDaoTmp>(PlaceDaoTmp.class, this.placeId);
 			Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
 					ApplicationDao.class, this.appId);
 			Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey, WidgetDao.class,
@@ -364,7 +364,7 @@ public class WidgetResource extends GenericResource {
 						Log.get().warn("Could not decode widgetId passed in URL parameter. " + e.getMessage());
 						e.printStackTrace();
 					}
-					Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, this.placeId);
+					Key<PlaceDaoTmp> placeKey = new Key<PlaceDaoTmp>(PlaceDaoTmp.class, this.placeId);
 					Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
 							ApplicationDao.class, this.appId);
 					Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey, WidgetDao.class,

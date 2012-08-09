@@ -1,23 +1,18 @@
-/**
- * 
- */
-package org.instantplaces.im.server.rest.representation.json;
+package org.instantplaces.im.server.dao;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+import javax.persistence.Id;
 
-/**
- * @author "Jorge C. S. Cardoso"
- *
- */
-@JsonAutoDetect(fieldVisibility=Visibility.ANY, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE)
-//@JsonIgnoreProperties({ "widgets" }) // @JsonIgnore seems to not work correctly, so we duplicate
-public class PlaceRest {
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
+
+@Cached
+public class PlaceDaoTmp {
+
+    @Id 
+    private String placeId;
 	
-
-	private	String placeId;
-
-	  /*
+    
+    /*
      * The reference code used for text-based interactions
      */
     private String placeReferenceCode;
@@ -35,21 +30,49 @@ public class PlaceRest {
     /**
      * The web address of the placeinteraction webpage.
      */
-    private String placeInteractionUrl;	
-
-	public PlaceRest() {
-	}	
+    private String placeInteractionUrl;
+    
+    
+	public PlaceDaoTmp(String id) {
+		this.placeId = id;
+		
+		/*
+		 * By default we set the place reference code to a lower case version of the id.
+		 */
+		this.placeReferenceCode = id.toLowerCase();
+	}
+	
+	@SuppressWarnings("unused")
+	private PlaceDaoTmp() {
+	}
 	
 
-	public void setPlaceId(String placeId) {
-		this.placeId = placeId;	
+	@Override
+	public boolean equals(Object app) {
+		if ( !(app instanceof PlaceDaoTmp) ) {
+			return false;
+		}
+		return ((PlaceDaoTmp) app).getPlaceId().equals(this.placeId);
 	}
 
-	
+
+	public Key<PlaceDaoTmp> getKey() {
+		return new Key<PlaceDaoTmp>(PlaceDaoTmp.class, this.placeId);
+	}
+
 	public String getPlaceId() {
-		return placeId;
+		return this.placeId;
 	}
-
+	
+	
+	public void setPlaceId(String placeID) {
+		this.placeId = placeID;
+	} 	
+	
+	@Override
+	public String toString() {
+		return "Place: " + this.placeId;
+	}
 
 	/**
 	 * @return the placeReferenceCode
@@ -58,14 +81,12 @@ public class PlaceRest {
 		return placeReferenceCode;
 	}
 
-
 	/**
 	 * @param placeReferenceCode the placeReferenceCode to set
 	 */
 	public void setPlaceReferenceCode(String placeReferenceCode) {
 		this.placeReferenceCode = placeReferenceCode;
 	}
-
 
 	/**
 	 * @return the placePhoneNumber
@@ -74,14 +95,12 @@ public class PlaceRest {
 		return placePhoneNumber;
 	}
 
-
 	/**
 	 * @param placePhoneNumber the placePhoneNumber to set
 	 */
 	public void setPlacePhoneNumber(String placePhoneNumber) {
 		this.placePhoneNumber = placePhoneNumber;
 	}
-
 
 	/**
 	 * @return the placeEmailAddress
@@ -90,14 +109,12 @@ public class PlaceRest {
 		return placeEmailAddress;
 	}
 
-
 	/**
 	 * @param placeEmailAddress the placeEmailAddress to set
 	 */
 	public void setPlaceEmailAddress(String placeEmailAddress) {
 		this.placeEmailAddress = placeEmailAddress;
 	}
-
 
 	/**
 	 * @return the placeInteractionUrl
@@ -106,11 +123,11 @@ public class PlaceRest {
 		return placeInteractionUrl;
 	}
 
-
 	/**
 	 * @param placeInteractionUrl the placeInteractionUrl to set
 	 */
 	public void setPlaceInteractionUrl(String placeInteractionUrl) {
 		this.placeInteractionUrl = placeInteractionUrl;
-	}	
+	}
+
 }

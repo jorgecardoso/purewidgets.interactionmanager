@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaoTmp;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
@@ -20,20 +20,25 @@ import org.instantplaces.im.server.dao.WidgetParameterDao;
  */
 public class RestConverter {
 
-	public static PlaceRest getPlaceRest(PlaceDao placeDao) {
+	public static PlaceRest getPlaceRest(PlaceDaoTmp placeDao) {
 		PlaceRest placeRest = new PlaceRest();
 		placeRest.setPlaceId(placeDao.getPlaceId());
+		
+		placeRest.setPlaceReferenceCode(placeDao.getPlaceReferenceCode());
+		placeRest.setPlaceEmailAddress(placeDao.getPlaceEmailAddress());
+		placeRest.setPlaceInteractionUrl(placeDao.getPlaceInteractionUrl());
+		placeRest.setPlacePhoneNumber(placeDao.getPlacePhoneNumber());
 		
 		return placeRest;
 		
 	}
 	
-	public static PlaceListRest getPlaceListRest(List<PlaceDao> placeListDao) {
+	public static PlaceListRest getPlaceListRest(List<PlaceDaoTmp> placeListDao) {
 		
 		
 		ArrayList<PlaceRest> placesRest = new ArrayList<PlaceRest>();
 		
-		for ( PlaceDao placeDao : placeListDao ) {
+		for ( PlaceDaoTmp placeDao : placeListDao ) {
 			placesRest.add( RestConverter.getPlaceRest(placeDao) );
 		}
 		

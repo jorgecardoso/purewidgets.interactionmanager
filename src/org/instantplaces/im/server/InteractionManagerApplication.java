@@ -63,6 +63,7 @@ public class InteractionManagerApplication extends Application {
          * Place
          */
         router.attach("/place", PlaceResource.class);
+        router.attach("/place/{placeid}", PlaceResource.class);
         
         /*
          * Cron

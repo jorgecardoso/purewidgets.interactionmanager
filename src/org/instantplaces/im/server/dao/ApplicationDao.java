@@ -40,13 +40,13 @@ public class ApplicationDao  {
 	 * The place this application belongs to
 	 */
 	@NotSaved
-	private PlaceDao place;
+	private PlaceDaoTmp place;
 	
 	/**
 	 * The parent key
 	 */
 	@Parent
-	private Key<PlaceDao> placeKey;
+	private Key<PlaceDaoTmp> placeKey;
 	
 	/**
 	 * The list of widgets in use by this app
@@ -54,7 +54,7 @@ public class ApplicationDao  {
 //	@NotSaved
 //	private ArrayList<WidgetDao> widgets;
 	
-	public ApplicationDao(PlaceDao place, String applicationId) {
+	public ApplicationDao(PlaceDaoTmp place, String applicationId) {
 		this.applicationId = applicationId;
 		
 		this.lastRequestTimestamp = System.currentTimeMillis();
@@ -82,14 +82,14 @@ public class ApplicationDao  {
 	/**
 	 * @return the place
 	 */
-	public PlaceDao getPlace() {
+	public PlaceDaoTmp getPlace() {
 		return place;
 	} 
 	
 	/**
 	 * @return the placeKey
 	 */
-	public Key<PlaceDao> getPlaceKey() {
+	public Key<PlaceDaoTmp> getPlaceKey() {
 		return placeKey;
 	}
 
@@ -115,17 +115,17 @@ public class ApplicationDao  {
 	}
 	
 
-	public void setPlace(PlaceDao place) {
+	public void setPlace(PlaceDaoTmp place) {
 		if ( null != place ) {
 			this.place = place;
-			this.placeKey = new Key<PlaceDao>(PlaceDao.class, place.getPlaceId());
+			this.placeKey = new Key<PlaceDaoTmp>(PlaceDaoTmp.class, place.getPlaceId());
 		}
 	}
 
 	/**
 	 * @param placeKey the placeKey to set
 	 */
-	public void setPlaceKey(Key<PlaceDao> placeKey) {
+	public void setPlaceKey(Key<PlaceDaoTmp> placeKey) {
 		this.placeKey = placeKey;
 	}
 	

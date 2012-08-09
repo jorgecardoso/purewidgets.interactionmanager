@@ -85,7 +85,7 @@ public class DaoConverter {
 	 * @param widgetRest
 	 * @return
 	 */
-	public static ApplicationDao getApplicationDao(PlaceDao parent, ApplicationRest applicationRest) {
+	public static ApplicationDao getApplicationDao(PlaceDaoTmp parent, ApplicationRest applicationRest) {
 		ApplicationDao applicationDao = new ApplicationDao(parent, applicationRest.getApplicationId());
 		
 		applicationDao.setApplicationBaseUrl(applicationRest.getApplicationBaseUrl());
