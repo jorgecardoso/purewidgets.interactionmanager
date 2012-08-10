@@ -18,7 +18,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.DaoTmp;
+import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
@@ -73,10 +73,10 @@ public class TaskLogInputStatistics extends ServerResource {
 			e.printStackTrace();
 		}
 		
-		DaoTmp.beginTransaction();
-		WidgetDao widgetDao = DaoTmp.getWidget(wir.getPlaceId(), wir.getApplicationId(), wir.getWidgetId());
-		WidgetOptionDao widgetOptionDao = DaoTmp.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
-		DaoTmp.commitOrRollbackTransaction();
+		Dao.beginTransaction();
+		WidgetDao widgetDao = Dao.getWidget(wir.getPlaceId(), wir.getApplicationId(), wir.getWidgetId());
+		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
+		Dao.commitOrRollbackTransaction();
 		
 
 		SpreadsheetService service = new SpreadsheetService("Interaction Manager");

@@ -14,7 +14,7 @@ import com.googlecode.objectify.ObjectifyOpts;
  * 
  * @author Jeff Schnitzer
  */
-public class DaoT extends DaoTmp  // DAO is your class derived from DAOBase as described above
+public class DaoT extends Dao  // DAO is your class derived from DAOBase as described above
 {
        
         
@@ -63,7 +63,7 @@ public class DaoT extends DaoTmp  // DAO is your class derived from DAOBase as d
         }
         
         public DaoT() {
-        	DaoTmp.beginTransaction();
+        	Dao.beginTransaction();
         }
       
         

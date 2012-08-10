@@ -4,7 +4,7 @@ import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
-import org.instantplaces.im.server.dao.DaoTmp;
+import org.instantplaces.im.server.dao.Dao;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
@@ -21,16 +21,16 @@ public class TaskRemoveChannelClientId  extends ServerResource {
 				
 	
 		String placeApplication = ChannelMapDao.getPlaceApplicationString(clientId);
-		DaoTmp.beginTransaction();
-		ChannelMapDao channelMap = DaoTmp.getChannelMap(placeApplication);
+		Dao.beginTransaction();
+		ChannelMapDao channelMap = Dao.getChannelMap(placeApplication);
 		if ( null != channelMap ) {
 			Log.get().warn("Removing clientId from channel map");
 			channelMap.remove(clientId);
-			DaoTmp.put(channelMap);
+			Dao.put(channelMap);
 		}
 		
 		
-		if ( !DaoTmp.commitOrRollbackTransaction() ) {
+		if ( !Dao.commitOrRollbackTransaction() ) {
 			Log.get().warn("Could not commit transaction, trying again");
 			try {
 				Queue queue = QueueFactory.getQueue("datastore");

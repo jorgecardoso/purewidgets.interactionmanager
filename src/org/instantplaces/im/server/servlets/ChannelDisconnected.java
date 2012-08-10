@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
-import org.instantplaces.im.server.dao.DaoTmp;
+import org.instantplaces.im.server.dao.Dao;
 
 import com.google.appengine.api.channel.ChannelPresence;
 import com.google.appengine.api.channel.ChannelService;

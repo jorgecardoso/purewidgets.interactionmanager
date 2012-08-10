@@ -18,7 +18,7 @@ import com.googlecode.objectify.util.DAOBase;
  * 
  */
 
-public class DaoTmp extends DAOBase {
+public class Dao extends DAOBase {
 	private static Objectify ofy;
 
 	static {

@@ -6,7 +6,7 @@ package org.instantplaces.im.server.rest.resource.cron;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.DaoTmp;
+import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
@@ -31,22 +31,22 @@ public class CronRebuildCodesResource extends ServerResource {
 	public Representation runCron() {
 
 		
-		List<Key<PlaceDao>> placeKeys = DaoTmp.getPlaceKeys();
+		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
 
 		for (Key<PlaceDao> placeKey : placeKeys) {
-			DaoTmp.beginTransaction();
+			Dao.beginTransaction();
 			
-			ReferenceCodeGeneratorDAO rcg = DaoTmp.getReferenceCodeGenerator(placeKey);
+			ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(placeKey);
 
 			rcg.rebuild();
-			List<WidgetOptionDao> options = DaoTmp.getWidgetOptions(placeKey);
+			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey);
 
 			for (WidgetOptionDao option : options) {
 				rcg.remove(option.getReferenceCode());
 				Log.get().debug("Removing used code: " + option.getReferenceCode());
 			}
 			
-			DaoTmp.commitOrRollbackTransaction();
+			Dao.commitOrRollbackTransaction();
 		}
 
 		
