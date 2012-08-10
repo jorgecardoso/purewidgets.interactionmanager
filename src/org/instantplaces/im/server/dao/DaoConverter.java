@@ -12,7 +12,7 @@ import org.instantplaces.im.server.rest.representation.json.WidgetRest;
 public class DaoConverter {
 
 	
-	public static WidgetInputDao getWidgetInputDao(WidgetOptionDaot parent, WidgetInputRest widgetInputRest) {
+	public static WidgetInputDao getWidgetInputDao(WidgetOptionDao parent, WidgetInputRest widgetInputRest) {
 		
 		long timeStamp = 0;
 		try {
@@ -28,8 +28,8 @@ public class DaoConverter {
 	}
  	
 	
-	public static WidgetOptionDaot getWidgetOptionDao(WidgetDaot parent, WidgetOptionRest widgetOptionRest) {
-		WidgetOptionDaot widgetOptionDao = new WidgetOptionDaot(parent.getKey(), widgetOptionRest.getWidgetOptionId());
+	public static WidgetOptionDao getWidgetOptionDao(WidgetDao parent, WidgetOptionRest widgetOptionRest) {
+		WidgetOptionDao widgetOptionDao = new WidgetOptionDao(parent.getKey(), widgetOptionRest.getWidgetOptionId());
 
 		widgetOptionDao.setSuggestedReferenceCode(widgetOptionRest.getSuggestedReferenceCode());
 		widgetOptionDao.setReferenceCode(widgetOptionRest.getReferenceCode());
@@ -63,8 +63,8 @@ public class DaoConverter {
 	 * @param widgetRest
 	 * @return
 	 */
-	public static WidgetDaot getWidgetDao(ApplicationDaot parent, WidgetRest widgetRest) {
-		WidgetDaot widgetDao = new WidgetDaot(parent.getKey(), widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
+	public static WidgetDao getWidgetDao(ApplicationDao parent, WidgetRest widgetRest) {
+		WidgetDao widgetDao = new WidgetDao(parent.getKey(), widgetRest.getWidgetId(), widgetRest.getControlType(), widgetRest.getShortDescription(), widgetRest.getLongDescription());
 		
 	
 		
@@ -85,8 +85,8 @@ public class DaoConverter {
 	 * @param widgetRest
 	 * @return
 	 */
-	public static ApplicationDaot getApplicationDao(PlaceDaot parent, ApplicationRest applicationRest) {
-		ApplicationDaot applicationDao = new ApplicationDaot(parent, applicationRest.getApplicationId());
+	public static ApplicationDao getApplicationDao(PlaceDao parent, ApplicationRest applicationRest) {
+		ApplicationDao applicationDao = new ApplicationDao(parent, applicationRest.getApplicationId());
 		
 		applicationDao.setApplicationBaseUrl(applicationRest.getApplicationBaseUrl());
 		applicationDao.setLastRequestTimestamp(applicationRest.getLastRequestTimestamp());

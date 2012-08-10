@@ -22,11 +22,11 @@ public class Dao extends DAOBase {
 	private static Objectify ofy;
 
 	static {
-		ObjectifyService.register(PlaceDaot.class);
+		ObjectifyService.register(PlaceDao.class);
 		ObjectifyService.register(ReferenceCodeGeneratorDAO.class);
-		ObjectifyService.register(ApplicationDaot.class);
-		ObjectifyService.register(WidgetDaot.class);
-		ObjectifyService.register(WidgetOptionDaot.class);
+		ObjectifyService.register(ApplicationDao.class);
+		ObjectifyService.register(WidgetDao.class);
+		ObjectifyService.register(WidgetOptionDao.class);
 		ObjectifyService.register(WidgetInputDao.class);
 		ObjectifyService.register(ChannelMapDao.class);
 	}
@@ -66,19 +66,19 @@ public class Dao extends DAOBase {
 		ofy.delete(o);
 	}
 
-	public static void deleteWidget(Key<ApplicationDaot> applicationKey,
+	public static void deleteWidget(Key<ApplicationDao> applicationKey,
 			String widgetId) {
-		delete(new Key<WidgetDaot>(applicationKey, WidgetDaot.class, widgetId));
+		delete(new Key<WidgetDao>(applicationKey, WidgetDao.class, widgetId));
 	}
 
 	public static void deleteWidget(String placeId, String applicationId,
 			String widgetId) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		delete(widgetKey);
 	}
@@ -88,7 +88,7 @@ public class Dao extends DAOBase {
 		delete(getWidgetInputsKeys(applicationOrWidgetKey));
 	}
 
-	public static void deleteWidgetInput(Key<ApplicationDaot> applicationKey,
+	public static void deleteWidgetInput(Key<ApplicationDao> applicationKey,
 			String widgetId) {
 
 		delete(getWidgetInputsKeys(applicationKey, widgetId));
@@ -108,7 +108,7 @@ public class Dao extends DAOBase {
 		delete(getWidgetOptionsKeys(applicationOrWidgetKey));
 	}
 
-	public static void deleteWidgetOptions(Key<ApplicationDaot> applicationKey,
+	public static void deleteWidgetOptions(Key<ApplicationDao> applicationKey,
 			String widgetId) {
 
 		delete(getWidgetOptionsKeys(applicationKey, widgetId));
@@ -123,22 +123,22 @@ public class Dao extends DAOBase {
 		delete(getWidgetOptionsKeys(placeId, applicationId, widgetId));
 	}
 
-	public static void deleteWidgets(Key<ApplicationDaot> applicationKey) {
+	public static void deleteWidgets(Key<ApplicationDao> applicationKey) {
 		delete(getWidgetsKeys(applicationKey));
 	}
 
-	public static void deleteWidgets(Key<PlaceDaot> placeKey,
+	public static void deleteWidgets(Key<PlaceDao> placeKey,
 			String applicationId) {
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		delete(getWidgetsKeys(applicationKey));
 	}
 
 	public static void deleteWidgets(String placeId, String applicationId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		deleteWidgets(applicationKey);
 	}
@@ -147,46 +147,46 @@ public class Dao extends DAOBase {
 		return ofy.get(keys);
 	}
 
-	public static ApplicationDaot getApplication(
-			Key<ApplicationDaot> applicationKey) {
+	public static ApplicationDao getApplication(
+			Key<ApplicationDao> applicationKey) {
 		return ofy.find(applicationKey);
 	}
 
-	public static ApplicationDaot getApplication(Key<PlaceDaot> parent,
+	public static ApplicationDao getApplication(Key<PlaceDao> parent,
 			String applicationId) {
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(parent,
-				ApplicationDaot.class, applicationId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(parent,
+				ApplicationDao.class, applicationId);
 		return getApplication(applicationKey);
 	}
 
-	public static ApplicationDaot getApplication(String placeId,
+	public static ApplicationDao getApplication(String placeId,
 			String applicationId) {
-		Key<PlaceDaot> parent = new Key<PlaceDaot>(PlaceDaot.class, placeId);
+		Key<PlaceDao> parent = new Key<PlaceDao>(PlaceDao.class, placeId);
 
-		Key<ApplicationDaot> key = new Key<ApplicationDaot>(parent,
-				ApplicationDaot.class, applicationId);
+		Key<ApplicationDao> key = new Key<ApplicationDao>(parent,
+				ApplicationDao.class, applicationId);
 
 		return getApplication(key);
 	}
 
-	public static List<ApplicationDaot> getApplications(Key<PlaceDaot> parentKey) {
-		Query<ApplicationDaot> q = ofy.query(ApplicationDaot.class).ancestor(
+	public static List<ApplicationDao> getApplications(Key<PlaceDao> parentKey) {
+		Query<ApplicationDao> q = ofy.query(ApplicationDao.class).ancestor(
 				parentKey);
 
 		return q.list();
 	}
 
-	public static List<ApplicationDaot> getApplications(String placeId) {
-		return getApplications(new Key<PlaceDaot>(PlaceDaot.class, placeId));
+	public static List<ApplicationDao> getApplications(String placeId) {
+		return getApplications(new Key<PlaceDao>(PlaceDao.class, placeId));
 	}
 
 	public static WidgetInputDao getLastWidgetInput(String placeId,
 			String applicationId, String widgetId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		Query<WidgetInputDao> q = ofy.query(WidgetInputDao.class)
 				.ancestor(widgetKey).order("-timeStamp");
@@ -195,12 +195,12 @@ public class Dao extends DAOBase {
 
 	}
 
-	public static PlaceDaot getPlace(Key<PlaceDaot> placeKey) {
+	public static PlaceDao getPlace(Key<PlaceDao> placeKey) {
 		return ofy.find(placeKey);
 	}
 
-	public static PlaceDaot getPlace(String placeId) {
-		return ofy.find(PlaceDaot.class, placeId);
+	public static PlaceDao getPlace(String placeId) {
+		return ofy.find(PlaceDao.class, placeId);
 	}
 
 	
@@ -212,44 +212,44 @@ public class Dao extends DAOBase {
 		return ofy.find(ChannelMapDao.class, placeApplicationId);
 	}
 	
-	public static List<Key<PlaceDaot>> getPlaceKeys() {
+	public static List<Key<PlaceDao>> getPlaceKeys() {
 		/*
 		 * We can't get all root entities inside a transaction, so don't use the
 		 * static ofy
 		 */
 		Objectify ofy_ = ObjectifyService.begin();
-		Query<PlaceDaot> q = ofy_.query(PlaceDaot.class);
+		Query<PlaceDao> q = ofy_.query(PlaceDao.class);
 
 		return q.listKeys();
 
 	}
 
-	public static List<Key<ApplicationDaot>> getApplicationKeys() {
+	public static List<Key<ApplicationDao>> getApplicationKeys() {
 		/*
 		 * We can't get all root entities inside a transaction, so don't use the
 		 * static ofy
 		 */
 		Objectify ofy_ = ObjectifyService.begin();
-		Query<ApplicationDaot> q = ofy_.query(ApplicationDaot.class);
+		Query<ApplicationDao> q = ofy_.query(ApplicationDao.class);
 
 		return q.listKeys();
 
 	}
 	
-	public static List<PlaceDaot> getPlaces() {
+	public static List<PlaceDao> getPlaces() {
 		/*
 		 * We can't get all root entities inside a transaction, do don't use the
 		 * static ofy
 		 */
 		Objectify ofy_ = ObjectifyService.begin();
-		Query<PlaceDaot> q = ofy_.query(PlaceDaot.class);
+		Query<PlaceDao> q = ofy_.query(PlaceDao.class);
 
 		return q.list();
 
 	}
 	
 	public static ReferenceCodeGeneratorDAO getReferenceCodeGenerator(
-			Key<PlaceDaot> placeKey) {
+			Key<PlaceDao> placeKey) {
 		Query<ReferenceCodeGeneratorDAO> q = ofy.query(
 				ReferenceCodeGeneratorDAO.class).ancestor(placeKey);
 
@@ -260,29 +260,29 @@ public class Dao extends DAOBase {
 			String placeId) {
 		Query<ReferenceCodeGeneratorDAO> q = ofy.query(
 				ReferenceCodeGeneratorDAO.class).ancestor(
-				new Key<PlaceDaot>(PlaceDaot.class, placeId));
+				new Key<PlaceDao>(PlaceDao.class, placeId));
 
 		return q.get();
 	}
 
 	
-	public static WidgetDaot getWidget(Key<ApplicationDaot> parentKey,
+	public static WidgetDao getWidget(Key<ApplicationDao> parentKey,
 			String widgetId) {
-		return getWidget(new Key<WidgetDaot>(parentKey, WidgetDaot.class,
+		return getWidget(new Key<WidgetDao>(parentKey, WidgetDao.class,
 				widgetId));
 	}
 
-	public static WidgetDaot getWidget(Key<WidgetDaot> widgetKey) {
+	public static WidgetDao getWidget(Key<WidgetDao> widgetKey) {
 		return ofy.find(widgetKey);
 	}
 
-	public static WidgetDaot getWidget(String placeId, String applicationId,
+	public static WidgetDao getWidget(String placeId, String applicationId,
 			String widgetId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidget(widgetKey);
 	}
@@ -304,13 +304,13 @@ public class Dao extends DAOBase {
 		return q.list();
 	}
 	
-	public static List<WidgetOptionDaot> getWidgetOptionsByReferenceCode(
+	public static List<WidgetOptionDao> getWidgetOptionsByReferenceCode(
 			String placeId, String referenceCode) {
 		
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
 		
 		Log.get().debug("Searching for widget options on place + " + placeId + ", with reference code " + referenceCode);
-		Query<WidgetOptionDaot> q = ofy.query(WidgetOptionDaot.class)
+		Query<WidgetOptionDao> q = ofy.query(WidgetOptionDao.class)
 				.ancestor(placeKey).filter("referenceCode =", referenceCode.trim());
 
 		return q.list();
@@ -319,9 +319,9 @@ public class Dao extends DAOBase {
 	public static List<WidgetInputDao> getWidgetInputs(String placeId,
 			String applicationId) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		return getWidgetInputs(applicationKey);
 
@@ -330,9 +330,9 @@ public class Dao extends DAOBase {
 	public static List<WidgetInputDao> getWidgetInputs(String placeId,
 			String applicationId, long from) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		return getWidgetInputs(applicationKey, from);
 
@@ -341,11 +341,11 @@ public class Dao extends DAOBase {
 	public static List<WidgetInputDao> getWidgetInputs(String placeId,
 			String applicationId, String widgetId) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidgetInputs(widgetKey);
 
@@ -354,11 +354,11 @@ public class Dao extends DAOBase {
 	public static List<WidgetInputDao> getWidgetInputs(String placeId,
 			String applicationId, String widgetId, long from) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidgetInputs(widgetKey, from);
 
@@ -374,8 +374,8 @@ public class Dao extends DAOBase {
 
 	public static List<Key<WidgetInputDao>> getWidgetInputsKeys(
 			Key<?> applicationKey, String widgetId) {
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		Query<WidgetInputDao> q = ofy.query(WidgetInputDao.class).ancestor(
 				widgetKey);
@@ -385,172 +385,172 @@ public class Dao extends DAOBase {
 
 	public static List<Key<WidgetInputDao>> getWidgetInputsKeys(String placeId,
 			String applicationId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		return getWidgetInputsKeys(applicationKey);
 	}
 
 	public static List<Key<WidgetInputDao>> getWidgetInputsKeys(String placeId,
 			String applicationId, String widgetId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidgetInputsKeys(widgetKey);
 	}
 
 	public static List<Key<WidgetInputDao>> getWidgetInputsKeys(String placeId,
 			String applicationId, String widgetId, String widgetOptionId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
-		Key<WidgetOptionDaot> widgetOptionKey = new Key<WidgetOptionDaot>(widgetKey,
-				WidgetOptionDaot.class, widgetOptionId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
+		Key<WidgetOptionDao> widgetOptionKey = new Key<WidgetOptionDao>(widgetKey,
+				WidgetOptionDao.class, widgetOptionId);
 		
 
 		return getWidgetInputsKeys(widgetOptionKey);
 	}
 	
-	public static WidgetOptionDaot getWidgetOption(Key<WidgetDaot> parentKey,
+	public static WidgetOptionDao getWidgetOption(Key<WidgetDao> parentKey,
 			String widgetOptionId) {
 
-		return getWidgetOption(new Key<WidgetOptionDaot>(parentKey,
-				WidgetOptionDaot.class, widgetOptionId));
+		return getWidgetOption(new Key<WidgetOptionDao>(parentKey,
+				WidgetOptionDao.class, widgetOptionId));
 
 	}
 
-	public static WidgetOptionDaot getWidgetOption(
-			Key<WidgetOptionDaot> widgetOptionKey) {
+	public static WidgetOptionDao getWidgetOption(
+			Key<WidgetOptionDao> widgetOptionKey) {
 
 		return ofy.find(widgetOptionKey);
 
 	}
 
-	public static WidgetOptionDaot getWidgetOption(String placeId,
+	public static WidgetOptionDao getWidgetOption(String placeId,
 			String applicationId, String widgetId, String widgetOptionId) {
 
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
-		Key<WidgetOptionDaot> widgetOptionKey = new Key<WidgetOptionDaot>(
-				widgetKey, WidgetOptionDaot.class, widgetOptionId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
+		Key<WidgetOptionDao> widgetOptionKey = new Key<WidgetOptionDao>(
+				widgetKey, WidgetOptionDao.class, widgetOptionId);
 
 		return getWidgetOption(widgetOptionKey);
 	}
 
-	public static List<WidgetOptionDaot> getWidgetOptions(
+	public static List<WidgetOptionDao> getWidgetOptions(
 			Key<?> parentKey) {
-		Query<WidgetOptionDaot> q = ofy.query(WidgetOptionDaot.class).ancestor(
+		Query<WidgetOptionDao> q = ofy.query(WidgetOptionDao.class).ancestor(
 				parentKey);
 
 		return q.list();
 	}
 
-	public static List<WidgetOptionDaot> getWidgetOptions(
-			Key<ApplicationDaot> applicationKey, String widgetId) {
-		return getWidgetOptions(new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId));
+	public static List<WidgetOptionDao> getWidgetOptions(
+			Key<ApplicationDao> applicationKey, String widgetId) {
+		return getWidgetOptions(new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId));
 	}
 
-	public static List<WidgetOptionDaot> getWidgetOptions(String placeId
+	public static List<WidgetOptionDao> getWidgetOptions(String placeId
 			) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
 		
 
 		return getWidgetOptions(placeKey);
 	}
 	
-	public static List<WidgetOptionDaot> getWidgetOptions(String placeId,
+	public static List<WidgetOptionDao> getWidgetOptions(String placeId,
 			String applicationId, String widgetId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidgetOptions(widgetKey);
 	}
 
-	public static List<Key<WidgetOptionDaot>> getWidgetOptionsKeys(
+	public static List<Key<WidgetOptionDao>> getWidgetOptionsKeys(
 			Key<?> applicatonOrWidgetKey) {
-		Query<WidgetOptionDaot> q = ofy.query(WidgetOptionDaot.class).ancestor(
+		Query<WidgetOptionDao> q = ofy.query(WidgetOptionDao.class).ancestor(
 				applicatonOrWidgetKey);
 
 		return q.listKeys();
 	}
 
-	public static List<Key<WidgetOptionDaot>> getWidgetOptionsKeys(
-			Key<ApplicationDaot> applicationKey, String widgetId) {
-		return getWidgetOptionsKeys(new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId));
+	public static List<Key<WidgetOptionDao>> getWidgetOptionsKeys(
+			Key<ApplicationDao> applicationKey, String widgetId) {
+		return getWidgetOptionsKeys(new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId));
 	}
 
-	public static List<Key<WidgetOptionDaot>> getWidgetOptionsKeys(
+	public static List<Key<WidgetOptionDao>> getWidgetOptionsKeys(
 			String placeId, String applicationId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 
 		return getWidgetOptionsKeys(applicationKey);
 	}
 
-	public static List<Key<WidgetOptionDaot>> getWidgetOptionsKeys(
+	public static List<Key<WidgetOptionDao>> getWidgetOptionsKeys(
 			String placeId, String applicationId, String widgetId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
-		Key<WidgetDaot> widgetKey = new Key<WidgetDaot>(applicationKey,
-				WidgetDaot.class, widgetId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+		Key<WidgetDao> widgetKey = new Key<WidgetDao>(applicationKey,
+				WidgetDao.class, widgetId);
 
 		return getWidgetOptionsKeys(widgetKey);
 	}
 
-	public static List<WidgetDaot> getWidgets(Key<ApplicationDaot> parentKey) {
-		Query<WidgetDaot> q = ofy.query(WidgetDaot.class).ancestor(parentKey);
+	public static List<WidgetDao> getWidgets(Key<ApplicationDao> parentKey) {
+		Query<WidgetDao> q = ofy.query(WidgetDao.class).ancestor(parentKey);
 		return q.list();
 	}
 
-	public static List<WidgetDaot> getWidgets(Key<PlaceDaot> placeKey,
+	public static List<WidgetDao> getWidgets(Key<PlaceDao> placeKey,
 			String applicationId) {
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 		return getWidgets(applicationKey);
 	}
 
-	public static List<WidgetDaot> getWidgets(String placeId,
+	public static List<WidgetDao> getWidgets(String placeId,
 			String applicationId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 		return getWidgets(applicationKey);
 	}
 
-	public static List<Key<WidgetDaot>> getWidgetsKeys(
-			Key<ApplicationDaot> parentKey) {
-		Query<WidgetDaot> q = ofy.query(WidgetDaot.class).ancestor(parentKey);
+	public static List<Key<WidgetDao>> getWidgetsKeys(
+			Key<ApplicationDao> parentKey) {
+		Query<WidgetDao> q = ofy.query(WidgetDao.class).ancestor(parentKey);
 		return q.listKeys();
 	}
 
-	public static List<Key<WidgetDaot>> getWidgetsKeys(Key<PlaceDaot> placeKey,
+	public static List<Key<WidgetDao>> getWidgetsKeys(Key<PlaceDao> placeKey,
 			String applicationId) {
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 		return getWidgetsKeys(applicationKey);
 	}
 
-	public static List<Key<WidgetDaot>> getWidgetsKeys(String placeId,
+	public static List<Key<WidgetDao>> getWidgetsKeys(String placeId,
 			String applicationId) {
-		Key<PlaceDaot> placeKey = new Key<PlaceDaot>(PlaceDaot.class, placeId);
-		Key<ApplicationDaot> applicationKey = new Key<ApplicationDaot>(placeKey,
-				ApplicationDaot.class, applicationId);
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
 		return getWidgetsKeys(applicationKey);
 	}
 

@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.instantplaces.im.server.logging.Log;
-import org.instantplaces.im.server.dao.ApplicationDaot;
-import org.instantplaces.im.server.dao.PlaceDaot;
-import org.instantplaces.im.server.dao.WidgetDaot;
+import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
-import org.instantplaces.im.server.dao.WidgetOptionDaot;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.dao.WidgetParameterDao;
 
 /**
@@ -20,7 +20,7 @@ import org.instantplaces.im.server.dao.WidgetParameterDao;
  */
 public class RestConverter {
 
-	public static PlaceRest getPlaceRest(PlaceDaot placeDao) {
+	public static PlaceRest getPlaceRest(PlaceDao placeDao) {
 		PlaceRest placeRest = new PlaceRest();
 		placeRest.setPlaceId(placeDao.getPlaceId());
 		placeRest.setPlaceName(placeDao.getPlaceName());
@@ -33,12 +33,12 @@ public class RestConverter {
 		
 	}
 	
-	public static PlaceListRest getPlaceListRest(List<PlaceDaot> placeListDao) {
+	public static PlaceListRest getPlaceListRest(List<PlaceDao> placeListDao) {
 		
 		
 		ArrayList<PlaceRest> placesRest = new ArrayList<PlaceRest>();
 		
-		for ( PlaceDaot placeDao : placeListDao ) {
+		for ( PlaceDao placeDao : placeListDao ) {
 			placesRest.add( RestConverter.getPlaceRest(placeDao) );
 		}
 		
@@ -47,10 +47,10 @@ public class RestConverter {
 		return placeListRest;
 	}
 	
-	public static WidgetListRest widgetArrayListFromDso(List<WidgetDaot> widgetDSOList) {
+	public static WidgetListRest widgetArrayListFromDso(List<WidgetDao> widgetDSOList) {
 		
 		ArrayList<WidgetRest> widgetListREST = new ArrayList<WidgetRest>();
-		for ( WidgetDaot wDSO : widgetDSOList ) {
+		for ( WidgetDao wDSO : widgetDSOList ) {
 			WidgetRest wREST = RestConverter.getWidgetRest(wDSO);
 			widgetListREST.add(wREST);
 		}
@@ -66,11 +66,11 @@ public class RestConverter {
 	 * @param widgetDao
 	 * @return
 	 */
-	public static WidgetRest getWidgetRest(WidgetDaot widgetDao) {
+	public static WidgetRest getWidgetRest(WidgetDao widgetDao) {
 		WidgetRest  widgetRest = new WidgetRest();
 	
 		if ( null != widgetDao.getWidgetOptions() ) {
-			for (WidgetOptionDaot option : widgetDao.getWidgetOptions()) {
+			for (WidgetOptionDao option : widgetDao.getWidgetOptions()) {
 				widgetRest.addWidgetOption( RestConverter.widgetOptionFromDSO(option) );
 			}
 		}
@@ -113,7 +113,7 @@ public class RestConverter {
 	 * @param widgetOptionDSO
 	 * @return
 	 */
-	public static WidgetOptionRest widgetOptionFromDSO(WidgetOptionDaot widgetOptionDSO) {
+	public static WidgetOptionRest widgetOptionFromDSO(WidgetOptionDao widgetOptionDSO) {
 		WidgetOptionRest woREST = new WidgetOptionRest();
 		woREST.setWidgetOptionId(widgetOptionDSO.getWidgetOptionId());
 		woREST.setReferenceCode(widgetOptionDSO.getReferenceCode());
@@ -131,7 +131,7 @@ public class RestConverter {
 	 * @param widgetDSO
 	 * @return
 	 */
-	public static ApplicationRest applicationFromDSO(ApplicationDaot applicationDao) {
+	public static ApplicationRest applicationFromDSO(ApplicationDao applicationDao) {
 		Log.debugFinest(RestConverter.class.getName(), "Converting ApplicationDao to ApplicationRest " + applicationDao.toString());
 		ApplicationRest  a = new ApplicationRest();
 	
@@ -150,10 +150,10 @@ public class RestConverter {
 		return a; 
 	}
 
-	public static ApplicationListRest applicationArrayListFromDSO(List<ApplicationDaot> applicationDSOList) {
+	public static ApplicationListRest applicationArrayListFromDSO(List<ApplicationDao> applicationDSOList) {
 		
 		ArrayList<ApplicationRest> applicationListREST = new ArrayList<ApplicationRest>();
-		for ( ApplicationDaot aDSO : applicationDSOList ) {
+		for ( ApplicationDao aDSO : applicationDSOList ) {
 			ApplicationRest aREST = applicationFromDSO(aDSO);
 			applicationListREST.add(aREST);
 		}

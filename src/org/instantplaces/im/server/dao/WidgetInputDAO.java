@@ -48,9 +48,9 @@ public class WidgetInputDao {
 //	private WidgetOptionDao widgetOption;
 
 	@Parent
-	private Key<WidgetOptionDaot> widgetOptionKey;
+	private Key<WidgetOptionDao> widgetOptionKey;
 
-	public WidgetInputDao(Key<WidgetOptionDaot> parent, long timeStamp, String[] parameters,
+	public WidgetInputDao(Key<WidgetOptionDao> parent, long timeStamp, String[] parameters,
 			String userId, String nickname) {
 		this.timeStamp = timeStamp;
 		this.parameters = parameters;
@@ -104,7 +104,7 @@ public class WidgetInputDao {
 	/**
 	 * @return the widgetOptionKey
 	 */
-	public Key<WidgetOptionDaot> getWidgetOptionKey() {
+	public Key<WidgetOptionDao> getWidgetOptionKey() {
 		return widgetOptionKey;
 	}
 
@@ -154,7 +154,7 @@ public class WidgetInputDao {
 	 * @param widgetOptionKey
 	 *            the widgetOptionKey to set
 	 */
-	public void setWidgetOptionKey(Key<WidgetOptionDaot> widgetOptionKey) {
+	public void setWidgetOptionKey(Key<WidgetOptionDao> widgetOptionKey) {
 		this.widgetOptionKey = widgetOptionKey;
 	}
 

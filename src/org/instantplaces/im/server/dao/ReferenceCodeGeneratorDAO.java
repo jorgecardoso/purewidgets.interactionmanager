@@ -26,17 +26,17 @@ public class ReferenceCodeGeneratorDAO {
 
 	
 	@NotSaved
-	private PlaceDaot place;
+	private PlaceDao place;
 
 	@SuppressWarnings("unused")
 	@Parent
-	private Key<PlaceDaot> placeKey;
+	private Key<PlaceDao> placeKey;
 
 	@SuppressWarnings("unused")
 	@Id
 	private Long referenceCodeGeneratorId;
 
-	public ReferenceCodeGeneratorDAO(PlaceDaot place) {
+	public ReferenceCodeGeneratorDAO(PlaceDao place) {
 		codes = new ArrayList<String>(100);
 		this.rebuild();
 		// Log.get().debug("ReferenceCodeManager: " + this.codes.toString());
@@ -69,7 +69,7 @@ public class ReferenceCodeGeneratorDAO {
 	/**
 	 * @return the place
 	 */
-	public PlaceDaot getPlace() {
+	public PlaceDao getPlace() {
 		return place;
 	}
 
@@ -184,7 +184,7 @@ public class ReferenceCodeGeneratorDAO {
 	 * finally { // query.closeAll(); } }
 	 */
 
-	public void recycleCode(WidgetOptionDaot widgetOption) {
+	public void recycleCode(WidgetOptionDao widgetOption) {
 		if ( !widgetOption.isRecyclable() ) {
 			return;
 		}
@@ -210,10 +210,10 @@ public class ReferenceCodeGeneratorDAO {
 	 * @param place
 	 *            the place to set
 	 */
-	public void setPlace(PlaceDaot place) {
+	public void setPlace(PlaceDao place) {
 		this.place = place;
 		if (null != place) {
-			this.placeKey = new Key<PlaceDaot>(PlaceDaot.class, place.getPlaceId());
+			this.placeKey = new Key<PlaceDao>(PlaceDao.class, place.getPlaceId());
 		}
 	}
 }

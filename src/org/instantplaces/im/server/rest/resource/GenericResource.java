@@ -11,7 +11,7 @@ import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.DeserializationProblemHandler;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDaot;
+import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.rest.representation.json.ErrorREST;
 
@@ -62,9 +62,9 @@ public abstract class GenericResource extends ServerResource {
 	 */
 	protected String requestingAppId;
 	
-	protected ApplicationDaot applicationDAO;
+	protected ApplicationDao applicationDAO;
 	
-	protected ApplicationDaot requestingApplicationDAO;
+	protected ApplicationDao requestingApplicationDAO;
 	
 	
 	public GenericResource() {

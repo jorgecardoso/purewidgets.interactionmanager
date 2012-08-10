@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDaot;
+import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
-import org.instantplaces.im.server.dao.WidgetOptionDaot;
+import org.instantplaces.im.server.dao.WidgetOptionDao;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
 import org.instantplaces.im.server.rest.resource.WidgetInputResource;
 import org.restlet.resource.Get;

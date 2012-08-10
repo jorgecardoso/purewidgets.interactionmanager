@@ -11,7 +11,7 @@ import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
-public class ApplicationDaot  {
+public class ApplicationDao  {
 	
 	@NotSaved //not needed but to make explicit
 	public static final int MAXIMUM_ACTIVITY_INTERVAL = 30*1000; // milliseconds
@@ -45,13 +45,13 @@ public class ApplicationDaot  {
 	 * The place this application belongs to
 	 */
 	@NotSaved
-	private PlaceDaot place;
+	private PlaceDao place;
 	
 	/**
 	 * The parent key
 	 */
 	@Parent
-	private Key<PlaceDaot> placeKey;
+	private Key<PlaceDao> placeKey;
 	
 	/**
 	 * The list of widgets in use by this app
@@ -59,7 +59,7 @@ public class ApplicationDaot  {
 //	@NotSaved
 //	private ArrayList<WidgetDao> widgets;
 	
-	public ApplicationDaot(PlaceDaot place, String applicationId) {
+	public ApplicationDao(PlaceDao place, String applicationId) {
 		this.applicationId = applicationId;
 		
 		this.lastRequestTimestamp = System.currentTimeMillis();
@@ -67,15 +67,15 @@ public class ApplicationDaot  {
 	}
 	
 	@SuppressWarnings("unused")
-	private ApplicationDaot() {
+	private ApplicationDao() {
 	}
 	
 	public String getApplicationId() {
 		return this.applicationId;
 	}
 
-	public Key<ApplicationDaot> getKey() {
-		return new Key<ApplicationDaot>(this.placeKey, ApplicationDaot.class, this.applicationId);
+	public Key<ApplicationDao> getKey() {
+		return new Key<ApplicationDao>(this.placeKey, ApplicationDao.class, this.applicationId);
 	}
 
 	public long getLastRequestTimestamp() {
@@ -87,14 +87,14 @@ public class ApplicationDaot  {
 	/**
 	 * @return the place
 	 */
-	public PlaceDaot getPlace() {
+	public PlaceDao getPlace() {
 		return place;
 	} 
 	
 	/**
 	 * @return the placeKey
 	 */
-	public Key<PlaceDaot> getPlaceKey() {
+	public Key<PlaceDao> getPlaceKey() {
 		return placeKey;
 	}
 
@@ -120,17 +120,17 @@ public class ApplicationDaot  {
 	}
 	
 
-	public void setPlace(PlaceDaot place) {
+	public void setPlace(PlaceDao place) {
 		if ( null != place ) {
 			this.place = place;
-			this.placeKey = new Key<PlaceDaot>(PlaceDaot.class, place.getPlaceId());
+			this.placeKey = new Key<PlaceDao>(PlaceDao.class, place.getPlaceId());
 		}
 	}
 
 	/**
 	 * @param placeKey the placeKey to set
 	 */
-	public void setPlaceKey(Key<PlaceDaot> placeKey) {
+	public void setPlaceKey(Key<PlaceDao> placeKey) {
 		this.placeKey = placeKey;
 	}
 	
