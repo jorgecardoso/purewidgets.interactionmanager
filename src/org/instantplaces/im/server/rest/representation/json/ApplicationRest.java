@@ -27,6 +27,8 @@ public class ApplicationRest {
 
 	private String applicationId;
 	
+	private String applicationName;
+	
 	private String applicationBaseUrl;
 	
 	/**
@@ -114,6 +116,22 @@ public class ApplicationRest {
 	 */
 	public void setApplicationBaseUrl(String applicationBaseUrl) {
 		this.applicationBaseUrl = applicationBaseUrl;
+	}
+
+
+	/**
+	 * @return the applicationName
+	 */
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+
+	/**
+	 * @param applicationName the applicationName to set
+	 */
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
 	}
 	
 }

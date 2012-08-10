@@ -111,13 +111,18 @@ public class WidgetOptionDao implements Serializable {
 	 *            the longDescripton to set
 	 */
 	public void setLongDescripton(String longDescripton) {
-		this.changedFlag = !(this.longDescripton == null ? longDescripton == null : this.longDescripton.equals(longDescripton) );
+		
+		if ( !(this.longDescripton == null ? longDescripton == null : this.longDescripton.equals(longDescripton) ) ) {
+			this.changedFlag = true;
+		}
 
 		this.longDescripton = longDescripton;
 	}
 
 	public void setReferenceCode(String referenceCode) {
-		this.changedFlag = !(this.referenceCode == null ? referenceCode == null : this.referenceCode.equals(referenceCode) );
+		if ( !(this.referenceCode == null ? referenceCode == null : this.referenceCode.equals(referenceCode) ) ) {
+			this.changedFlag = true;
+		}
 		
 
 		this.referenceCode = referenceCode;
@@ -128,13 +133,17 @@ public class WidgetOptionDao implements Serializable {
 	 *            the shortDescription to set
 	 */
 	public void setShortDescription(String shortDescription) {
-		this.changedFlag = !(this.shortDescription == null ? shortDescription == null : this.shortDescription.equals(shortDescription) );
+		if ( !(this.shortDescription == null ? shortDescription == null : this.shortDescription.equals(shortDescription) ) ) {
+			this.changedFlag = true;
+		}
 		
 		this.shortDescription = shortDescription;
 	}
 
 	public void setSuggestedReferenceCode(String suggestedReferenceCode) {
-		this.changedFlag = !(this.suggestedReferenceCode == null ? suggestedReferenceCode == null : this.suggestedReferenceCode.equals(suggestedReferenceCode) );
+		if ( !(this.suggestedReferenceCode == null ? suggestedReferenceCode == null : this.suggestedReferenceCode.equals(suggestedReferenceCode) ) ) {
+			this.changedFlag = true;
+		}
 	
 		this.suggestedReferenceCode = suggestedReferenceCode;
 	}
@@ -222,7 +231,9 @@ public class WidgetOptionDao implements Serializable {
 	 * @param iconUrl the iconUrl to set
 	 */
 	public void setIconUrl(String iconUrl) {
-		this.changedFlag = !(this.iconUrl == null ? iconUrl == null : this.iconUrl.equals(iconUrl) );
+		if ( !(this.iconUrl == null ? iconUrl == null : this.iconUrl.equals(iconUrl) ) ) {
+			this.changedFlag = true;
+		}
 		
 
 		this.iconUrl = iconUrl;

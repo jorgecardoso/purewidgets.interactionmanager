@@ -4,6 +4,7 @@ import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
 public class PlaceDao {
@@ -11,6 +12,12 @@ public class PlaceDao {
     @Id 
     private String placeId;
 	
+    
+    /**
+     * The human-readable place name
+     */
+    @Unindexed
+    private String placeName;
     
     /*
      * The reference code used for text-based interactions
@@ -20,16 +27,19 @@ public class PlaceDao {
     /*
      * The phone number users can text in order to interact.
      */
+    @Unindexed
     private String placePhoneNumber;
     
     /**
      * The email address to which users can send emails to interact
      */
+    @Unindexed
     private String placeEmailAddress;
     
     /**
      * The web address of the placeinteraction webpage.
      */
+    @Unindexed
     private String placeInteractionUrl;
     
     
@@ -128,6 +138,20 @@ public class PlaceDao {
 	 */
 	public void setPlaceInteractionUrl(String placeInteractionUrl) {
 		this.placeInteractionUrl = placeInteractionUrl;
+	}
+
+	/**
+	 * @return the placeName
+	 */
+	public String getPlaceName() {
+		return placeName;
+	}
+
+	/**
+	 * @param placeName the placeName to set
+	 */
+	public void setPlaceName(String placeName) {
+		this.placeName = placeName;
 	}
 
 }

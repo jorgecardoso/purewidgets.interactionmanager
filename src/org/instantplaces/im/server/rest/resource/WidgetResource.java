@@ -10,7 +10,7 @@ import java.util.List;
 import org.instantplaces.im.server.rest.representation.json.RestConverter;
 import org.instantplaces.im.server.rest.representation.json.WidgetListRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetRest;
-import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
@@ -146,9 +146,10 @@ public class WidgetResource extends GenericResource {
 				 * Save the widget
 				 */
 				if ( existingWidgetDao.isChangedFlag() ) {
+					Log.debugFinest(this, "Widget " + existingWidgetDao.getWidgetId() + " changed, updating datastore.");
 					Dao.put(existingWidgetDao);
 				} else {
-					Log.get().debug("Widget did not change, skipping datastore put.");
+					Log.debugFinest(this, "Widget " + existingWidgetDao.getWidgetId() + " did not change, skipping datastore put.");
 				}
 				
 				/*
@@ -156,10 +157,12 @@ public class WidgetResource extends GenericResource {
 				 */
 				//Dao.put(existingWidgetDao.getWidgetOptions());
 				if ( optionsChanged.size() <= 0 && optionsToAdd.size() <= 0) {
-					Log.get().debug("No options changed...");
-				} 
-				Dao.put(optionsChanged);
-				Dao.put(optionsToAdd);
+					Log.debugFinest("No options changed in widget " + existingWidgetDao.getWidgetId() + ", skipping datastore put...");
+				} else {
+					Log.debugFinest("Options changed in widget " + existingWidgetDao.getWidgetId() + ", updating datastore.");
+					Dao.put(optionsChanged);
+					Dao.put(optionsToAdd);
+				}
 
 			} else {
 				existingWidgetDao = DaoConverter.getWidgetDao(existingApplicationDSO, receivedWidgetRest);

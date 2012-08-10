@@ -90,7 +90,7 @@ public class DaoConverter {
 		
 		applicationDao.setApplicationBaseUrl(applicationRest.getApplicationBaseUrl());
 		applicationDao.setLastRequestTimestamp(applicationRest.getLastRequestTimestamp());
-		
+		applicationDao.setApplicationName(applicationRest.getApplicationName());
 		return applicationDao;
 	}
 

@@ -8,7 +8,7 @@ import java.util.Iterator;
 import javax.persistence.Embedded;
 import javax.persistence.Id;
 
-import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.logging.Log;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cached;
@@ -62,27 +62,33 @@ public class WidgetDao implements Serializable {
 	@NotSaved
 	private boolean changedFlag;
 	
+	@NotSaved
+	private boolean traceChanges;
+	
 	public WidgetDao(Key<ApplicationDao> applicationKey) {
 		this(applicationKey, null, null, null, null);
 	}
 
 	public WidgetDao(Key<ApplicationDao> applicationKey, String widgetId, String controlType,
 			String shortDescription, String longDescription) {
+		this();
 		this.widgetId = widgetId;
 		this.controlType = controlType;
 		this.shortDescription = shortDescription;
 		this.longDescription = longDescription;
 		this.applicationKey = applicationKey;
-		//this.setApplication(application);
+		
 	}
 
 	@SuppressWarnings("unused")
 	private WidgetDao() {
-
+		this.widgetParameters = new ArrayList<WidgetParameterDao>();
+		this.traceChanges = false;
 	}
 
 	public void clearChangedFlag() {
 		this.changedFlag = false;
+		this.traceChanges = true;
 	}
 	
 	public void addWidgetOption(WidgetOptionDao widgetOption) {
@@ -90,7 +96,6 @@ public class WidgetDao implements Serializable {
 			this.widgetOptions = new ArrayList<WidgetOptionDao>();
 		}
 		this.widgetOptions.add(widgetOption);
-		this.changedFlag = true;
 	}
 	
 
@@ -99,7 +104,11 @@ public class WidgetDao implements Serializable {
 			this.widgetParameters = new ArrayList<WidgetParameterDao>();
 		}
 		this.widgetParameters.add(widgetParameter);
-		this.changedFlag = true;
+		
+		if ( this.traceChanges ) {
+			this.changedFlag = true;
+			Log.debugFinest(this, "Widget " + this.widgetId + " changed in parameters: added " + widgetParameter.toString());
+		}
 	}
 
 	public ArrayList<WidgetOptionDao> assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
@@ -267,8 +276,11 @@ public class WidgetDao implements Serializable {
 	 *            the applicationKey to set
 	 */
 	public void setApplicationKey(Key<ApplicationDao> applicationKey) {
-		if ( !this.applicationKey.equals(applicationKey) ) {
-			this.changedFlag = true;
+		if ( this.traceChanges ) {
+			if ( !this.applicationKey.equals(applicationKey) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in application key.");
+			}
 		}
 		this.applicationKey = applicationKey;
 	}
@@ -278,8 +290,11 @@ public class WidgetDao implements Serializable {
 	 *            the controlType to set
 	 */
 	public void setControlType(String controlType) {
-		if ( !this.controlType.equals(controlType) ) {
-			this.changedFlag = true;
+		if ( this.traceChanges ) {
+			if ( !this.controlType.equals(controlType) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in control type.");
+			}	
 		}
 		this.controlType = controlType;
 	}
@@ -289,8 +304,11 @@ public class WidgetDao implements Serializable {
 	 *            the longDescription to set
 	 */
 	public void setLongDescription(String longDescription) {
-		if ( !this.longDescription.equals(longDescription) ) {
-			this.changedFlag = true;
+		if ( this.traceChanges ) {
+			if ( !this.longDescription.equals(longDescription) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in long description.");
+			}
 		}
 		this.longDescription = longDescription;
 	}
@@ -300,8 +318,11 @@ public class WidgetDao implements Serializable {
 	 *            the shortDescription to set
 	 */
 	public void setShortDescription(String shortDescription) {
-		if ( !this.shortDescription.equals(shortDescription) ) {
-			this.changedFlag = true;
+		if ( this.traceChanges ) {
+			if ( !this.shortDescription.equals(shortDescription) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in short description.");
+			}
 		}
 		this.shortDescription = shortDescription;
 	}
@@ -309,8 +330,11 @@ public class WidgetDao implements Serializable {
 
 
 	public void setWidgetId(String id) {
-		if ( !this.widgetId.equals(id) ) {
-			this.changedFlag = true;
+		if ( this.traceChanges ) {
+			if ( !this.widgetId.equals(id) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in widget id.");
+			}
 		}
 		this.widgetId = id;
 
@@ -343,8 +367,29 @@ public class WidgetDao implements Serializable {
 	 * @param widgetParameters the widgetParameters to set
 	 */
 	public void setWidgetParameters(ArrayList<WidgetParameterDao> widgetParameters) {
-		this.changedFlag = !(this.widgetParameters==null ? widgetParameters==null : this.widgetParameters.equals(widgetParameters));
-		this.widgetParameters = widgetParameters;
+		if ( this.traceChanges ) {
+			if ( !(this.widgetParameters==null ? widgetParameters==null : this.widgetParameters.equals(widgetParameters)) ) {
+				this.changedFlag = true;
+				Log.debugFinest(this, "Widget " + this.widgetId + " changed in parameters.");
+				if ( null != this.widgetParameters ) {
+					for (WidgetParameterDao p : this.widgetParameters) {
+						Log.debugFinest(this, "current: " + p.toString());
+					}
+				} else {
+					Log.debugFinest(this, "current: null");
+				}
+				if ( null != widgetParameters ) {
+					for (WidgetParameterDao p : widgetParameters) {
+						Log.debugFinest(this, "new: " + p.toString());
+					}
+				} else {
+					Log.debugFinest(this, "new: null");
+				}
+			}
+		}
+		if ( null != widgetParameters ) {
+			this.widgetParameters = widgetParameters;
+		}
 	}
 
 	/**

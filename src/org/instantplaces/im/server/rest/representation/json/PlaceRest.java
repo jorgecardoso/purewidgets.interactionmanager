@@ -17,7 +17,9 @@ public class PlaceRest {
 
 	private	String placeId;
 
-	  /*
+	private String placeName;
+	
+	/*
      * The reference code used for text-based interactions
      */
     private String placeReferenceCode;
@@ -112,5 +114,21 @@ public class PlaceRest {
 	 */
 	public void setPlaceInteractionUrl(String placeInteractionUrl) {
 		this.placeInteractionUrl = placeInteractionUrl;
+	}
+
+
+	/**
+	 * @return the placeName
+	 */
+	public String getPlaceName() {
+		return placeName;
+	}
+
+
+	/**
+	 * @param placeName the placeName to set
+	 */
+	public void setPlaceName(String placeName) {
+		this.placeName = placeName;
 	}	
 }

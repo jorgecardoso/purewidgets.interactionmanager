@@ -29,6 +29,11 @@ public class ApplicationDao  {
 	@Unindexed
 	private String applicationBaseUrl;
 	
+	/**
+	 * The human-readable application name
+	 */
+	@Unindexed
+	private String applicationName;
 	
 	/** The address to notify when new input is available
 	 * 
@@ -172,6 +177,20 @@ public class ApplicationDao  {
 	 */
 	public void setApplicationServerNotificationUrl(String applicationServerNotificationUrl) {
 		this.applicationServerNotificationUrl = applicationServerNotificationUrl;
+	}
+
+	/**
+	 * @return the placeName
+	 */
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	/**
+	 * @param placeName the placeName to set
+	 */
+	public void setApplicationName(String placeName) {
+		this.applicationName = placeName;
 	}
 
 	

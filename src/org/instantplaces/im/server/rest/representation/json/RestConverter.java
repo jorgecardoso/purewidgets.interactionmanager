@@ -6,7 +6,7 @@ package org.instantplaces.im.server.rest.representation.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.instantplaces.im.server.Log;
+import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
@@ -23,7 +23,7 @@ public class RestConverter {
 	public static PlaceRest getPlaceRest(PlaceDao placeDao) {
 		PlaceRest placeRest = new PlaceRest();
 		placeRest.setPlaceId(placeDao.getPlaceId());
-		
+		placeRest.setPlaceName(placeDao.getPlaceName());
 		placeRest.setPlaceReferenceCode(placeDao.getPlaceReferenceCode());
 		placeRest.setPlaceEmailAddress(placeDao.getPlaceEmailAddress());
 		placeRest.setPlaceInteractionUrl(placeDao.getPlaceInteractionUrl());
@@ -131,22 +131,22 @@ public class RestConverter {
 	 * @param widgetDSO
 	 * @return
 	 */
-	public static ApplicationRest applicationFromDSO(ApplicationDao applicationDSO) {
-		Log.get().debug("Converting to REST " + applicationDSO.toString());
+	public static ApplicationRest applicationFromDSO(ApplicationDao applicationDao) {
+		Log.debugFinest(RestConverter.class.getName(), "Converting ApplicationDao to ApplicationRest " + applicationDao.toString());
 		ApplicationRest  a = new ApplicationRest();
 	
-		a.setPlaceId( applicationDSO.getPlaceKey().getName() );
-		a.setApplicationId( applicationDSO.getApplicationId() );
-		a.setApplicationBaseUrl(applicationDSO.getApplicationBaseUrl());
+		a.setPlaceId( applicationDao.getPlaceKey().getName() );
+		a.setApplicationName( applicationDao.getApplicationName() );
+		a.setApplicationId( applicationDao.getApplicationId() );
+		a.setApplicationBaseUrl(applicationDao.getApplicationBaseUrl());
 		
 		
 		/*for ( WidgetDSO widget : applicationDSO.getWidgets() ) {
 			a.addWidget( widgetRestFromDso( widget ));
 		}*/
 		
-		a.setLastRequestTimestamp(applicationDSO.getLastRequestTimestamp());
+		a.setLastRequestTimestamp(applicationDao.getLastRequestTimestamp());
 		
-		Log.get().debug("Converted: " + a.toString());
 		return a; 
 	}
 
