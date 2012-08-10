@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaot;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
-import org.instantplaces.im.server.dao.WidgetOptionDao;
+import org.instantplaces.im.server.dao.WidgetOptionDaot;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -31,17 +31,17 @@ public class CronRebuildCodesResource extends ServerResource {
 	public Representation runCron() {
 
 		
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+		List<Key<PlaceDaot>> placeKeys = Dao.getPlaceKeys();
 
-		for (Key<PlaceDao> placeKey : placeKeys) {
+		for (Key<PlaceDaot> placeKey : placeKeys) {
 			Dao.beginTransaction();
 			
 			ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(placeKey);
 
 			rcg.rebuild();
-			List<WidgetOptionDao> options = Dao.getWidgetOptions(placeKey);
+			List<WidgetOptionDaot> options = Dao.getWidgetOptions(placeKey);
 
-			for (WidgetOptionDao option : options) {
+			for (WidgetOptionDaot option : options) {
 				rcg.remove(option.getReferenceCode());
 				Log.get().debug("Removing used code: " + option.getReferenceCode());
 			}

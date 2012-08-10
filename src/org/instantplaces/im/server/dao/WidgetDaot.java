@@ -17,7 +17,7 @@ import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
-public class WidgetDao implements Serializable {
+public class WidgetDaot implements Serializable {
 
 	/**
 	 * 
@@ -28,7 +28,7 @@ public class WidgetDao implements Serializable {
 //	private ApplicationDao application;
 
 	@Parent
-	private Key<ApplicationDao> applicationKey;
+	private Key<ApplicationDaot> applicationKey;
 
 	@Unindexed
 	private String controlType;
@@ -57,7 +57,7 @@ public class WidgetDao implements Serializable {
 	private ArrayList<WidgetParameterDao> widgetParameters;
 	
 	@NotSaved
-	private ArrayList<WidgetOptionDao> widgetOptions;
+	private ArrayList<WidgetOptionDaot> widgetOptions;
 
 	@NotSaved
 	private boolean changedFlag;
@@ -65,11 +65,11 @@ public class WidgetDao implements Serializable {
 	@NotSaved
 	private boolean traceChanges;
 	
-	public WidgetDao(Key<ApplicationDao> applicationKey) {
+	public WidgetDaot(Key<ApplicationDaot> applicationKey) {
 		this(applicationKey, null, null, null, null);
 	}
 
-	public WidgetDao(Key<ApplicationDao> applicationKey, String widgetId, String controlType,
+	public WidgetDaot(Key<ApplicationDaot> applicationKey, String widgetId, String controlType,
 			String shortDescription, String longDescription) {
 		this();
 		this.widgetId = widgetId;
@@ -81,7 +81,7 @@ public class WidgetDao implements Serializable {
 	}
 
 	@SuppressWarnings("unused")
-	private WidgetDao() {
+	private WidgetDaot() {
 		this.widgetParameters = new ArrayList<WidgetParameterDao>();
 		this.traceChanges = false;
 	}
@@ -91,9 +91,9 @@ public class WidgetDao implements Serializable {
 		this.traceChanges = true;
 	}
 	
-	public void addWidgetOption(WidgetOptionDao widgetOption) {
+	public void addWidgetOption(WidgetOptionDaot widgetOption) {
 		if (null == this.widgetOptions) {
-			this.widgetOptions = new ArrayList<WidgetOptionDao>();
+			this.widgetOptions = new ArrayList<WidgetOptionDaot>();
 		}
 		this.widgetOptions.add(widgetOption);
 	}
@@ -111,11 +111,11 @@ public class WidgetDao implements Serializable {
 		}
 	}
 
-	public ArrayList<WidgetOptionDao> assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
-		ArrayList<WidgetOptionDao> assigned = new ArrayList<WidgetOptionDao>();
+	public ArrayList<WidgetOptionDaot> assignReferenceCodes(ReferenceCodeGeneratorDAO rcg) {
+		ArrayList<WidgetOptionDaot> assigned = new ArrayList<WidgetOptionDaot>();
 		
 		if ( this.controlType.equalsIgnoreCase("presence") ) {
-			WidgetOptionDao option = this.getWidgetOptions().get(0);
+			WidgetOptionDaot option = this.getWidgetOptions().get(0);
 			option.clearChangedFlag();
 			option.setReferenceCode("checkin");
 			option.setRecyclable(false);
@@ -126,7 +126,7 @@ public class WidgetDao implements Serializable {
 		}
 		
 		String code;
-		for ( WidgetOptionDao option : this.widgetOptions ) {
+		for ( WidgetOptionDaot option : this.widgetOptions ) {
 			option.clearChangedFlag();
 			
 			if ( null == option.getReferenceCode() ) {
@@ -156,7 +156,7 @@ public class WidgetDao implements Serializable {
 	/**
 	 * @return the applicationKey
 	 */
-	public Key<ApplicationDao> getApplicationKey() {
+	public Key<ApplicationDaot> getApplicationKey() {
 		return applicationKey;
 	}
 
@@ -167,8 +167,8 @@ public class WidgetDao implements Serializable {
 		return controlType;
 	}
 
-	public Key<WidgetDao> getKey() {
-		return new Key<WidgetDao>(this.applicationKey, WidgetDao.class, this.widgetId);
+	public Key<WidgetDaot> getKey() {
+		return new Key<WidgetDaot>(this.applicationKey, WidgetDaot.class, this.widgetId);
 	}
 
 	/**
@@ -192,27 +192,27 @@ public class WidgetDao implements Serializable {
 	/**
 	 * @return the widgetOptions
 	 */
-	public ArrayList<WidgetOptionDao> getWidgetOptions() {
+	public ArrayList<WidgetOptionDaot> getWidgetOptions() {
 		return widgetOptions;
 	}
 
 
-	public ArrayList<WidgetOptionDao> mergeOptionsToAdd(WidgetDao that) {
+	public ArrayList<WidgetOptionDaot> mergeOptionsToAdd(WidgetDaot that) {
 		
-		ArrayList<WidgetOptionDao> toAdd = new ArrayList<WidgetOptionDao>();
+		ArrayList<WidgetOptionDaot> toAdd = new ArrayList<WidgetOptionDaot>();
 		
 		/*
 		 * If we have no options, add all
 		 */
 		if (null == this.widgetOptions) {
-			this.widgetOptions = new ArrayList<WidgetOptionDao>();
+			this.widgetOptions = new ArrayList<WidgetOptionDaot>();
 			this.widgetOptions.addAll(that.getWidgetOptions());
 			toAdd.addAll(that.getWidgetOptions());
 			
 		} else {
-			Iterator<WidgetOptionDao> it = that.getWidgetOptions().iterator();
+			Iterator<WidgetOptionDaot> it = that.getWidgetOptions().iterator();
 			while (it.hasNext()) {
-				WidgetOptionDao next = it.next();
+				WidgetOptionDaot next = it.next();
 				if (!this.widgetOptions.contains(next)) {
 					Log.get().debug("Adding to new option " + next.toString());
 					this.widgetOptions.add(next);
@@ -230,9 +230,9 @@ public class WidgetDao implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof WidgetDao))
+		if (!(obj instanceof WidgetDaot))
 			return false;
-		WidgetDao other = (WidgetDao) obj;
+		WidgetDaot other = (WidgetDaot) obj;
 		if (widgetId == null) {
 			if (other.widgetId != null)
 				return false;
@@ -241,16 +241,16 @@ public class WidgetDao implements Serializable {
 		return true;
 	}
 
-	public ArrayList<WidgetOptionDao> mergeOptionsToDelete(WidgetDao that) {
-		ArrayList<WidgetOptionDao> toDelete = new ArrayList<WidgetOptionDao>();
+	public ArrayList<WidgetOptionDaot> mergeOptionsToDelete(WidgetDaot that) {
+		ArrayList<WidgetOptionDaot> toDelete = new ArrayList<WidgetOptionDaot>();
 		/*
 		 * Check options that have been deleted in that and... delete them in
 		 * this
 		 */
 		if (null != this.widgetOptions) {
-			Iterator<WidgetOptionDao> it = this.widgetOptions.iterator();
+			Iterator<WidgetOptionDaot> it = this.widgetOptions.iterator();
 			while (it.hasNext()) {
-				WidgetOptionDao next = it.next();
+				WidgetOptionDaot next = it.next();
 				if (!that.getWidgetOptions().contains(next)) {
 					Log.get().debug("Deleting unused option " + it.toString());
 					it.remove();
@@ -275,7 +275,7 @@ public class WidgetDao implements Serializable {
 	 * @param applicationKey
 	 *            the applicationKey to set
 	 */
-	public void setApplicationKey(Key<ApplicationDao> applicationKey) {
+	public void setApplicationKey(Key<ApplicationDaot> applicationKey) {
 		if ( this.traceChanges ) {
 			if ( !this.applicationKey.equals(applicationKey) ) {
 				this.changedFlag = true;
@@ -344,7 +344,7 @@ public class WidgetDao implements Serializable {
 	 * @param widgetOptions
 	 *            the widgetOptions to set
 	 */
-	public void setWidgetOptions(ArrayList<WidgetOptionDao> widgetOptions) {
+	public void setWidgetOptions(ArrayList<WidgetOptionDaot> widgetOptions) {
 		this.widgetOptions = widgetOptions;
 	}
 

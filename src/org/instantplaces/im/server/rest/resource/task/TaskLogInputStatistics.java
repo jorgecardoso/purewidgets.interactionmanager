@@ -19,8 +19,8 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.WidgetDao;
-import org.instantplaces.im.server.dao.WidgetOptionDao;
+import org.instantplaces.im.server.dao.WidgetDaot;
+import org.instantplaces.im.server.dao.WidgetOptionDaot;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
@@ -74,8 +74,8 @@ public class TaskLogInputStatistics extends ServerResource {
 		}
 		
 		Dao.beginTransaction();
-		WidgetDao widgetDao = Dao.getWidget(wir.getPlaceId(), wir.getApplicationId(), wir.getWidgetId());
-		WidgetOptionDao widgetOptionDao = Dao.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
+		WidgetDaot widgetDao = Dao.getWidget(wir.getPlaceId(), wir.getApplicationId(), wir.getWidgetId());
+		WidgetOptionDaot widgetOptionDao = Dao.getWidgetOption(widgetDao.getKey(), wir.getWidgetOptionId());
 		Dao.commitOrRollbackTransaction();
 		
 

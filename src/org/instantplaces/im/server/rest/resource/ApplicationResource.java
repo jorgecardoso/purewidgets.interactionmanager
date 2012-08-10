@@ -8,10 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.ApplicationDaot;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaot;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.rest.representation.json.ApplicationListRest;
 import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
@@ -35,7 +35,7 @@ public class ApplicationResource extends GenericResource {
 	 */
 	@Override
 	protected Object doPost(Object incoming) {
-		PlaceDao existingPlaceDSO = null;
+		PlaceDaot existingPlaceDSO = null;
 		
 		ApplicationRest applicationRest = (ApplicationRest) incoming;
 
@@ -48,7 +48,7 @@ public class ApplicationResource extends GenericResource {
 		if (null == existingPlaceDSO) {
 			Log.get().info(
 					"The specified place " + this.placeId + " was not found. Creating new...");
-			existingPlaceDSO = new PlaceDao(this.placeId);
+			existingPlaceDSO = new PlaceDaot(this.placeId);
 			Dao.put(existingPlaceDSO);
 
 			/*
@@ -58,7 +58,7 @@ public class ApplicationResource extends GenericResource {
 			Dao.put(rcg);
 		} 
 
-		ApplicationDao applicationDao = DaoConverter.getApplicationDao(existingPlaceDSO, applicationRest);
+		ApplicationDaot applicationDao = DaoConverter.getApplicationDao(existingPlaceDSO, applicationRest);
 		
 		
 		Dao.put(applicationDao);
@@ -98,7 +98,7 @@ public class ApplicationResource extends GenericResource {
 			/*
 			 * Return the list of applications
 			 */
-		    ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
+		    ApplicationDaot applicationDao = Dao.getApplication(this.placeId, this.appId);
 			
 			Dao.commitOrRollbackTransaction();
 			
@@ -141,7 +141,7 @@ public class ApplicationResource extends GenericResource {
 			/*
 			 * Return the list of applications
 			 */
-			List<ApplicationDao> applications = Dao.getApplications(this.placeId);
+			List<ApplicationDaot> applications = Dao.getApplications(this.placeId);
 			
 			Dao.commitOrRollbackTransaction();
 			

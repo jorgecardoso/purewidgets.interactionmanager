@@ -11,14 +11,14 @@ import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
-public class WidgetOptionDao implements Serializable {
+public class WidgetOptionDaot implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Parent
-	private Key<WidgetDao> widgetKey;
+	private Key<WidgetDaot> widgetKey;
 
 	@Id
 	private String widgetOptionId;
@@ -48,11 +48,11 @@ public class WidgetOptionDao implements Serializable {
 	private boolean changedFlag;
 
 
-	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId) {
+	public WidgetOptionDaot(Key<WidgetDaot> parentKey, String widgetOptionId) {
 		this(parentKey, widgetOptionId, null, null);
 	}
 
-	public WidgetOptionDao(Key<WidgetDao> parentKey, String widgetOptionId, String suggestedReferenceCode,
+	public WidgetOptionDaot(Key<WidgetDaot> parentKey, String widgetOptionId, String suggestedReferenceCode,
 			String referenceCode) {
 		this.widgetOptionId = widgetOptionId;
 		this.suggestedReferenceCode = suggestedReferenceCode;
@@ -62,11 +62,11 @@ public class WidgetOptionDao implements Serializable {
 	}
 
 	@SuppressWarnings("unused")
-	private WidgetOptionDao() {
+	private WidgetOptionDaot() {
 	}
 
-	public Key<WidgetOptionDao> getKey() {
-		return new Key<WidgetOptionDao>(this.widgetKey, WidgetOptionDao.class, this.widgetOptionId);
+	public Key<WidgetOptionDaot> getKey() {
+		return new Key<WidgetOptionDaot>(this.widgetKey, WidgetOptionDaot.class, this.widgetOptionId);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class WidgetOptionDao implements Serializable {
 	/**
 	 * @return the widgetKey
 	 */
-	public Key<WidgetDao> getWidgetKey() {
+	public Key<WidgetDaot> getWidgetKey() {
 		return widgetKey;
 	}
 
@@ -160,7 +160,7 @@ public class WidgetOptionDao implements Serializable {
 	 * @param widgetKey
 	 *            the widgetKey to set
 	 */
-	public void setWidgetKey(Key<WidgetDao> widgetKey) {
+	public void setWidgetKey(Key<WidgetDaot> widgetKey) {
 		if ( !this.widgetKey.equals(widgetKey) ) {
 			this.changedFlag = true;
 		}
@@ -186,9 +186,9 @@ public class WidgetOptionDao implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof WidgetOptionDao))
+		if (!(obj instanceof WidgetOptionDaot))
 			return false;
-		WidgetOptionDao other = (WidgetOptionDao) obj;
+		WidgetOptionDaot other = (WidgetOptionDaot) obj;
 		if (widgetOptionId == null) {
 			if (other.widgetOptionId != null) {
 				return false;

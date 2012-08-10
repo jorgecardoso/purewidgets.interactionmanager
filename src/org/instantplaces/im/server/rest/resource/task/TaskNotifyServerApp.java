@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.ApplicationDaot;
 import org.instantplaces.im.server.dao.Dao;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -34,7 +34,7 @@ public class TaskNotifyServerApp extends ServerResource {
 		Log.get().debug("Executing task: " + originalUrl);
 		
 		Dao.beginTransaction();
-		ApplicationDao applicationDao = Dao.getApplication(placeId, applicationId);
+		ApplicationDaot applicationDao = Dao.getApplication(placeId, applicationId);
 		
 		String baseUrl = applicationDao.getApplicationServerNotificationUrl();
 		if ( null !=  baseUrl && baseUrl.length() > 0 ) {

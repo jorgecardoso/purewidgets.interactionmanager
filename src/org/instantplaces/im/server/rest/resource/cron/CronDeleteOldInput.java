@@ -6,9 +6,9 @@ package org.instantplaces.im.server.rest.resource.cron;
 import java.util.List;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.ApplicationDao;
+import org.instantplaces.im.server.dao.ApplicationDaot;
 import org.instantplaces.im.server.dao.Dao;
-import org.instantplaces.im.server.dao.PlaceDao;
+import org.instantplaces.im.server.dao.PlaceDaot;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -38,9 +38,9 @@ public class CronDeleteOldInput extends ServerResource {
 
 		
 
-		List<Key<ApplicationDao>> applicationKeys = Dao.getApplicationKeys();
+		List<Key<ApplicationDaot>> applicationKeys = Dao.getApplicationKeys();
 
-		for (Key<ApplicationDao> applicationKey : applicationKeys) {
+		for (Key<ApplicationDaot> applicationKey : applicationKeys) {
 			
 			Dao.beginTransaction();
 			List<WidgetInputDao> widgetInputList = Dao.getWidgetInputs(applicationKey);

@@ -7,7 +7,7 @@ import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
-public class PlaceDao {
+public class PlaceDaot {
 
     @Id 
     private String placeId;
@@ -43,7 +43,7 @@ public class PlaceDao {
     private String placeInteractionUrl;
     
     
-	public PlaceDao(String id) {
+	public PlaceDaot(String id) {
 		this.placeId = id;
 		
 		/*
@@ -53,21 +53,21 @@ public class PlaceDao {
 	}
 	
 	@SuppressWarnings("unused")
-	private PlaceDao() {
+	private PlaceDaot() {
 	}
 	
 
 	@Override
 	public boolean equals(Object app) {
-		if ( !(app instanceof PlaceDao) ) {
+		if ( !(app instanceof PlaceDaot) ) {
 			return false;
 		}
-		return ((PlaceDao) app).getPlaceId().equals(this.placeId);
+		return ((PlaceDaot) app).getPlaceId().equals(this.placeId);
 	}
 
 
-	public Key<PlaceDao> getKey() {
-		return new Key<PlaceDao>(PlaceDao.class, this.placeId);
+	public Key<PlaceDaot> getKey() {
+		return new Key<PlaceDaot>(PlaceDaot.class, this.placeId);
 	}
 
 	public String getPlaceId() {

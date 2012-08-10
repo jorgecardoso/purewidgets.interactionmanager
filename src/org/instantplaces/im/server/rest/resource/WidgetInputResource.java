@@ -10,10 +10,10 @@ import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
-import org.instantplaces.im.server.dao.PlaceDao;
-import org.instantplaces.im.server.dao.WidgetDao;
+import org.instantplaces.im.server.dao.PlaceDaot;
+import org.instantplaces.im.server.dao.WidgetDaot;
 import org.instantplaces.im.server.dao.WidgetInputDao;
-import org.instantplaces.im.server.dao.WidgetOptionDao;
+import org.instantplaces.im.server.dao.WidgetOptionDaot;
 import org.instantplaces.im.server.rest.representation.json.RestConverter;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputListRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
@@ -60,16 +60,16 @@ public class WidgetInputResource extends GenericResource {
 		/*
 		 * TODO: if place reference code is not provided, try to find the application anyway
 		 */
-		List<PlaceDao> places = Dao.getPlaces();
+		List<PlaceDaot> places = Dao.getPlaces();
 		
-		for ( PlaceDao place : places ) {
+		for ( PlaceDaot place : places ) {
 			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
 				Dao.beginTransaction();
-				WidgetOptionDao widgetOption = null; 
+				WidgetOptionDaot widgetOption = null; 
 				
-				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
+				List<WidgetOptionDaot> options = Dao.getWidgetOptions(place.getPlaceId());
 				
-				for ( WidgetOptionDao option : options ) {
+				for ( WidgetOptionDaot option : options ) {
 					if ( option.getReferenceCode().equals(refCode)) {
 						widgetOption = option;
 						break;
@@ -123,7 +123,7 @@ public class WidgetInputResource extends GenericResource {
 		}
 		
 		Dao.beginTransaction();
-		List<WidgetOptionDao> widgetOptionDaoList = Dao.getWidgetOptionsByReferenceCode(placeId, referenceCode);
+		List<WidgetOptionDaot> widgetOptionDaoList = Dao.getWidgetOptionsByReferenceCode(placeId, referenceCode);
 		
 		
 		if ( null != widgetOptionDaoList ) {
@@ -131,7 +131,7 @@ public class WidgetInputResource extends GenericResource {
 			ArrayList<WidgetInputDao> inputList = new ArrayList<WidgetInputDao>();
 			
 			Log.get().debug("Forwarding input to " + widgetOptionDaoList.size() + " widget options");
-			for ( WidgetOptionDao widgetOptionDao : widgetOptionDaoList ) {
+			for ( WidgetOptionDaot widgetOptionDao : widgetOptionDaoList ) {
 			
 				WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
 	
@@ -256,11 +256,11 @@ public class WidgetInputResource extends GenericResource {
 		 */
 		} else {
 			Dao.beginTransaction();
-			List<WidgetDao> widgets = Dao.getWidgets(this.placeId, this.appId);
+			List<WidgetDaot> widgets = Dao.getWidgets(this.placeId, this.appId);
 					//DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
 			ArrayList<WidgetInputDao> inputs = new ArrayList<WidgetInputDao>();
 			
-			for ( WidgetDao w : widgets ) {
+			for ( WidgetDaot w : widgets ) {
 				WidgetInputDao input = Dao.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
 						//DsoFetcher.getLastWidgetInputFromDSO(this.pm, this.placeId, this.appId, w.getWidgetId());
 				if ( null != input ) {
