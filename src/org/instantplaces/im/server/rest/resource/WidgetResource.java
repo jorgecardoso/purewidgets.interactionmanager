@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import org.instantplaces.im.server.rest.representation.json.WidgetListRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetRest;
 import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.DaoConverter;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
@@ -30,6 +31,9 @@ import com.googlecode.objectify.Key;
 
 public class WidgetResource extends GenericResource {
 
+	private HashMap<String, WidgetDao> widgetsProxy;
+	private HashMap<Key<WidgetDao>, ArrayList<WidgetOptionDao>> widgetOptionsProxy;
+	
 	@Override
 	protected Object doPut(Object in) {
 		String errorMessage = "Put not allowed. Sorry, only GET or POST methods allowed for this resource.";
@@ -37,6 +41,63 @@ public class WidgetResource extends GenericResource {
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
 	}
 
+	
+	private void fillProxy(WidgetListRest widgetListRest) {
+		if ( widgetListRest.getWidgets().size() > 5 ) {
+			Log.debug(this, "Filling in widget and widgetOption proxy.");
+			DaoTmp.beginTransaction();
+			List<WidgetDao> widgetsDao = DaoTmp.getWidgets(this.placeId, this.appId);
+			List<WidgetOptionDao> widgetOptionsDao = DaoTmp.getWidgetOptions(this.placeId, this.appId);
+			
+			DaoTmp.commitOrRollbackTransaction();
+			this.widgetsProxy = new HashMap<String, WidgetDao>();
+			for ( WidgetDao widgetDao : widgetsDao ) {
+				this.widgetsProxy.put(this.placeId+this.appId+widgetDao.getWidgetId(), widgetDao);
+			}
+			
+			this.widgetOptionsProxy = new HashMap<Key<WidgetDao>, ArrayList<WidgetOptionDao>>();
+			for ( WidgetOptionDao optionDao : widgetOptionsDao ) {
+				ArrayList<WidgetOptionDao> current = this.widgetOptionsProxy.get(optionDao.getWidgetKey());
+				if ( null == current ) {
+					current = new ArrayList<WidgetOptionDao> ();
+				}
+				current.add(optionDao);
+				this.widgetOptionsProxy.put(optionDao.getWidgetKey(), current);
+			}
+			
+		} else {
+			Log.debug(this, "Not enough widgets to compensate using proxy...");
+		}
+		
+	}
+	
+
+	private ArrayList<WidgetOptionDao> getWidgetOptions( Key<WidgetDao>  widgetKey) {
+		if ( null != this.widgetOptionsProxy ) {
+			
+			if ( this.widgetOptionsProxy.containsKey(widgetKey) ) {
+				Log.debug(this, "Returning widgetOptions from proxy store.");
+				return this.widgetOptionsProxy.get(widgetKey);
+			}
+		}
+		Log.debug(this, "Returning widgetOptions from datastore.");
+		return new ArrayList<WidgetOptionDao>(DaoTmp.getWidgetOptions(widgetKey));
+		
+	}
+	
+	private WidgetDao getWidget( String placeId, String applicationId, String widgetId ) {
+		if ( null != widgetsProxy ) {
+			String key = placeId+applicationId+widgetId;
+			if ( widgetsProxy.containsKey(key) ) {
+				Log.debug(this, "Returning widget from proxy store.");
+				return widgetsProxy.get(key);
+			}
+		}
+		Log.debug(this, "Returning widget from datastore.");
+		return DaoTmp.getWidget(placeId, applicationId, widgetId);
+	}
+	
+	
 	@Override
 	protected Object doPost(Object in) {
 		long start = System.currentTimeMillis();
@@ -50,25 +111,25 @@ public class WidgetResource extends GenericResource {
 		ApplicationDao existingApplicationDSO = null;
 
 		WidgetListRest receivedWidgetListREST = (WidgetListRest) in;
-
+		this.fillProxy(receivedWidgetListREST);
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
 		 */
-		Dao.beginTransaction();
-		existingPlaceDSO = Dao.getPlace(this.placeId);
+		DaoTmp.beginTransaction();
+		existingPlaceDSO = DaoTmp.getPlace(this.placeId);
 		if (null == existingPlaceDSO) {
 			Log.get().info(
 					"The specified place " + this.placeId + " was not found. Creating new...");
 			existingPlaceDSO = new PlaceDao(this.placeId);
-			Dao.put(existingPlaceDSO);
+			DaoTmp.put(existingPlaceDSO);
 
 			/*
 			 * A new place needs a new ReferenceCodeGenerator
 			 */
 			rcg = new ReferenceCodeGeneratorDAO(existingPlaceDSO);
-			Dao.put(rcg);
+			DaoTmp.put(rcg);
 		} else {
-			rcg = Dao.getReferenceCodeGenerator(this.placeId);
+			rcg = DaoTmp.getReferenceCodeGenerator(this.placeId);
 
 		}
 
@@ -76,19 +137,19 @@ public class WidgetResource extends GenericResource {
 		 * Get the Application from the store. Create one if it does not exist
 		 * yet.
 		 */
-		existingApplicationDSO = Dao.getApplication(this.placeId, this.appId);
+		existingApplicationDSO = DaoTmp.getApplication(this.placeId, this.appId);
 		if (null == existingApplicationDSO) {
 			Log.get().info(
 					"The specified application " + this.appId + "was not found. Creating new...");
 			existingApplicationDSO = new ApplicationDao(existingPlaceDSO, this.appId);
-			Dao.put(existingApplicationDSO);
+			DaoTmp.put(existingApplicationDSO);
 		}
 
 		ArrayList<WidgetDao> widgetsAdded = new ArrayList<WidgetDao>();
 
 		for (WidgetRest receivedWidgetRest : receivedWidgetListREST.getWidgets()) {
 
-			WidgetDao existingWidgetDao = Dao
+			WidgetDao existingWidgetDao = this
 					.getWidget(this.placeId, this.appId, receivedWidgetRest.getWidgetId());
 			
 			/*
@@ -110,7 +171,7 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * The widget already exists, so fetch its options
 				 */
-				ArrayList<WidgetOptionDao> optionsFromDataStore = new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(existingWidgetDao.getKey()));
+				ArrayList<WidgetOptionDao> optionsFromDataStore = this.getWidgetOptions(existingWidgetDao.getKey());
 				existingWidgetDao.setWidgetOptions(optionsFromDataStore);
 				
 				/*
@@ -127,14 +188,14 @@ public class WidgetResource extends GenericResource {
 				 */
 				for (WidgetOptionDao option : optionsToDelete) {
 					rcg.recycleCode(option);
-					Dao.delete(Dao.getWidgetInputsKeys(this.placeId, this.appId,
+					DaoTmp.delete(DaoTmp.getWidgetInputsKeys(this.placeId, this.appId,
 							existingWidgetDao.getWidgetId(), option.getWidgetOptionId()));
 				}
 
 				/*
 				 * Bulk delete the options
 				 */
-				Dao.delete(optionsToDelete);
+				DaoTmp.delete(optionsToDelete);
 
 				/*
 				 * Assign reference codes to the new options
@@ -147,7 +208,7 @@ public class WidgetResource extends GenericResource {
 				 */
 				if ( existingWidgetDao.isChangedFlag() ) {
 					Log.debugFinest(this, "Widget " + existingWidgetDao.getWidgetId() + " changed, updating datastore.");
-					Dao.put(existingWidgetDao);
+					DaoTmp.put(existingWidgetDao);
 				} else {
 					Log.debugFinest(this, "Widget " + existingWidgetDao.getWidgetId() + " did not change, skipping datastore put.");
 				}
@@ -160,15 +221,15 @@ public class WidgetResource extends GenericResource {
 					Log.debugFinest("No options changed in widget " + existingWidgetDao.getWidgetId() + ", skipping datastore put...");
 				} else {
 					Log.debugFinest("Options changed in widget " + existingWidgetDao.getWidgetId() + ", updating datastore.");
-					Dao.put(optionsChanged);
-					Dao.put(optionsToAdd);
+					DaoTmp.put(optionsChanged);
+					DaoTmp.put(optionsToAdd);
 				}
 
 			} else {
 				existingWidgetDao = DaoConverter.getWidgetDao(existingApplicationDSO, receivedWidgetRest);
 				existingWidgetDao.assignReferenceCodes(rcg);
-				Dao.put(existingWidgetDao);
-				Dao.put(existingWidgetDao.getWidgetOptions());
+				DaoTmp.put(existingWidgetDao);
+				DaoTmp.put(existingWidgetDao.getWidgetOptions());
 			}
 			widgetsAdded.add(existingWidgetDao);
 		}
@@ -181,9 +242,9 @@ public class WidgetResource extends GenericResource {
 		/*
 		 * Save the reference code
 		 */
-		Dao.put(rcg);
+		DaoTmp.put(rcg);
 
-		if (!Dao.commitOrRollbackTransaction()) {
+		if (!DaoTmp.commitOrRollbackTransaction()) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
 					"Could not commit transaction");
 		}
@@ -201,13 +262,13 @@ public class WidgetResource extends GenericResource {
 		
 
 		if (this.widgetId != null) {
-			Dao.beginTransaction();
+			DaoTmp.beginTransaction();
 			/*
 			 * Return the specified widget
 			 */
-			WidgetDao widget = Dao.getWidget(this.placeId, this.appId, this.widgetId);
+			WidgetDao widget = DaoTmp.getWidget(this.placeId, this.appId, this.widgetId);
 
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 
 			if (widget == null) {
 				String errorMessage = "The specified widget was not found.";
@@ -225,14 +286,14 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * Return the list of widgets
 				 */
-				Dao.beginTransaction();
-				widgets = new ArrayList<WidgetDao>(Dao.getWidgets(this.placeId, this.appId));
+				DaoTmp.beginTransaction();
+				widgets = new ArrayList<WidgetDao>(DaoTmp.getWidgets(this.placeId, this.appId));
 				for ( WidgetDao widget : widgets ) {
-					ArrayList<WidgetOptionDao> options =  new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(widget.getKey()));
+					ArrayList<WidgetOptionDao> options =  new ArrayList<WidgetOptionDao>(DaoTmp.getWidgetOptions(widget.getKey()));
 					
 					widget.setWidgetOptions(options);
 				}
-				Dao.commitOrRollbackTransaction();
+				DaoTmp.commitOrRollbackTransaction();
 				syncCache.put("place/"+this.placeId+"/application/"+this.appId+"/widget", widgets);
 			}
 			
@@ -255,9 +316,9 @@ public class WidgetResource extends GenericResource {
 	private WidgetListRest deleteSpecifiedWidgets(
 			ArrayList<Key<WidgetDao>> widgetsToDeleteKeys, boolean volatileOnly) {
 
-		ReferenceCodeGeneratorDAO rcg = Dao.getReferenceCodeGenerator(this.placeId);
+		ReferenceCodeGeneratorDAO rcg = DaoTmp.getReferenceCodeGenerator(this.placeId);
 
-		Collection<WidgetDao> widgetsToDelete = Dao.get(widgetsToDeleteKeys).values();
+		Collection<WidgetDao> widgetsToDelete = DaoTmp.get(widgetsToDeleteKeys).values();
 
 		ArrayList<WidgetOptionDao> widgetOptionsToDelete = new ArrayList<WidgetOptionDao>();
 
@@ -276,7 +337,7 @@ public class WidgetResource extends GenericResource {
 			/*
 			 * Recycle the reference codes
 			 */
-			List<WidgetOptionDao> widgetOptions = Dao.getWidgetOptions(this.placeId, this.appId,
+			List<WidgetOptionDao> widgetOptions = DaoTmp.getWidgetOptions(this.placeId, this.appId,
 					widget.getWidgetId());
 
 			for (WidgetOptionDao option : widgetOptions) {
@@ -293,18 +354,18 @@ public class WidgetResource extends GenericResource {
 			 * Get the list of input that belong to this widget, so that it can
 			 * be deleted later
 			 */
-			widgetInputToDelete.addAll(Dao.getWidgetInputs(this.placeId, this.appId,
+			widgetInputToDelete.addAll(DaoTmp.getWidgetInputs(this.placeId, this.appId,
 					widget.getWidgetId()));
 
 		}
-		Dao.delete(widgetInputToDelete);
-		Dao.delete(widgetOptionsToDelete);
-		Dao.delete(widgetsToDelete);
+		DaoTmp.delete(widgetInputToDelete);
+		DaoTmp.delete(widgetOptionsToDelete);
+		DaoTmp.delete(widgetsToDelete);
 
 		/*
 		 * Save the code generator with the new recycled codes.
 		 */
-		Dao.put(rcg);
+		DaoTmp.put(rcg);
 
 		/*
 		 * To be returned
@@ -339,7 +400,7 @@ public class WidgetResource extends GenericResource {
 		WidgetListRest toReturn = new WidgetListRest();
 		ArrayList<Key<WidgetDao>> list = new ArrayList<Key<WidgetDao>>();
 
-		Dao.beginTransaction();
+		DaoTmp.beginTransaction();
 
 		if (this.widgetId != null) { // Delete the specified widget
 
@@ -382,14 +443,14 @@ public class WidgetResource extends GenericResource {
 				boolean volatileOnly = this.getRequest().getOriginalRef().getQueryAsForm()
 						.getFirstValue("volatileonly", "true").equalsIgnoreCase("true");
 
-				list.addAll(Dao.getWidgetsKeys(this.placeId, this.appId));
+				list.addAll(DaoTmp.getWidgetsKeys(this.placeId, this.appId));
 
 				toReturn = this.deleteSpecifiedWidgets(list, volatileOnly);
 
 			}
 		}
 
-		if (!Dao.commitOrRollbackTransaction()) {
+		if (!DaoTmp.commitOrRollbackTransaction()) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
 					"Could not commit transaction");
 

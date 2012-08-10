@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;

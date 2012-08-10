@@ -12,7 +12,7 @@ import org.codehaus.jackson.map.DeserializationProblemHandler;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.rest.representation.json.ErrorREST;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -100,15 +100,15 @@ public abstract class GenericResource extends ServerResource {
 		 * Update the requesting app's last request timestamp
 		 */
 		if ( null != this.placeId ) {
-			Dao.beginTransaction();
-			this.requestingApplicationDAO = Dao.getApplication (this.placeId, this.requestingAppId);
+			DaoTmp.beginTransaction();
+			this.requestingApplicationDAO = DaoTmp.getApplication (this.placeId, this.requestingAppId);
 			
 			if ( null != this.requestingApplicationDAO ) {
 				this.requestingApplicationDAO.setLastRequestTimestamp(System.currentTimeMillis());
-				Dao.put(this.requestingApplicationDAO);
+				DaoTmp.put(this.requestingApplicationDAO);
 			} 
 			
-			if ( !Dao.commitOrRollbackTransaction() ) {
+			if ( !DaoTmp.commitOrRollbackTransaction() ) {
 				Log.get().warn("Could not update timestamp of application: " + this.requestingAppId);
 			}
 		}

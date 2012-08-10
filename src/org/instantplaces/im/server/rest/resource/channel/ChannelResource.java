@@ -5,7 +5,7 @@ package org.instantplaces.im.server.rest.resource.channel;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.rest.representation.json.ChannelTokenRest;
 import org.instantplaces.im.server.rest.resource.GenericResource;
 import org.restlet.data.Status;
@@ -31,9 +31,9 @@ public class ChannelResource extends GenericResource {
 		
 		 ChannelService channelService = ChannelServiceFactory.getChannelService();
 
-		 Dao.beginTransaction();
+		 DaoTmp.beginTransaction();
 		 Log.get().debug(" Retrieving Channel map for place: " + this.placeId + " app:" + this.appId);
-		 ChannelMapDao channelMap = Dao.getChannelMap(this.placeId, this.appId);
+		 ChannelMapDao channelMap = DaoTmp.getChannelMap(this.placeId, this.appId);
 		 
 		 if ( null == channelMap ) {
 			 Log.get().debug("Could not read channel map for " + this.placeId + "-" + this.appId + " from datastore, creating new...");
@@ -46,9 +46,9 @@ public class ChannelResource extends GenericResource {
 
 		 Log.get().debug("Created channel token for: " + this.placeId + "-" + this.appId);
 		 
-		 Dao.put(channelMap);
+		 DaoTmp.put(channelMap);
 		 
-		 Dao.commitOrRollbackTransaction();
+		 DaoTmp.commitOrRollbackTransaction();
 		 
 		 return new ChannelTokenRest(token);
 	}

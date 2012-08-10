@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.restlet.representation.Representation;
@@ -38,21 +38,21 @@ public class CronDeleteOldInput extends ServerResource {
 
 		
 
-		List<Key<ApplicationDao>> applicationKeys = Dao.getApplicationKeys();
+		List<Key<ApplicationDao>> applicationKeys = DaoTmp.getApplicationKeys();
 
 		for (Key<ApplicationDao> applicationKey : applicationKeys) {
 			
-			Dao.beginTransaction();
-			List<WidgetInputDao> widgetInputList = Dao.getWidgetInputs(applicationKey);
+			DaoTmp.beginTransaction();
+			List<WidgetInputDao> widgetInputList = DaoTmp.getWidgetInputs(applicationKey);
 			
 			for ( WidgetInputDao widgetInput : widgetInputList ) {
 				if ( (current - widgetInput.getTimeStamp()) > OLD ) {
 					Log.get().info("Deleting old input: " + widgetInput.getTimeStamp() );
-					Dao.delete(widgetInput);
+					DaoTmp.delete(widgetInput);
 				}
 			}
 			
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 		}
 		
 

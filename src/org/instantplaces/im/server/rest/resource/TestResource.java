@@ -1,7 +1,7 @@
 package org.instantplaces.im.server.rest.resource;
 
 import org.instantplaces.im.server.Log;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
@@ -18,7 +18,7 @@ public class TestResource extends ServerResource {
 	public Object doGet() {
 		Log.get().debug("Get Test Resource");
 		
-		Dao.beginTransaction();
+		DaoTmp.beginTransaction();
 		
 //		PlaceDAO place = new PlaceDAO("place");
 //		ApplicationDAO app = new ApplicationDAO(place, "application");
@@ -32,7 +32,7 @@ public class TestResource extends ServerResource {
 //			Log.get().debug("option: "  + option.getWidgetOptionId());
 //		}
 		
-		Dao.commitOrRollbackTransaction();
+		DaoTmp.commitOrRollbackTransaction();
 //		List<Key<PlaceDAO>> placeKeys = DAO.getPlaceKeys();
 //		
 //		for ( Key<PlaceDAO> key : placeKeys ) {

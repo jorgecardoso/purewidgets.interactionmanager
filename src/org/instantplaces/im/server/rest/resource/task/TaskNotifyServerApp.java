@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
@@ -33,8 +33,8 @@ public class TaskNotifyServerApp extends ServerResource {
 		
 		Log.get().debug("Executing task: " + originalUrl);
 		
-		Dao.beginTransaction();
-		ApplicationDao applicationDao = Dao.getApplication(placeId, applicationId);
+		DaoTmp.beginTransaction();
+		ApplicationDao applicationDao = DaoTmp.getApplication(placeId, applicationId);
 		
 		String baseUrl = applicationDao.getApplicationServerNotificationUrl();
 		if ( null !=  baseUrl && baseUrl.length() > 0 ) {
@@ -44,7 +44,7 @@ public class TaskNotifyServerApp extends ServerResource {
 		} else {
 			Log.get().debug("No notification URL.");
 		}
-		Dao.commitOrRollbackTransaction();
+		DaoTmp.commitOrRollbackTransaction();
 		return "";
 	}
 	

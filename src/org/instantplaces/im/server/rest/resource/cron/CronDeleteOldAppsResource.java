@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -37,23 +37,23 @@ public class CronDeleteOldAppsResource extends ServerResource {
 
 		
 
-		List<Key<PlaceDao>> placeKeys = Dao.getPlaceKeys();
+		List<Key<PlaceDao>> placeKeys = DaoTmp.getPlaceKeys();
 
 		for (Key<PlaceDao> placeKey : placeKeys) {
-			Dao.beginTransaction();
-			List<ApplicationDao> applications = Dao.getApplications(placeKey);
+			DaoTmp.beginTransaction();
+			List<ApplicationDao> applications = DaoTmp.getApplications(placeKey);
 
 			for (ApplicationDao app : applications) {
 				Log.get().debug("Application " + app.getApplicationId() + " is " + ((current - app.getLastRequestTimestamp())/(1000*60*60)) + " hours old.");
 				if ((current - app.getLastRequestTimestamp()) > OLD) {
 					Log.get().info("Deleting old application: " + app.getApplicationId());
-					Dao.delete(app);
-					Dao.delete(Dao.getWidgetsKeys(app.getKey()));
-					Dao.delete(Dao.getWidgetOptionsKeys(app.getKey()));
-					Dao.delete(Dao.getWidgetInputsKeys(app.getKey()));
+					DaoTmp.delete(app);
+					DaoTmp.delete(DaoTmp.getWidgetsKeys(app.getKey()));
+					DaoTmp.delete(DaoTmp.getWidgetOptionsKeys(app.getKey()));
+					DaoTmp.delete(DaoTmp.getWidgetInputsKeys(app.getKey()));
 				}
 			}
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 		}
 		
 

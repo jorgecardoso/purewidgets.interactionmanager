@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.Log;
 import org.instantplaces.im.server.dao.ApplicationDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.DaoConverter;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
@@ -43,27 +43,27 @@ public class ApplicationResource extends GenericResource {
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
 		 */
-		Dao.beginTransaction();
-		existingPlaceDSO = Dao.getPlace(this.placeId);
+		DaoTmp.beginTransaction();
+		existingPlaceDSO = DaoTmp.getPlace(this.placeId);
 		if (null == existingPlaceDSO) {
 			Log.get().info(
 					"The specified place " + this.placeId + " was not found. Creating new...");
 			existingPlaceDSO = new PlaceDao(this.placeId);
-			Dao.put(existingPlaceDSO);
+			DaoTmp.put(existingPlaceDSO);
 
 			/*
 			 * A new place needs a new ReferenceCodeGenerator
 			 */
 			ReferenceCodeGeneratorDAO rcg = new ReferenceCodeGeneratorDAO(existingPlaceDSO);
-			Dao.put(rcg);
+			DaoTmp.put(rcg);
 		} 
 
 		ApplicationDao applicationDao = DaoConverter.getApplicationDao(existingPlaceDSO, applicationRest);
 		
 		
-		Dao.put(applicationDao);
+		DaoTmp.put(applicationDao);
 		
-		Dao.commitOrRollbackTransaction();
+		DaoTmp.commitOrRollbackTransaction();
 		
 		return applicationRest;
 
@@ -94,13 +94,13 @@ public class ApplicationResource extends GenericResource {
 		 * If the request is for a specific app return it
 		 */
 		if ( null != this.appId ) {
-			Dao.beginTransaction();
+			DaoTmp.beginTransaction();
 			/*
 			 * Return the list of applications
 			 */
-		    ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
+		    ApplicationDao applicationDao = DaoTmp.getApplication(this.placeId, this.appId);
 			
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 			
 			if ( null != applicationDao ) {
 				ApplicationRest applicationRest= RestConverter.applicationFromDSO(applicationDao);
@@ -137,13 +137,13 @@ public class ApplicationResource extends GenericResource {
 			}
 	
 			
-			Dao.beginTransaction();
+			DaoTmp.beginTransaction();
 			/*
 			 * Return the list of applications
 			 */
-			List<ApplicationDao> applications = Dao.getApplications(this.placeId);
+			List<ApplicationDao> applications = DaoTmp.getApplications(this.placeId);
 			
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 			
 			
 	

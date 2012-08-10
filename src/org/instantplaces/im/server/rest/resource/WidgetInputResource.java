@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.instantplaces.im.server.logging.Log;
 import org.instantplaces.im.server.dao.ChannelMapDao;
-import org.instantplaces.im.server.dao.Dao;
+import org.instantplaces.im.server.dao.DaoTmp;
 import org.instantplaces.im.server.dao.DaoConverter;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
@@ -60,14 +60,14 @@ public class WidgetInputResource extends GenericResource {
 		/*
 		 * TODO: if place reference code is not provided, try to find the application anyway
 		 */
-		List<PlaceDao> places = Dao.getPlaces();
+		List<PlaceDao> places = DaoTmp.getPlaces();
 		
 		for ( PlaceDao place : places ) {
 			if ( place.getPlaceReferenceCode().equalsIgnoreCase(placeReferenceCode) ) {
-				Dao.beginTransaction();
+				DaoTmp.beginTransaction();
 				WidgetOptionDao widgetOption = null; 
 				
-				List<WidgetOptionDao> options = Dao.getWidgetOptions(place.getPlaceId());
+				List<WidgetOptionDao> options = DaoTmp.getWidgetOptions(place.getPlaceId());
 				
 				for ( WidgetOptionDao option : options ) {
 					if ( option.getReferenceCode().equals(refCode)) {
@@ -79,7 +79,7 @@ public class WidgetInputResource extends GenericResource {
 					
 				if (widgetOption == null) {
 					Log.debug(WidgetInputResource.class.getName(), "No widgets are using this reference code.");
-					Dao.commitOrRollbackTransaction();
+					DaoTmp.commitOrRollbackTransaction();
 				} else {
 					
 					/*
@@ -98,7 +98,7 @@ public class WidgetInputResource extends GenericResource {
 					widgetInputRest.setParameters(parameters);
 					
 					
-					Dao.commitOrRollbackTransaction();
+					DaoTmp.commitOrRollbackTransaction();
 					
 					WidgetInputResource.handleInput(widgetInputRest, widgetInputRest.getPlaceId(), widgetInputRest.getApplicationId(), widgetInputRest.getWidgetId());
 				}
@@ -122,8 +122,8 @@ public class WidgetInputResource extends GenericResource {
 			return;
 		}
 		
-		Dao.beginTransaction();
-		List<WidgetOptionDao> widgetOptionDaoList = Dao.getWidgetOptionsByReferenceCode(placeId, referenceCode);
+		DaoTmp.beginTransaction();
+		List<WidgetOptionDao> widgetOptionDaoList = DaoTmp.getWidgetOptionsByReferenceCode(placeId, referenceCode);
 		
 		
 		if ( null != widgetOptionDaoList ) {
@@ -136,7 +136,7 @@ public class WidgetInputResource extends GenericResource {
 				WidgetInputDao widgetInputDao = DaoConverter.getWidgetInputDao(widgetOptionDao, receivedWidgetInputRest);
 	
 				widgetInputDao.setTimeStamp( System.currentTimeMillis() );
-				Dao.put( widgetInputDao );
+				DaoTmp.put( widgetInputDao );
 				
 				inputList.add(widgetInputDao);
 			
@@ -149,7 +149,7 @@ public class WidgetInputResource extends GenericResource {
 				 */
 				WidgetInputResource.logInputStatistics(widgetInputDao);
 			}
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 			
 			/*
 			 * Send the input through the channel for each app
@@ -164,7 +164,7 @@ public class WidgetInputResource extends GenericResource {
 			
 		} else {
 			Log.get().warn("WidgetOption does not exist.");
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 		}
 	}
 	
@@ -232,10 +232,10 @@ public class WidgetInputResource extends GenericResource {
 			/*
 			 * Fetch the widgets from the data store.
 			 */
-			Dao.beginTransaction();
-			List<WidgetInputDao> widgetInputs = Dao.getWidgetInputs(this.placeId, this.appId, from); 
+			DaoTmp.beginTransaction();
+			List<WidgetInputDao> widgetInputs = DaoTmp.getWidgetInputs(this.placeId, this.appId, from); 
 					
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 			
 			/*
 			 * Put the last timestamp in Memcache, 
@@ -255,19 +255,19 @@ public class WidgetInputResource extends GenericResource {
 		 * Return the last input to every widget
 		 */
 		} else {
-			Dao.beginTransaction();
-			List<WidgetDao> widgets = Dao.getWidgets(this.placeId, this.appId);
+			DaoTmp.beginTransaction();
+			List<WidgetDao> widgets = DaoTmp.getWidgets(this.placeId, this.appId);
 					//DsoFetcher.getWidgetsFromDSO(this.pm, this.placeId, this.appId);
 			ArrayList<WidgetInputDao> inputs = new ArrayList<WidgetInputDao>();
 			
 			for ( WidgetDao w : widgets ) {
-				WidgetInputDao input = Dao.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
+				WidgetInputDao input = DaoTmp.getLastWidgetInput(this.placeId, this.appId, w.getWidgetId()); 
 						//DsoFetcher.getLastWidgetInputFromDSO(this.pm, this.placeId, this.appId, w.getWidgetId());
 				if ( null != input ) {
 					inputs.add(input);
 				}
 			}
-			Dao.commitOrRollbackTransaction();
+			DaoTmp.commitOrRollbackTransaction();
 			return RestConverter.getWidgetInputList(inputs);
 		}
 	}
@@ -277,11 +277,11 @@ public class WidgetInputResource extends GenericResource {
 	}
 	
 	public static void sendInputThroughChannel(WidgetInputDao widgetInputDao, String placeId, String appId) {
-		Dao.beginTransaction();
+		DaoTmp.beginTransaction();
 		
-		ChannelMapDao channelMap = Dao.getChannelMap(placeId, appId);
+		ChannelMapDao channelMap = DaoTmp.getChannelMap(placeId, appId);
 		
-		Dao.commitOrRollbackTransaction();
+		DaoTmp.commitOrRollbackTransaction();
 		
 		if ( null == channelMap ) {
 			return;
