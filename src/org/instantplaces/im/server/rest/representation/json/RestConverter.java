@@ -139,7 +139,7 @@ public class RestConverter {
 		a.setApplicationName( applicationDao.getApplicationName() );
 		a.setApplicationId( applicationDao.getApplicationId() );
 		a.setApplicationBaseUrl(applicationDao.getApplicationBaseUrl());
-		
+		a.setOnScreen(applicationDao.isOnScreen());
 		
 		/*for ( WidgetDSO widget : applicationDSO.getWidgets() ) {
 			a.addWidget( widgetRestFromDso( widget ));
