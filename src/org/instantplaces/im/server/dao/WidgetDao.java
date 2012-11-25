@@ -82,6 +82,9 @@ public class WidgetDao implements Serializable {
 
 	@SuppressWarnings("unused")
 	private WidgetDao() {
+		this.longDescription ="";
+		this.shortDescription = "";
+		this.controlType = "";
 		this.widgetParameters = new ArrayList<WidgetParameterDao>();
 		this.traceChanges = false;
 	}
@@ -305,7 +308,9 @@ public class WidgetDao implements Serializable {
 	 */
 	public void setLongDescription(String longDescription) {
 		if ( this.traceChanges ) {
-			if ( !this.longDescription.equals(longDescription) ) {
+			if ( ( null != this.longDescription && null == longDescription ) ||
+					( null == this.longDescription && null != longDescription ) ||
+					!this.longDescription.equals(longDescription) ) {
 				this.changedFlag = true;
 				Log.debugFinest(this, "Widget " + this.widgetId + " changed in long description.");
 			}
@@ -319,7 +324,9 @@ public class WidgetDao implements Serializable {
 	 */
 	public void setShortDescription(String shortDescription) {
 		if ( this.traceChanges ) {
-			if ( !this.shortDescription.equals(shortDescription) ) {
+			if ( ( null != this.shortDescription && null == shortDescription ) || 
+					( null == this.shortDescription && null != shortDescription ) || 
+					!this.shortDescription.equals(shortDescription) ) {
 				this.changedFlag = true;
 				Log.debugFinest(this, "Widget " + this.widgetId + " changed in short description.");
 			}

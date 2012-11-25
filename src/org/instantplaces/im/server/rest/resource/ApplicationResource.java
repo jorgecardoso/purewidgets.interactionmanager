@@ -14,9 +14,12 @@ import org.instantplaces.im.server.dao.DaoConverter;
 import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.ReferenceCodeGeneratorDAO;
 import org.instantplaces.im.server.rest.representation.json.ApplicationListRest;
+import org.instantplaces.im.server.rest.representation.json.ApplicationOnscreenRest;
 import org.instantplaces.im.server.rest.representation.json.ApplicationRest;
 import org.instantplaces.im.server.rest.representation.json.RestConverter;
 import org.instantplaces.im.server.rest.representation.json.WidgetListRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetRest;
+import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
@@ -78,8 +81,39 @@ public class ApplicationResource extends GenericResource {
 	 */
 	@Override
 	protected Object doPut(Object incoming) {
-		// TODO Auto-generated method stub
-		return null;
+		ApplicationOnscreenRest applicationOnscreenRest = (ApplicationOnscreenRest) incoming;
+		
+		/**
+		 * TODO: This should not be done: this is making a single app marked as being on screen (in the future 
+		 * we could have various simultaneously on screen).
+		 */
+		if ( applicationOnscreenRest.isOnScreen() == true ) {
+			Dao.beginTransaction();
+			List<ApplicationDao> applications = Dao.getApplications(this.placeId);
+			for ( ApplicationDao app : applications ) {
+				if ( app.getApplicationId().equals(this.appId) ) {
+					app.setOnScreen(true);
+				} else {
+					app.setOnScreen(false);
+				}
+			}
+			Dao.put(applications);
+			Dao.commitOrRollbackTransaction();
+			return applicationOnscreenRest;
+		}
+		
+		Dao.beginTransaction();
+		ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
+		
+		if ( null == applicationDao ) {
+			Dao.commitOrRollbackTransaction();
+			return null;
+		}
+		
+		applicationDao.setOnScreen(applicationOnscreenRest.isOnScreen());
+		Dao.put(applicationDao);
+		Dao.commitOrRollbackTransaction();
+		return applicationOnscreenRest;
 	}
 
 	/*
@@ -198,6 +232,9 @@ public class ApplicationResource extends GenericResource {
 	 */
 	@Override
 	protected Class getResourceClass() {
+		if (this.getMethod().equals(Method.PUT)) {
+			return ApplicationOnscreenRest.class;
+		} 
 		return ApplicationRest.class;
 	}
 

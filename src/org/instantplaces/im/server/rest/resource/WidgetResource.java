@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,6 +31,9 @@ import com.googlecode.objectify.Key;
 
 public class WidgetResource extends GenericResource {
 
+	private HashMap<String, WidgetDao> widgetsProxy;
+	private HashMap<Key<WidgetDao>, ArrayList<WidgetOptionDao>> widgetOptionsProxy;
+	
 	@Override
 	protected Object doPut(Object in) {
 		String errorMessage = "Put not allowed. Sorry, only GET or POST methods allowed for this resource.";
@@ -37,6 +41,63 @@ public class WidgetResource extends GenericResource {
 		throw new ResourceException(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, errorMessage);
 	}
 
+	
+	private void fillProxy(WidgetListRest widgetListRest) {
+		if ( widgetListRest.getWidgets().size() > 5 ) {
+			Log.debug(this, "Filling in widget and widgetOption proxy.");
+			Dao.beginTransaction();
+			List<WidgetDao> widgetsDao = Dao.getWidgets(this.placeId, this.appId);
+			List<WidgetOptionDao> widgetOptionsDao = Dao.getWidgetOptions(this.placeId, this.appId);
+			
+			Dao.commitOrRollbackTransaction();
+			this.widgetsProxy = new HashMap<String, WidgetDao>();
+			for ( WidgetDao widgetDao : widgetsDao ) {
+				this.widgetsProxy.put(this.placeId+this.appId+widgetDao.getWidgetId(), widgetDao);
+			}
+			
+			this.widgetOptionsProxy = new HashMap<Key<WidgetDao>, ArrayList<WidgetOptionDao>>();
+			for ( WidgetOptionDao optionDao : widgetOptionsDao ) {
+				ArrayList<WidgetOptionDao> current = this.widgetOptionsProxy.get(optionDao.getWidgetKey());
+				if ( null == current ) {
+					current = new ArrayList<WidgetOptionDao> ();
+				}
+				current.add(optionDao);
+				this.widgetOptionsProxy.put(optionDao.getWidgetKey(), current);
+			}
+			
+		} else {
+			Log.debug(this, "Not enough widgets to compensate using proxy...");
+		}
+		
+	}
+	
+
+	private ArrayList<WidgetOptionDao> getWidgetOptions( Key<WidgetDao>  widgetKey) {
+		if ( null != this.widgetOptionsProxy ) {
+			
+			if ( this.widgetOptionsProxy.containsKey(widgetKey) ) {
+				Log.debug(this, "Returning widgetOptions from proxy store.");
+				return this.widgetOptionsProxy.get(widgetKey);
+			}
+		}
+		Log.debug(this, "Returning widgetOptions from datastore.");
+		return new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(widgetKey));
+		
+	}
+	
+	private WidgetDao getWidget( String placeId, String applicationId, String widgetId ) {
+		if ( null != widgetsProxy ) {
+			String key = placeId+applicationId+widgetId;
+			if ( widgetsProxy.containsKey(key) ) {
+				Log.debug(this, "Returning widget from proxy store.");
+				return widgetsProxy.get(key);
+			}
+		}
+		Log.debug(this, "Returning widget from datastore.");
+		return Dao.getWidget(placeId, applicationId, widgetId);
+	}
+	
+	
 	@Override
 	protected Object doPost(Object in) {
 		long start = System.currentTimeMillis();
@@ -50,7 +111,7 @@ public class WidgetResource extends GenericResource {
 		ApplicationDao existingApplicationDSO = null;
 
 		WidgetListRest receivedWidgetListREST = (WidgetListRest) in;
-
+		this.fillProxy(receivedWidgetListREST);
 		/*
 		 * Get the Place from the store. Create one if it does not exist yet
 		 */
@@ -88,7 +149,7 @@ public class WidgetResource extends GenericResource {
 
 		for (WidgetRest receivedWidgetRest : receivedWidgetListREST.getWidgets()) {
 
-			WidgetDao existingWidgetDao = Dao
+			WidgetDao existingWidgetDao = this
 					.getWidget(this.placeId, this.appId, receivedWidgetRest.getWidgetId());
 			
 			/*
@@ -110,7 +171,7 @@ public class WidgetResource extends GenericResource {
 				/*
 				 * The widget already exists, so fetch its options
 				 */
-				ArrayList<WidgetOptionDao> optionsFromDataStore = new ArrayList<WidgetOptionDao>(Dao.getWidgetOptions(existingWidgetDao.getKey()));
+				ArrayList<WidgetOptionDao> optionsFromDataStore = this.getWidgetOptions(existingWidgetDao.getKey());
 				existingWidgetDao.setWidgetOptions(optionsFromDataStore);
 				
 				/*

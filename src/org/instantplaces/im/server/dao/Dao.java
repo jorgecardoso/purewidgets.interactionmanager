@@ -445,6 +445,17 @@ public class Dao extends DAOBase {
 
 		return getWidgetOption(widgetOptionKey);
 	}
+	
+	public static List<WidgetOptionDao>  getWidgetOptions(String placeId,
+			String applicationId) {
+
+		Key<PlaceDao> placeKey = new Key<PlaceDao>(PlaceDao.class, placeId);
+		Key<ApplicationDao> applicationKey = new Key<ApplicationDao>(placeKey,
+				ApplicationDao.class, applicationId);
+
+
+		return getWidgetOptions(applicationKey);
+	}
 
 	public static List<WidgetOptionDao> getWidgetOptions(
 			Key<?> parentKey) {

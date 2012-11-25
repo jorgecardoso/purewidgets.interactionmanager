@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.instantplaces.im.server.logging.Log;
+import org.instantplaces.im.server.dao.ApplicationDao;
 import org.instantplaces.im.server.dao.ChannelMapDao;
 import org.instantplaces.im.server.dao.Dao;
 import org.instantplaces.im.server.dao.DaoConverter;
@@ -14,9 +15,12 @@ import org.instantplaces.im.server.dao.PlaceDao;
 import org.instantplaces.im.server.dao.WidgetDao;
 import org.instantplaces.im.server.dao.WidgetInputDao;
 import org.instantplaces.im.server.dao.WidgetOptionDao;
+import org.instantplaces.im.server.rest.representation.json.InputResponseRest;
 import org.instantplaces.im.server.rest.representation.json.RestConverter;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputListRest;
 import org.instantplaces.im.server.rest.representation.json.WidgetInputRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetListRest;
+import org.instantplaces.im.server.rest.representation.json.WidgetRest;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
@@ -49,7 +53,18 @@ public class WidgetInputResource extends GenericResource {
 		
 		handleInput(receivedWidgetInputRest, this.placeId, this.appId, this.widgetId);
 		
-		return null;
+		Dao.beginTransaction();
+		PlaceDao placeDao = Dao.getPlace(this.placeId);
+		ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
+		WidgetDao widgetDao = Dao.getWidget(this.placeId, this.appId, this.widgetId);
+		Dao.commitOrRollbackTransaction();
+		
+		InputResponseRest inputResponseRest;
+		inputResponseRest = new InputResponseRest(RestConverter.getPlaceRest(placeDao), 
+												RestConverter.applicationFromDSO(applicationDao),
+												RestConverter.getWidgetRest(widgetDao));
+		
+		return inputResponseRest;
 	}
 	
 
@@ -311,14 +326,12 @@ public class WidgetInputResource extends GenericResource {
 			    channelService.sendMessage(new ChannelMessage(clientId, json));
 			}
 		}
-		
 	}
 	
 	@Override
 	protected Object doGet() {
 		WidgetInputListRest toReturn = new WidgetInputListRest();
-		
-		
+	
 		//InputRequest.getPresences();
 		
 		String fromParameter = this.getRequest().getOriginalRef().getQueryAsForm().getFirstValue("from", "");
@@ -349,8 +362,10 @@ public class WidgetInputResource extends GenericResource {
 
 	@Override
 	protected Class getResourceClass() {
-		return WidgetInputRest.class;
+		if (this.getMethod().equals(Method.POST)) {
+			return InputResponseRest.class;
+		} else {
+			return WidgetInputRest.class;
+		} 
 	}
-
-
 }

@@ -56,6 +56,7 @@ public class InteractionManagerApplication extends Application {
         /*
          * Application
          */
+        router.attach("/place/{placeid}/application/{appid}/onscreen", ApplicationResource.class);
         router.attach("/place/{placeid}/application/{appid}", ApplicationResource.class);
         router.attach("/place/{placeid}/application", ApplicationResource.class);
               

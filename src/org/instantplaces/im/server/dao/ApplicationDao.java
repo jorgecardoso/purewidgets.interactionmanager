@@ -54,6 +54,12 @@ public class ApplicationDao  {
 	private Key<PlaceDao> placeKey;
 	
 	/**
+	 * Is this app currently on-screen?
+	 */
+	@Unindexed
+	private boolean onScreen;
+	
+	/**
 	 * The list of widgets in use by this app
 	 */
 //	@NotSaved
@@ -191,6 +197,20 @@ public class ApplicationDao  {
 	 */
 	public void setApplicationName(String placeName) {
 		this.applicationName = placeName;
+	}
+
+	/**
+	 * @return the onScreen
+	 */
+	public boolean isOnScreen() {
+		return onScreen;
+	}
+
+	/**
+	 * @param onScreen the onScreen to set
+	 */
+	public void setOnScreen(boolean onScreen) {
+		this.onScreen = onScreen;
 	}
 
 	
