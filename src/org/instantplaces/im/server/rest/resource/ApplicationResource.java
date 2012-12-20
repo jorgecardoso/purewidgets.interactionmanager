@@ -83,6 +83,7 @@ public class ApplicationResource extends GenericResource {
 	protected Object doPut(Object incoming) {
 		ApplicationOnscreenRest applicationOnscreenRest = (ApplicationOnscreenRest) incoming;
 		
+
 		/**
 		 * TODO: This should not be done: this is making a single app marked as being on screen (in the future 
 		 * we could have various simultaneously on screen).
@@ -102,6 +103,7 @@ public class ApplicationResource extends GenericResource {
 			return applicationOnscreenRest;
 		}
 		
+
 		Dao.beginTransaction();
 		ApplicationDao applicationDao = Dao.getApplication(this.placeId, this.appId);
 		
