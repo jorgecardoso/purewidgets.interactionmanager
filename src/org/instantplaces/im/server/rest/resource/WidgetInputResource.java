@@ -299,6 +299,7 @@ public class WidgetInputResource extends GenericResource {
 		Dao.commitOrRollbackTransaction();
 		
 		if ( null == channelMap ) {
+			Log.get().warn("Could not get channel map");
 			return;
 		}
 		
@@ -325,6 +326,8 @@ public class WidgetInputResource extends GenericResource {
 				 
 			    channelService.sendMessage(new ChannelMessage(clientId, json));
 			}
+		} else {
+			Log.get().warn("Could not get any id from channel map.");
 		}
 	}
 	
