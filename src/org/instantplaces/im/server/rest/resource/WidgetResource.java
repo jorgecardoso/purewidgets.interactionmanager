@@ -130,7 +130,18 @@ public class WidgetResource extends GenericResource {
 			Dao.put(rcg);
 		} else {
 			rcg = Dao.getReferenceCodeGenerator(this.placeId);
-
+			
+			/*
+			 * Only needed because I sometimes delete the RCG directly from the appengine datastore viewer.
+			 */
+			if ( null == rcg ) {
+				/*
+				 * A new place needs a new ReferenceCodeGenerator
+				 */
+				rcg = new ReferenceCodeGeneratorDAO(existingPlaceDSO);
+				Dao.put(rcg);
+			}
+				
 		}
 
 		/*
